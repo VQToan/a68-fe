@@ -1,8 +1,8 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
-import axios from 'axios';
 import { PayloadAction } from '@reduxjs/toolkit';
-import { loginSuccess, loginFailure } from '../features/authSlice';
-import apiClient from '../services/apiClient';
+import { AxiosResponse } from 'axios';
+import { login } from '@features/authSlice';
+import apiClient from '@services/apiClient';
 
 // Types
 interface LoginPayload {
@@ -11,22 +11,22 @@ interface LoginPayload {
 }
 
 interface LoginResponse {
-  token: string;
+  access: string;
+  refresh: string;
 }
 
 // Worker saga for login
-function* handleLogin(action: PayloadAction<LoginPayload>) {
+function* handleLogin(action: PayloadAction<LoginPayload>): Generator<any, void, AxiosResponse<LoginResponse>> {
   try {
-    const response = yield call(apiClient.post, '/api/login', action.payload);
-    const { token } = response.data as LoginResponse;
-    yield put(loginSuccess(token));
-  } catch (error) {
-    console.error('Login failed', error);
-    yield put(loginFailure());
+    const response = yield call(apiClient.post, '/auth/token/', action.payload);
+    yield put(login.fulfilled(response.data, '', action.payload));
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.detail || 'Đăng nhập thất bại';
+    yield put(login.rejected(null, '', action.payload, errorMessage));
   }
 }
 
 // Watcher saga for login
-export function* watchLogin() {
-  yield takeLatest('auth/loginRequest', handleLogin);
+export function* watchLogin(): Generator<any, void, void> {
+  yield takeLatest(login.pending.type, handleLogin);
 }
