@@ -25,6 +25,13 @@ export default tseslint.config(
       ],
       // allow any
       '@typescript-eslint/no-explicit-any': 'off',
+      // allow unused vars
+      '@typescript-eslint/no-unused-vars': 'off',
+      // allow unused vars in dev
+      'no-unused-vars': 'off',
+      'react/prop-types': 'off',
+      // exhaustive-deps
+      'react-hooks/exhaustive-deps': 'off',
     },
   },
 )

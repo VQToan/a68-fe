@@ -12,44 +12,57 @@ import {
   Grid,
   IconButton,
   Divider,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
-import ModuleBotList from "./ModuleBotList";
-import ModuleBotForm from "./ModuleBotForm";
-import type { FormMode } from "./ModuleBotForm";
-import { useModule } from "@hooks/useModule";
 import { useDebounce } from "@utils/debounceUtils";
+import { useBotTemplate } from "@hooks/useBotTemplate";
+import { useModule } from "@hooks/useModule";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
-import type { IModuleBot } from "@services/moduleBots.service";
+import BotTemplateList from "./BotTemplateList";
+import BotTemplateForm from "./BotTemplateForm";
+import BotTemplateDetail from "./BotTemplateDetail";
+import type { BotTemplateCreate, BotTemplateUpdate } from "../../types/botTemplate.types";
 
-const ModuleBot = () => {
-  // Use the moduleSlice through the useModule hook
+// Form mode type definition
+export type FormMode = "create" | "view" | "edit";
+
+const BotTemplate = () => {
+  // Use the botTemplate hook for state management
   const {
-    modules,
+    templates,
     isLoading,
     error,
-    currentModule,
-    getModules,
-    getModuleById,
-    createModule,
-    updateModule,
-    deleteModule,
+    currentTemplate,
+    getTemplates,
+    getTemplateById,
+    createTemplate,
+    updateTemplate,
+    deleteTemplate,
     clearError,
-    clearCurrentModule,
-  } = useModule();
+    clearCurrentTemplate,
+  } = useBotTemplate();
+
+  // Use the module hook to fetch modules for dropdowns
+  const { getModules } = useModule();
 
   // Use the notification context
   const { showNotification } = useNotification();
 
+  // Theme and responsive design
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   // Local state for UI
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
-  const [dialogTitle, setDialogTitle] = useState("Thêm Module Bot Mới");
+  const [dialogTitle, setDialogTitle] = useState("Tạo Bot Template Mới");
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -62,16 +75,15 @@ const ModuleBot = () => {
     name: "",
   });
 
-  // Initial fetch
+  // Initial fetch of bot templates and modules
   useEffect(() => {
+    getTemplates();
     getModules();
   }, []);
 
-  // Search with debounce
+  // Fetch templates when search term changes
   useEffect(() => {
-    if (debouncedSearchTerm !== undefined) {
-      getModules(debouncedSearchTerm);
-    }
+    getTemplates(debouncedSearchTerm);
   }, [debouncedSearchTerm]);
 
   // Show error notification when error occurs
@@ -95,13 +107,14 @@ const ModuleBot = () => {
     // Set dialog title based on mode
     switch (mode) {
       case "create":
-        setDialogTitle("Thêm Module Bot Mới");
+        setDialogTitle("Tạo Bot Template Mới");
+        clearCurrentTemplate();
         break;
       case "view":
-        setDialogTitle("Chi Tiết Module Bot");
+        setDialogTitle("Chi Tiết Bot Template");
         break;
       case "edit":
-        setDialogTitle("Chỉnh Sửa Module Bot");
+        setDialogTitle("Chỉnh Sửa Bot Template");
         break;
     }
 
@@ -110,53 +123,56 @@ const ModuleBot = () => {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    // Clear the current module when dialog closes
-    clearCurrentModule();
+    // Delay clearing current template to avoid UI flicker during dialog close animation
+    setTimeout(() => {
+      if (dialogMode === "create") {
+        clearCurrentTemplate();
+      }
+    }, 300);
   };
 
-  // Handle form submission (add or update module)
-  const handleSubmitModule = async (
-    formData: Omit<IModuleBot, "_id" | "created_at">
-  ) => {
+  // Handle form submission
+  const handleSubmit = async (formData: BotTemplateCreate | BotTemplateUpdate) => {
     try {
       if (dialogMode === "create") {
-        // Create new module
-        await createModule(formData);
-        showNotification("Module bot đã được tạo thành công", "success");
-      } else if (dialogMode === "edit" && currentModule) {
-        // Update existing module
-        await updateModule(currentModule._id, formData);
-        showNotification("Module bot đã được cập nhật thành công", "success");
+        // Create new bot template
+        await createTemplate(formData as BotTemplateCreate);
+        showNotification("Bot template đã được tạo thành công", "success");
+      } else if (dialogMode === "edit" && currentTemplate?._id) {
+        // Update existing bot template
+        await updateTemplate(currentTemplate._id, formData as BotTemplateUpdate);
+        showNotification("Bot template đã được cập nhật thành công", "success");
       }
       handleCloseDialog();
+      getTemplates(debouncedSearchTerm); // Refresh the list
     } catch (error) {
-      console.error("Error submitting module bot:", error);
+      console.error("Error submitting bot template:", error);
     }
   };
 
   // Handle edit mode toggle from view mode
   const handleSwitchToEditMode = () => {
     setDialogMode("edit");
-    setDialogTitle("Chỉnh Sửa Module Bot");
+    setDialogTitle("Chỉnh Sửa Bot Template");
   };
 
-  // Handle view module details
-  const handleViewModule = async (id: string) => {
+  // Handle view bot template details
+  const handleViewTemplate = async (id: string) => {
     try {
-      await getModuleById(id);
+      await getTemplateById(id);
       handleOpenDialog("view");
     } catch (error) {
-      console.error("Error fetching module details:", error);
+      console.error("Error fetching bot template details:", error);
     }
   };
 
-  // Handle edit module directly
-  const handleEditModule = async (id: string) => {
+  // Handle edit bot template directly
+  const handleEditTemplate = async (id: string) => {
     try {
-      await getModuleById(id);
+      await getTemplateById(id);
       handleOpenDialog("edit");
     } catch (error) {
-      console.error("Error fetching module details:", error);
+      console.error("Error fetching bot template details:", error);
     }
   };
 
@@ -178,16 +194,16 @@ const ModuleBot = () => {
     });
   };
 
-  // Handle delete module
-  const handleDeleteModule = async () => {
+  // Handle delete bot template
+  const handleDeleteTemplate = async () => {
     if (!confirmDelete.id) return;
 
     try {
-      await deleteModule(confirmDelete.id);
-      showNotification("Module bot đã được xóa thành công", "success");
+      await deleteTemplate(confirmDelete.id);
+      showNotification("Bot template đã được xóa thành công", "success");
       handleCloseDeleteConfirm();
     } catch (error) {
-      console.error("Error deleting module bot:", error);
+      console.error("Error deleting bot template:", error);
     }
   };
 
@@ -202,7 +218,7 @@ const ModuleBot = () => {
         >
           <Grid size={{ xs: "auto" }}>
             <Typography variant="h5" component="h1" gutterBottom>
-              Quản lý Module Bot
+              Quản lý Bot Template
             </Typography>
           </Grid>
           <Grid size={{ xs: "auto" }}>
@@ -211,7 +227,7 @@ const ModuleBot = () => {
               startIcon={<AddIcon />}
               onClick={() => handleOpenDialog("create")}
             >
-              Thêm module mới
+              Tạo template mới
             </Button>
           </Grid>
         </Grid>
@@ -221,7 +237,7 @@ const ModuleBot = () => {
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Tìm kiếm module..."
+          placeholder="Tìm kiếm template..."
           value={searchTerm}
           onChange={handleSearch}
           sx={{ mb: 3 }}
@@ -234,24 +250,25 @@ const ModuleBot = () => {
           }}
         />
 
-        <ModuleBotList
-          modules={modules}
+        <BotTemplateList
+          templates={templates}
           isLoading={isLoading}
-          onEdit={handleEditModule}
+          onEdit={handleEditTemplate}
           onDelete={(id, name) => handleOpenDeleteConfirm(id, name)}
-          onView={handleViewModule}
+          onView={handleViewTemplate}
         />
       </Paper>
 
-      {/* Dialog for creating, viewing or editing module */}
+      {/* Dialog for creating, viewing or editing bot template */}
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
         fullWidth
-        maxWidth="sm"
+        maxWidth="md"
+        fullScreen={isMobile}
         PaperProps={{
           sx: {
-            borderRadius: 1,
+            borderRadius: isMobile ? 0 : 1,
           },
         }}
       >
@@ -265,19 +282,33 @@ const ModuleBot = () => {
             alignItems: "center",
           }}
         >
-          <Typography variant="h6">{dialogTitle}</Typography>
-          <IconButton onClick={handleCloseDialog} size="small" sx={{ p: 0.5 }}>
+          {dialogTitle}
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseDialog}
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent sx={{ p: 3, pt: 3 }}>
-          <ModuleBotForm
-            initialData={currentModule || {}}
-            onSubmit={handleSubmitModule}
-            onCancel={handleCloseDialog}
-            mode={dialogMode}
-            onEdit={handleSwitchToEditMode}
-          />
+        <DialogContent sx={{ p: 3, mt: 1 }}>
+          {dialogMode === "view" && currentTemplate ? (
+            <BotTemplateDetail 
+              template={currentTemplate} 
+              isLoading={isLoading} 
+              onEdit={handleSwitchToEditMode} 
+            />
+          ) : (
+            <BotTemplateForm
+              initialData={currentTemplate || undefined}
+              onSubmit={handleSubmit}
+              isSubmitting={isLoading}
+              isEditMode={dialogMode === "edit"}
+              onCancel={handleCloseDialog}
+            />
+          )}
         </DialogContent>
       </Dialog>
 
@@ -285,14 +316,12 @@ const ModuleBot = () => {
       <ConfirmDialog
         open={confirmDelete.open}
         title="Xác nhận xóa"
-        message={`Bạn có chắc chắn muốn xóa module "${confirmDelete.name}"? Hành động này không thể hoàn tác.`}
-        confirmLabel="Xóa"
-        confirmColor="error"
-        onConfirm={handleDeleteModule}
+        message={`Bạn có chắc chắn muốn xóa bot template "${confirmDelete.name}"?`}
+        onConfirm={handleDeleteTemplate}
         onCancel={handleCloseDeleteConfirm}
       />
     </Box>
   );
 };
 
-export default ModuleBot;
+export default BotTemplate;

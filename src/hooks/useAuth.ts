@@ -7,7 +7,7 @@ import {
   fetchCurrentUser,
   updateCurrentUser
 } from '@features/auth/authSlice';
-import type { LoginCredentials, RegisterCredentials, UserUpdate } from '@types/auth.types';
+import type { LoginCredentials, RegisterCredentials, UserUpdate } from '../types/auth.types';
 
 export const useAuth = () => {
   const auth = useAppSelector((state) => state.auth);

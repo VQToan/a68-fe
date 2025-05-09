@@ -9,7 +9,6 @@ import {
   TableRow,
   Paper,
   Typography,
-  Chip,
   IconButton,
   Tooltip,
   CircularProgress
@@ -17,18 +16,18 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import type { IModuleBot } from "@services/moduleBots.service";
+import type { BotTemplate } from '../../types/botTemplate.types';
 
-interface ModuleBotListProps {
-  modules: IModuleBot[];
+interface BotTemplateListProps {
+  templates: BotTemplate[];
   isLoading: boolean;
   onEdit?: (id: string) => void;
   onDelete?: (id: string, name: string) => void;
   onView?: (id: string) => void;
 }
 
-const ModuleBotList: React.FC<ModuleBotListProps> = ({ 
-  modules, 
+const BotTemplateList: React.FC<BotTemplateListProps> = ({ 
+  templates, 
   isLoading,
   onEdit,
   onDelete,
@@ -48,65 +47,67 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
 
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" p={3}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
         <CircularProgress />
       </Box>
     );
   }
 
-  if (modules.length === 0) {
+  if (templates.length === 0) {
     return (
-      <Box p={3} textAlign="center">
-        <Typography variant="body1" color="textSecondary">
-          Không tìm thấy module nào. Hãy thêm module mới.
+      <Paper sx={{ p: 3, textAlign: 'center' }}>
+        <Typography variant="body1" color="text.secondary">
+          Không có bot template nào được tìm thấy.
         </Typography>
-      </Box>
+      </Paper>
     );
   }
 
   return (
-    <TableContainer component={Paper} variant="outlined">
-      <Table>
+    <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650 }} aria-label="bot templates table">
         <TableHead>
           <TableRow>
-            <TableCell><strong>Tên</strong></TableCell>
-            <TableCell><strong>Name in Source</strong></TableCell>
-            <TableCell><strong>Loại</strong></TableCell>
-            <TableCell><strong>Mô tả</strong></TableCell>
-            <TableCell><strong>Ngày tạo</strong></TableCell>
-            <TableCell><strong>Thao tác</strong></TableCell>
+            <TableCell>Tên</TableCell>
+            <TableCell>Mô tả</TableCell>
+            <TableCell>Ngày tạo</TableCell>
+            <TableCell>Thao tác</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {modules.map((module) => (
-            <TableRow key={module._id} hover>
-              <TableCell>{module.name}</TableCell>
-              <TableCell>
-                <Chip 
-                  label={module.name_in_source} 
-                  size="small" 
-                  color="primary" 
-                  variant="outlined" 
-                />
+          {templates.map((template) => (
+            <TableRow
+              key={template._id}
+              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              hover
+            >
+              <TableCell component="th" scope="row">
+                {template.name}
               </TableCell>
               <TableCell>
-                <Chip 
-                  label={module.type || "entry"} 
-                  size="small" 
-                  color="secondary" 
-                  variant="outlined" 
-                />
+                <Tooltip title={template.description} arrow>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      maxWidth: 200,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {template.description}
+                  </Typography>
+                </Tooltip>
               </TableCell>
-              <TableCell>{module.description}</TableCell>
-              <TableCell>{formatDate(module.created_at)}</TableCell>
+              <TableCell>{formatDate(template.created_at)}</TableCell>
               <TableCell>
-                <Box>
+                <Box sx={{ display: 'flex', gap: 1 }}>
                   {onView && (
                     <Tooltip title="Xem chi tiết">
                       <IconButton 
                         size="small" 
-                        color="primary"
-                        onClick={() => onView(module._id)}
+                        color="info"
+                        onClick={() => onView(template._id)}
                       >
                         <VisibilityIcon fontSize="small" />
                       </IconButton>
@@ -118,7 +119,7 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
                       <IconButton 
                         size="small" 
                         color="primary"
-                        onClick={() => onEdit(module._id)}
+                        onClick={() => onEdit(template._id)}
                       >
                         <EditIcon fontSize="small" />
                       </IconButton>
@@ -130,7 +131,7 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
                       <IconButton 
                         size="small" 
                         color="error"
-                        onClick={() => onDelete(module._id, module.name)}
+                        onClick={() => onDelete(template._id, template.name)}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
@@ -146,4 +147,4 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
   );
 };
 
-export default ModuleBotList;
+export default BotTemplateList;

@@ -2,12 +2,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './auth/authSlice';
 import moduleReducer from './module/moduleSlice';
 import backtestReducer from './backtest/backtestSlice';
+import botTemplateReducer from './botTemplate/botTemplateSlice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     module: moduleReducer,
     backtest: backtestReducer,
+    botTemplate: botTemplateReducer,
     // Add other reducers here as your application grows
   },
   devTools: process.env.NODE_ENV !== 'production',

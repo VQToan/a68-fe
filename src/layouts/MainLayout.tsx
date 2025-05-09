@@ -32,6 +32,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
 import CurrencyBitcoinIcon from "@mui/icons-material/CurrencyBitcoin";
 import BarChartIcon from "@mui/icons-material/BarChart"; // Import icon for Backtest
+import DescriptionIcon from "@mui/icons-material/Description"; // Import icon for Bot Template
 import { useAuth } from "@hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import theme from "../theme";
@@ -234,9 +235,11 @@ const MainLayout = () => {
                       easing: theme.transitions.easing.sharp,
                       duration: theme.transitions.duration.leavingScreen,
                     }),
-                    width: theme.spacing(7),
                     [theme.breakpoints.up("sm")]: {
                       width: theme.spacing(9),
+                    },
+                    [theme.breakpoints.down("sm")]: {
+                      width: theme.spacing(7),
                     },
                   }
                 : {
@@ -357,6 +360,34 @@ const MainLayout = () => {
                     backgroundColor: 'rgba(255,255,255,0.1)'
                   }
                 }}
+                onClick={() => handleNavigation("/bot-template")}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <DescriptionIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Bot Template"
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                  '&:hover': {
+                    backgroundColor: 'rgba(255,255,255,0.1)'
+                  }
+                }}
                 onClick={() => handleNavigation("/backtest")}
               >
                 <ListItemIcon
@@ -444,7 +475,7 @@ const MainLayout = () => {
               ? 0
               : open
               ? 0
-              : `-${drawerWidth - theme.spacing(9)}px`,
+              : `calc(-${drawerWidth}px + ${theme.spacing(9)})`,
             transition: theme.transitions.create("margin", {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,

@@ -80,7 +80,7 @@ const Login = () => {
             {isLoading ? 'Signing in...' : 'Sign In'}
           </Button>
           <Grid container>
-            <Grid item>
+            <Grid size={{ xs: "auto" }}>
               <Link component={RouterLink} to="/register" variant="body2">
                 {"Don't have an account? Sign Up"}
               </Link>

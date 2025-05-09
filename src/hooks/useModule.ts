@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from './reduxHooks';
 import { 
   fetchModules,
@@ -11,23 +10,6 @@ import {
   clearError as clearErrorAction
 } from '@features/module/moduleSlice';
 import type { ModuleBotCreate, ModuleBotUpdate } from '@services/moduleBots.service';
-
-// Custom hook for debouncing values
-export const useDebounce = <T>(value: T, delay: number = 500): T => {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-};
 
 export const useModule = () => {
   const dispatch = useAppDispatch();

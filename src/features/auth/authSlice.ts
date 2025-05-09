@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { AuthState, LoginCredentials, RegisterCredentials, Token, User, UserUpdate } from '@types/auth.types';
+import type { AuthState, LoginCredentials, RegisterCredentials, Token, User, UserUpdate } from '../../types/auth.types';
 import authService from '@services/auth.service';
 
 // Get initial auth state from localStorage

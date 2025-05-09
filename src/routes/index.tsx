@@ -8,6 +8,7 @@ import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 import ModuleBot from '../pages/ModuleBot';
 import Backtest from '../pages/Backtest';
+import BotTemplate from '../pages/BotTemplate';
 import NotFound from '../pages/NotFound';
 import MainLayout from '../layouts/MainLayout';
 
@@ -42,6 +43,10 @@ export const routes: RouteObject[] = [
           {
             path: 'module-bot',
             element: <ModuleBot />
+          },
+          {
+            path: 'bot-template',
+            element: <BotTemplate />
           },
           {
             path: 'backtest',

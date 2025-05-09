@@ -61,7 +61,7 @@ const Home = () => {
         <Box sx={{ position: "absolute", bottom: -100, left: -100, width: 300, height: 300, borderRadius: "50%", background: theme.palette.error.main, opacity: 0.1 }} />
 
         <Grid container spacing={4} alignItems="center">
-          <Grid item xs={12} md={7}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
               AutoTrade68
             </Typography>
@@ -106,7 +106,7 @@ const Home = () => {
               </Button>
             </Stack>
           </Grid>
-          <Grid item xs={12} md={5} sx={{ textAlign: "center" }}>
+          <Grid size={{ xs: 12, md: 5 }} sx={{ textAlign: "center" }}>
             <Box
               component="img"
               src={autoTradeLogo}
@@ -149,7 +149,7 @@ const Home = () => {
       
       <Grid container spacing={4} sx={{ mb: 8 }}>
         {features.map((feature, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
             <Card 
               elevation={2}
               sx={{ 
@@ -200,7 +200,7 @@ const Home = () => {
         
         <Grid container spacing={2} justifyContent="center">
           {cryptoAssets.map((crypto, index) => (
-            <Grid item xs={6} sm={3} key={index} sx={{ textAlign: "center" }}>
+            <Grid size={{ xs: 6, sm: 3 }} key={index} sx={{ textAlign: "center" }}>
               <Card 
                 elevation={0} 
                 sx={{ 
