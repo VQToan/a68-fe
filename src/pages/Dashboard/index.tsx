@@ -7,6 +7,7 @@ import {
   Divider
 } from '@mui/material';
 import { useAuth } from '@hooks/useAuth';
+import { memo } from 'react';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -87,4 +88,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default memo(Dashboard);

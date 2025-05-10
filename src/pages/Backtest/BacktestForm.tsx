@@ -133,7 +133,7 @@ const BacktestForm = ({
   // Fetch modules on component mount
   useEffect(() => {
     getModules();
-  }, [getModules]);
+  }, []);
 
   // Set initial parameters if in edit mode
   useEffect(() => {
@@ -230,7 +230,7 @@ const BacktestForm = ({
 
       <Box component="form" onSubmit={handleSubmit(onFormSubmit)} noValidate>
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Controller
               name="name"
               control={control}
@@ -246,7 +246,7 @@ const BacktestForm = ({
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Controller
               name="description"
               control={control}
@@ -264,7 +264,7 @@ const BacktestForm = ({
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle1" gutterBottom>
               Cấu hình Backtest
             </Typography>
@@ -300,7 +300,7 @@ const BacktestForm = ({
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Tên Bot"
                       fullWidth
@@ -310,7 +310,7 @@ const BacktestForm = ({
                       }
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Cặp giao dịch"
                       fullWidth
@@ -320,7 +320,7 @@ const BacktestForm = ({
                       }
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
                       <InputLabel>Interval 1</InputLabel>
                       <Select
@@ -340,7 +340,7 @@ const BacktestForm = ({
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
                       <InputLabel>Interval 2</InputLabel>
                       <Select
@@ -360,7 +360,7 @@ const BacktestForm = ({
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth>
                       <InputLabel>Trade Mode</InputLabel>
                       <Select
@@ -383,7 +383,7 @@ const BacktestForm = ({
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Thời gian bắt đầu"
                       type="datetime-local"
@@ -395,7 +395,7 @@ const BacktestForm = ({
                       }
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Thời gian kết thúc"
                       type="datetime-local"
@@ -418,7 +418,7 @@ const BacktestForm = ({
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Số lượng giao dịch (QUANTITY)"
                       type="number"
@@ -433,7 +433,7 @@ const BacktestForm = ({
                       inputProps={{ step: "0.001" }}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Đòn bẩy (LEVERAGE)"
                       type="number"
@@ -447,7 +447,7 @@ const BacktestForm = ({
                       }
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Chốt lời (TAKE_PROFIT) %"
                       type="number"
@@ -464,7 +464,7 @@ const BacktestForm = ({
                       inputProps={{ step: "0.1" }}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Vốn ban đầu (FUNDS)"
                       type="number"
@@ -475,7 +475,7 @@ const BacktestForm = ({
                       }
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Trailing Percentage (%)"
                       type="number"
@@ -493,7 +493,7 @@ const BacktestForm = ({
                       inputProps={{ step: "0.1" }}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Thời gian nghỉ giữa các lệnh (giây)"
                       type="number"
@@ -510,7 +510,7 @@ const BacktestForm = ({
                       }
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Thời gian tạm dừng (PAUSE_TIME)"
                       fullWidth
@@ -523,7 +523,7 @@ const BacktestForm = ({
                       }
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Tạm dừng theo ngày (PAUSE_DAY)"
                       fullWidth
@@ -545,7 +545,7 @@ const BacktestForm = ({
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Biên lợi nhuận tối thiểu (%)"
                       type="number"
@@ -563,7 +563,7 @@ const BacktestForm = ({
                       inputProps={{ step: "0.1" }}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Hệ số lợi nhuận tối thiểu"
                       type="number"
@@ -581,7 +581,7 @@ const BacktestForm = ({
                       inputProps={{ step: "0.1" }}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Lợi nhuận tối thiểu (MIN_ROI) %"
                       type="number"
@@ -593,7 +593,7 @@ const BacktestForm = ({
                       inputProps={{ step: "0.1" }}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Biên độ tối thiểu (MIN_MARGIN) %"
                       type="number"
@@ -610,7 +610,7 @@ const BacktestForm = ({
                       inputProps={{ step: "0.1" }}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Biên độ tối đa (MAX_MARGIN) %"
                       type="number"
@@ -627,7 +627,7 @@ const BacktestForm = ({
                       inputProps={{ step: "0.1" }}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Thua lỗ tối đa (MAX_LOSS) %"
                       type="number"
@@ -653,7 +653,7 @@ const BacktestForm = ({
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Chu kỳ MA (MA_PERIOD)"
                       fullWidth
@@ -666,13 +666,13 @@ const BacktestForm = ({
                   </Grid>
 
                   {/* RSI Settings */}
-                  <Grid item xs={12}>
+                  <Grid size={{ xs: 12 }}>
                     <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
                       Cài đặt RSI
                     </Typography>
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="RSI Long Entry"
                       type="number"
@@ -689,7 +689,7 @@ const BacktestForm = ({
                       }
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="RSI Long Entry Candle"
                       type="number"
@@ -706,7 +706,7 @@ const BacktestForm = ({
                       }
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="RSI Long Exit"
                       type="number"
@@ -723,7 +723,7 @@ const BacktestForm = ({
                       }
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="RSI Long Exit Candle"
                       type="number"
@@ -741,7 +741,7 @@ const BacktestForm = ({
                     />
                   </Grid>
 
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="RSI Short Entry"
                       type="number"
@@ -758,7 +758,7 @@ const BacktestForm = ({
                       }
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="RSI Short Entry Candle"
                       type="number"
@@ -775,7 +775,7 @@ const BacktestForm = ({
                       }
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="RSI Short Exit"
                       type="number"
@@ -792,7 +792,7 @@ const BacktestForm = ({
                       }
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="RSI Short Exit Candle"
                       type="number"
@@ -820,7 +820,7 @@ const BacktestForm = ({
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Lưới DCA (DCA_GRID)"
                       type="number"
@@ -836,7 +836,7 @@ const BacktestForm = ({
                       helperText="Ví dụ: 0.008 là 0.8%"
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Hệ số DCA (DCA_MULTIPLIER)"
                       type="number"
@@ -854,7 +854,7 @@ const BacktestForm = ({
                       inputProps={{ step: "0.01" }}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Số tiền DCA (DCA_AMOUNT)"
                       type="number"
@@ -870,7 +870,7 @@ const BacktestForm = ({
                       }
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Hệ số số tiền DCA (DCA_AMOUNT_MULTIPLIER)"
                       type="number"
@@ -893,7 +893,7 @@ const BacktestForm = ({
             </Accordion>
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Box
               sx={{
                 display: "flex",

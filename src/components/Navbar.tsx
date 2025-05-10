@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Avatar, Button, Tooltip, MenuItem } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from '../hooks/useAuth';
+import { areEqual } from '@/utils/common';
 
 const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -10,27 +11,27 @@ const Navbar = () => {
   const { isLoggedIn, user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+  const handleOpenNavMenu =useCallback( (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
-  };
+  }, [setAnchorElNav]);
   
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+  const handleOpenUserMenu = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
-  };
+  }, [setAnchorElUser]);
 
-  const handleCloseNavMenu = () => {
+  const handleCloseNavMenu = useCallback(() => {
     setAnchorElNav(null);
-  };
+  }, [setAnchorElNav]);
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = useCallback(() => {
     setAnchorElUser(null);
-  };
+  }, [setAnchorElUser]);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     logout();
     navigate('/');
     handleCloseUserMenu();
-  };
+  }, [logout, navigate, handleCloseUserMenu]);
 
   return (
     <AppBar position="static">
@@ -167,7 +168,7 @@ const Navbar = () => {
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt={user?.username || 'User'} src="/static/images/avatar/2.jpg" />
+                  <Avatar alt={user?.full_name || 'User'} src="/static/images/avatar/2.jpg" />
                 </IconButton>
               </Tooltip>
               <Menu
@@ -201,4 +202,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default memo(Navbar, areEqual);

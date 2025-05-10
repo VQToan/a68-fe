@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { Outlet } from "react-router-dom";
 import {
   ThemeProvider,
@@ -37,6 +37,7 @@ import { useAuth } from "@hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import theme from "../theme";
 import autoTradeLogo from "../assets/autotrade68_logo.jpg";
+import { areEqual } from "@/utils/common";
 
 const drawerWidth = 240;
 
@@ -49,51 +50,69 @@ const MainLayout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleDrawerOpen = () => {
+  const handleDrawerOpen = useCallback(() => {
     setOpen(true);
-  };
+  }, [setOpen]);
 
-  const handleDrawerClose = () => {
+  const handleDrawerClose = useCallback(() => {
     setOpen(false);
-  };
+  }, [setOpen]);
 
-  const handleUserMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+  const handleUserMenuClick = useCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      setAnchorEl(event.currentTarget);
+    },
+    [setAnchorEl]
+  );
 
-  const handleUserMenuClose = () => {
+  const handleUserMenuClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, [setAnchorEl]);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     handleUserMenuClose();
     logout();
     navigate("/login");
-  };
+  }, [handleUserMenuClose, logout, navigate]);
 
-  const handleProfile = () => {
+  const handleProfile = useCallback(() => {
     handleUserMenuClose();
     navigate("/profile");
-  };
+  }, [handleUserMenuClose, navigate]);
 
-  const handleSettings = () => {
+  const handleSettings = useCallback(() => {
     handleUserMenuClose();
     navigate("/settings");
-  };
+  }, [handleUserMenuClose, navigate]);
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
-    if (isMobile) {
-      setOpen(false);
+  const handleNavigation = useCallback(
+    (path: string) => {
+      navigate(path);
+      if (isMobile) {
+        setOpen(false);
+      }
+    },
+    [isMobile, navigate]
+  );
+
+  // const userName = user?.full_name || user?.email || "User";
+  const userName = useMemo(() => {
+    if (user?.full_name) {
+      return user.full_name;
+    } else if (user?.email) {
+      return user.email;
+    } else {
+      return "User";
     }
-  };
-
-  const userName = user?.full_name || user?.email || "User";
+  }, [user]);
 
   // Get first letter for Avatar
-  const getInitials = (name: string) => {
-    return name.charAt(0).toUpperCase();
-  };
+  const getInitials = useCallback(
+    (name: string) => {
+      return name.charAt(0).toUpperCase();
+    },
+    [user]
+  );
 
   return (
     <ThemeProvider theme={theme}>
@@ -132,13 +151,13 @@ const MainLayout = () => {
               <MenuIcon />
             </IconButton>
             <Box sx={{ display: "flex", alignItems: "center" }}>
-              <img 
-                src={autoTradeLogo} 
-                alt="AutoTrade68 Logo" 
-                style={{ 
-                  height: '40px', 
-                  marginRight: '16px',
-                  borderRadius: '50%'
+              <img
+                src={autoTradeLogo}
+                alt="AutoTrade68 Logo"
+                style={{
+                  height: "40px",
+                  marginRight: "16px",
+                  borderRadius: "50%",
                 }}
               />
               <Typography variant="h6" noWrap component="div">
@@ -267,7 +286,7 @@ const MainLayout = () => {
               )}
             </IconButton>
           </Toolbar>
-          <Divider sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+          <Divider sx={{ bgcolor: "rgba(255,255,255,0.1)" }} />
           <List>
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
@@ -275,9 +294,9 @@ const MainLayout = () => {
                   minHeight: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.1)'
-                  }
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                  },
                 }}
                 onClick={() => handleNavigation("/")}
               >
@@ -300,9 +319,9 @@ const MainLayout = () => {
                   minHeight: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.1)'
-                  }
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                  },
                 }}
                 onClick={() => handleNavigation("/dashboard")}
               >
@@ -321,16 +340,16 @@ const MainLayout = () => {
                 />
               </ListItemButton>
             </ListItem>
-            
+
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{
                   minHeight: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.1)'
-                  }
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                  },
                 }}
                 onClick={() => handleNavigation("/module-bot")}
               >
@@ -356,9 +375,9 @@ const MainLayout = () => {
                   minHeight: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.1)'
-                  }
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                  },
                 }}
                 onClick={() => handleNavigation("/bot-template")}
               >
@@ -384,9 +403,9 @@ const MainLayout = () => {
                   minHeight: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.1)'
-                  }
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                  },
                 }}
                 onClick={() => handleNavigation("/backtest")}
               >
@@ -412,9 +431,9 @@ const MainLayout = () => {
                   minHeight: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.1)'
-                  }
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                  },
                 }}
                 onClick={() => handleNavigation("/trading")}
               >
@@ -434,7 +453,7 @@ const MainLayout = () => {
               </ListItemButton>
             </ListItem>
           </List>
-          <Divider sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+          <Divider sx={{ bgcolor: "rgba(255,255,255,0.1)" }} />
           <List>
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
@@ -442,9 +461,9 @@ const MainLayout = () => {
                   minHeight: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
-                  '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.1)'
-                  }
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                  },
                 }}
                 onClick={handleLogout}
               >
@@ -470,7 +489,7 @@ const MainLayout = () => {
             flexGrow: 1,
             p: 3,
             width: "100%",
-            backgroundColor: 'background.default',
+            backgroundColor: "background.default",
             marginLeft: isMobile
               ? 0
               : open
@@ -490,4 +509,4 @@ const MainLayout = () => {
   );
 };
 
-export default MainLayout;
+export default memo(MainLayout, areEqual);

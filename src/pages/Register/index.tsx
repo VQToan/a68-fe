@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Container,
@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useAuth } from "@hooks/useAuth";
+import { areEqual } from "@/utils/common";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -29,71 +30,77 @@ const Register = () => {
     confirmPassword: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Password validation
-    if (name === "password") {
-      if (value.length < 8) {
-        setFormErrors((prev) => ({
-          ...prev,
-          password: "Password must be at least 8 characters long",
-        }));
-      } else {
-        setFormErrors((prev) => ({ ...prev, password: "" }));
+      // Password validation
+      if (name === "password") {
+        if (value.length < 8) {
+          setFormErrors((prev) => ({
+            ...prev,
+            password: "Password must be at least 8 characters long",
+          }));
+        } else {
+          setFormErrors((prev) => ({ ...prev, password: "" }));
+        }
       }
-    }
 
-    // Confirm password validation
-    if (name === "confirmPassword" || name === "password") {
-      if (name === "confirmPassword" && value !== formData.password) {
+      // Confirm password validation
+      if (name === "confirmPassword" || name === "password") {
+        if (name === "confirmPassword" && value !== formData.password) {
+          setFormErrors((prev) => ({
+            ...prev,
+            confirmPassword: "Passwords do not match",
+          }));
+        } else if (
+          name === "password" &&
+          value !== formData.confirmPassword &&
+          formData.confirmPassword
+        ) {
+          setFormErrors((prev) => ({
+            ...prev,
+            confirmPassword: "Passwords do not match",
+          }));
+        } else if (name === "confirmPassword" && value === formData.password) {
+          setFormErrors((prev) => ({ ...prev, confirmPassword: "" }));
+        }
+      }
+    },
+    [setFormData, formData.password, formData.confirmPassword]
+  );
+
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      // Validate form before submission
+      if (formErrors.password || formErrors.confirmPassword) {
+        return;
+      }
+
+      if (formData.password !== formData.confirmPassword) {
         setFormErrors((prev) => ({
           ...prev,
           confirmPassword: "Passwords do not match",
         }));
-      } else if (
-        name === "password" &&
-        value !== formData.confirmPassword &&
-        formData.confirmPassword
-      ) {
-        setFormErrors((prev) => ({
-          ...prev,
-          confirmPassword: "Passwords do not match",
-        }));
-      } else if (name === "confirmPassword" && value === formData.password) {
-        setFormErrors((prev) => ({ ...prev, confirmPassword: "" }));
+        return;
       }
-    }
-  };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    // Validate form before submission
-    if (formErrors.password || formErrors.confirmPassword) {
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setFormErrors((prev) => ({
-        ...prev,
-        confirmPassword: "Passwords do not match",
-      }));
-      return;
-    }
-
-    try {
-      const { confirmPassword, ...registerData } = formData;
-      const result = await register(registerData);
-      if (result.meta.requestStatus === "fulfilled") {
-        // After successful registration, redirect to login page
-        navigate("/login");
+      try {
+        const { confirmPassword, ...registerData } = formData;
+        const result = await register(registerData);
+        if (result.meta.requestStatus === "fulfilled") {
+          // After successful registration, redirect to login page
+          navigate("/login");
+        }
+      } catch (error) {
+        console.error("Registration failed:", error);
       }
-    } catch (error) {
-      console.error("Registration failed:", error);
-    }
-  };
+    },
+    [formData, formErrors, register, navigate]
+  );
 
   return (
     <Container component="main" maxWidth="xs">
@@ -196,4 +203,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default memo(Register, areEqual);

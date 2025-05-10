@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import {
   Box,
   Button,
@@ -20,6 +20,7 @@ import {
   type BotTemplateUpdate,
 } from "../../types/botTemplate.types";
 import type { IModuleBot } from "@services/moduleBots.service";
+import { areEqual } from "@/utils/common";
 
 export type FormMode = "create" | "edit";
 
@@ -139,20 +140,23 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
   }, [initialData, reset]);
 
   // Handle form submission
-  const onFormSubmit = (data: any) => {
-    // Clean up data to include only non-empty module IDs
-    const cleanData = { ...data };
+  const onFormSubmit = useCallback(
+    (data: any) => {
+      // Clean up data to include only non-empty module IDs
+      const cleanData = { ...data };
 
-    // Convert empty strings to null for optional fields
-    Object.values(ModuleType).forEach((type) => {
-      const field = moduleTypeToField[type];
-      if (cleanData[field] === "") {
-        cleanData[field] = null;
-      }
-    });
+      // Convert empty strings to null for optional fields
+      Object.values(ModuleType).forEach((type) => {
+        const field = moduleTypeToField[type];
+        if (cleanData[field] === "") {
+          cleanData[field] = null;
+        }
+      });
 
-    onSubmit(cleanData);
-  };
+      onSubmit(cleanData);
+    },
+    [onSubmit, moduleTypeToField]
+  );
 
   return (
     <Box
@@ -465,4 +469,4 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
   );
 };
 
-export default BotTemplateForm;
+export default memo(BotTemplateForm, areEqual);

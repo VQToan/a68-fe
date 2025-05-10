@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import {
   Box,
   Typography,
@@ -24,6 +24,7 @@ import { useDebounce } from "@utils/debounceUtils";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
 import type { IModuleBot } from "@services/moduleBots.service";
+import { areEqual } from "@/utils/common";
 
 const ModuleBot = () => {
   // Use the moduleSlice through the useModule hook
@@ -83,103 +84,119 @@ const ModuleBot = () => {
   }, [error]);
 
   // Handle search
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setSearchTerm(value);
-  };
+  const handleSearch = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value;
+      setSearchTerm(value);
+    },
+    [setSearchTerm]
+  );
 
   // Handle dialog open/close
-  const handleOpenDialog = (mode: FormMode = "create") => {
-    setDialogMode(mode);
+  const handleOpenDialog = useCallback(
+    (mode: FormMode = "create") => {
+      setDialogMode(mode);
 
-    // Set dialog title based on mode
-    switch (mode) {
-      case "create":
-        setDialogTitle("Thêm Module Bot Mới");
-        break;
-      case "view":
-        setDialogTitle("Chi Tiết Module Bot");
-        break;
-      case "edit":
-        setDialogTitle("Chỉnh Sửa Module Bot");
-        break;
-    }
+      // Set dialog title based on mode
+      switch (mode) {
+        case "create":
+          setDialogTitle("Thêm Module Bot Mới");
+          break;
+        case "view":
+          setDialogTitle("Chi Tiết Module Bot");
+          break;
+        case "edit":
+          setDialogTitle("Chỉnh Sửa Module Bot");
+          break;
+      }
 
-    setOpenDialog(true);
-  };
+      setOpenDialog(true);
+    },
+    [setDialogMode, setDialogTitle]
+  );
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = useCallback(() => {
     setOpenDialog(false);
     // Clear the current module when dialog closes
     clearCurrentModule();
-  };
+  }, [clearCurrentModule, setOpenDialog]);
 
   // Handle form submission (add or update module)
-  const handleSubmitModule = async (
-    formData: Omit<IModuleBot, "_id" | "created_at">
-  ) => {
-    try {
-      if (dialogMode === "create") {
-        // Create new module
-        await createModule(formData);
-        showNotification("Module bot đã được tạo thành công", "success");
-      } else if (dialogMode === "edit" && currentModule) {
-        // Update existing module
-        await updateModule(currentModule._id, formData);
-        showNotification("Module bot đã được cập nhật thành công", "success");
+  const handleSubmitModule = useCallback(
+    async (formData: Omit<IModuleBot, "_id" | "created_at">) => {
+      try {
+        if (dialogMode === "create") {
+          // Create new module
+          await createModule(formData);
+          showNotification("Module bot đã được tạo thành công", "success");
+        } else if (dialogMode === "edit" && currentModule) {
+          // Update existing module
+          await updateModule(currentModule._id, formData);
+          showNotification("Module bot đã được cập nhật thành công", "success");
+        }
+        handleCloseDialog();
+      } catch (error) {
+        console.error("Error submitting module bot:", error);
       }
-      handleCloseDialog();
-    } catch (error) {
-      console.error("Error submitting module bot:", error);
-    }
-  };
+    },
+    [dialogMode, currentModule, createModule, updateModule, showNotification]
+  );
 
   // Handle edit mode toggle from view mode
-  const handleSwitchToEditMode = () => {
+  const handleSwitchToEditMode = useCallback(() => {
     setDialogMode("edit");
     setDialogTitle("Chỉnh Sửa Module Bot");
-  };
+  }, [setDialogMode, setDialogTitle]);
 
   // Handle view module details
-  const handleViewModule = async (id: string) => {
-    try {
-      await getModuleById(id);
-      handleOpenDialog("view");
-    } catch (error) {
-      console.error("Error fetching module details:", error);
-    }
-  };
+  const handleViewModule = useCallback(
+    async (id: string) => {
+      try {
+        await getModuleById(id);
+        handleOpenDialog("view");
+      } catch (error) {
+        console.error("Error fetching module details:", error);
+      }
+    },
+    [getModuleById, handleOpenDialog]
+  );
 
   // Handle edit module directly
-  const handleEditModule = async (id: string) => {
-    try {
-      await getModuleById(id);
-      handleOpenDialog("edit");
-    } catch (error) {
-      console.error("Error fetching module details:", error);
-    }
-  };
+  const handleEditModule = useCallback(
+    async (id: string) => {
+      try {
+        await getModuleById(id);
+        handleOpenDialog("edit");
+      } catch (error) {
+        console.error("Error fetching module details:", error);
+      }
+    },
+    [getModuleById, handleOpenDialog]
+  );
 
   // Handle opening confirm delete dialog
-  const handleOpenDeleteConfirm = (id: string, name: string) => {
-    setConfirmDelete({
-      open: true,
-      id,
-      name,
-    });
-  };
+  const handleOpenDeleteConfirm = useCallback(
+    (id: string, name: string) => {
+      setConfirmDelete({
+        open: true,
+        id,
+        name,
+      });
+    },
+    [setConfirmDelete]
+  );
 
   // Handle closing confirm delete dialog
-  const handleCloseDeleteConfirm = () => {
+  const handleCloseDeleteConfirm = useCallback(() => {
     setConfirmDelete({
       open: false,
       id: null,
       name: "",
     });
-  };
+  }, [setConfirmDelete]);
 
   // Handle delete module
-  const handleDeleteModule = async () => {
+  const handleDeleteModule = useCallback(async () => {
     if (!confirmDelete.id) return;
 
     try {
@@ -189,7 +206,12 @@ const ModuleBot = () => {
     } catch (error) {
       console.error("Error deleting module bot:", error);
     }
-  };
+  }, [
+    confirmDelete.id,
+    deleteModule,
+    handleCloseDeleteConfirm,
+    showNotification,
+  ]);
 
   return (
     <Box>
@@ -295,4 +317,4 @@ const ModuleBot = () => {
   );
 };
 
-export default ModuleBot;
+export default memo(ModuleBot, areEqual);

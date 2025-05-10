@@ -296,12 +296,12 @@ const Backtest = () => {
           alignItems="center"
           justifyContent="space-between"
         >
-          <Grid item>
+          <Grid size={{ xs: "auto" }}>
             <Typography variant="h5" component="h1" gutterBottom>
               Quản lý Backtest
             </Typography>
           </Grid>
-          <Grid item>
+          <Grid size={{ xs: "auto" }}>
             <Button
               variant="contained"
               startIcon={<AddIcon />}

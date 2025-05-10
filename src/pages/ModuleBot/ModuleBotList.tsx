@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { 
   Box, 
   Table, 
@@ -18,6 +18,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import type { IModuleBot } from "@services/moduleBots.service";
+import { areEqual, formatDate } from "@utils/common";
 
 interface ModuleBotListProps {
   modules: IModuleBot[];
@@ -34,18 +35,6 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
   onDelete,
   onView
 }) => {
-  // Format date to a more readable format
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" p={3}>
@@ -146,4 +135,4 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
   );
 };
 
-export default ModuleBotList;
+export default memo(ModuleBotList,areEqual);

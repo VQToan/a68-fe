@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import {
   Box,
   Typography,
@@ -26,7 +26,11 @@ import ConfirmDialog from "@components/ConfirmDialog";
 import BotTemplateList from "./BotTemplateList";
 import BotTemplateForm from "./BotTemplateForm";
 import BotTemplateDetail from "./BotTemplateDetail";
-import type { BotTemplateCreate, BotTemplateUpdate } from "../../types/botTemplate.types";
+import type {
+  BotTemplateCreate,
+  BotTemplateUpdate,
+} from "../../types/botTemplate.types";
+import { areEqual } from "@/utils/common";
 
 // Form mode type definition
 export type FormMode = "create" | "view" | "edit";
@@ -95,33 +99,39 @@ const BotTemplate = () => {
   }, [error]);
 
   // Handle search
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setSearchTerm(value);
-  };
+  const handleSearch = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value;
+      setSearchTerm(value);
+    },
+    [setSearchTerm]
+  );
 
   // Handle dialog open/close
-  const handleOpenDialog = (mode: FormMode = "create") => {
-    setDialogMode(mode);
+  const handleOpenDialog = useCallback(
+    (mode: FormMode = "create") => {
+      setDialogMode(mode);
 
-    // Set dialog title based on mode
-    switch (mode) {
-      case "create":
-        setDialogTitle("Tạo Bot Template Mới");
-        clearCurrentTemplate();
-        break;
-      case "view":
-        setDialogTitle("Chi Tiết Bot Template");
-        break;
-      case "edit":
-        setDialogTitle("Chỉnh Sửa Bot Template");
-        break;
-    }
+      // Set dialog title based on mode
+      switch (mode) {
+        case "create":
+          setDialogTitle("Tạo Bot Template Mới");
+          clearCurrentTemplate();
+          break;
+        case "view":
+          setDialogTitle("Chi Tiết Bot Template");
+          break;
+        case "edit":
+          setDialogTitle("Chỉnh Sửa Bot Template");
+          break;
+      }
 
-    setOpenDialog(true);
-  };
+      setOpenDialog(true);
+    },
+    [setDialogMode, setDialogTitle, clearCurrentTemplate]
+  );
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = useCallback(() => {
     setOpenDialog(false);
     // Delay clearing current template to avoid UI flicker during dialog close animation
     setTimeout(() => {
@@ -129,73 +139,98 @@ const BotTemplate = () => {
         clearCurrentTemplate();
       }
     }, 300);
-  };
+  }, [dialogMode, clearCurrentTemplate]);
 
   // Handle form submission
-  const handleSubmit = async (formData: BotTemplateCreate | BotTemplateUpdate) => {
-    try {
-      if (dialogMode === "create") {
-        // Create new bot template
-        await createTemplate(formData as BotTemplateCreate);
-        showNotification("Bot template đã được tạo thành công", "success");
-      } else if (dialogMode === "edit" && currentTemplate?._id) {
-        // Update existing bot template
-        await updateTemplate(currentTemplate._id, formData as BotTemplateUpdate);
-        showNotification("Bot template đã được cập nhật thành công", "success");
+  const handleSubmit = useCallback(
+    async (formData: BotTemplateCreate | BotTemplateUpdate) => {
+      try {
+        if (dialogMode === "create") {
+          // Create new bot template
+          await createTemplate(formData as BotTemplateCreate);
+          showNotification("Bot template đã được tạo thành công", "success");
+        } else if (dialogMode === "edit" && currentTemplate?._id) {
+          // Update existing bot template
+          await updateTemplate(
+            currentTemplate._id,
+            formData as BotTemplateUpdate
+          );
+          showNotification(
+            "Bot template đã được cập nhật thành công",
+            "success"
+          );
+        }
+        handleCloseDialog();
+        getTemplates(debouncedSearchTerm); // Refresh the list
+      } catch (error) {
+        console.error("Error submitting bot template:", error);
       }
-      handleCloseDialog();
-      getTemplates(debouncedSearchTerm); // Refresh the list
-    } catch (error) {
-      console.error("Error submitting bot template:", error);
-    }
-  };
+    },
+    [
+      dialogMode,
+      currentTemplate,
+      createTemplate,
+      updateTemplate,
+      getTemplates,
+      debouncedSearchTerm,
+    ]
+  );
 
   // Handle edit mode toggle from view mode
-  const handleSwitchToEditMode = () => {
+  const handleSwitchToEditMode = useCallback(() => {
     setDialogMode("edit");
     setDialogTitle("Chỉnh Sửa Bot Template");
-  };
+  }, [setDialogMode, setDialogTitle]);
 
   // Handle view bot template details
-  const handleViewTemplate = async (id: string) => {
-    try {
-      await getTemplateById(id);
-      handleOpenDialog("view");
-    } catch (error) {
-      console.error("Error fetching bot template details:", error);
-    }
-  };
+  const handleViewTemplate = useCallback(
+    async (id: string) => {
+      try {
+        await getTemplateById(id);
+        handleOpenDialog("view");
+      } catch (error) {
+        console.error("Error fetching bot template details:", error);
+      }
+    },
+    [getTemplateById, handleOpenDialog]
+  );
 
   // Handle edit bot template directly
-  const handleEditTemplate = async (id: string) => {
-    try {
-      await getTemplateById(id);
-      handleOpenDialog("edit");
-    } catch (error) {
-      console.error("Error fetching bot template details:", error);
-    }
-  };
+  const handleEditTemplate = useCallback(
+    async (id: string) => {
+      try {
+        await getTemplateById(id);
+        handleOpenDialog("edit");
+      } catch (error) {
+        console.error("Error fetching bot template details:", error);
+      }
+    },
+    [getTemplateById, handleOpenDialog]
+  );
 
   // Handle opening confirm delete dialog
-  const handleOpenDeleteConfirm = (id: string, name: string) => {
-    setConfirmDelete({
-      open: true,
-      id,
-      name,
-    });
-  };
+  const handleOpenDeleteConfirm = useCallback(
+    (id: string, name: string) => {
+      setConfirmDelete({
+        open: true,
+        id,
+        name,
+      });
+    },
+    [setConfirmDelete]
+  );
 
   // Handle closing confirm delete dialog
-  const handleCloseDeleteConfirm = () => {
+  const handleCloseDeleteConfirm = useCallback(() => {
     setConfirmDelete({
       open: false,
       id: null,
       name: "",
     });
-  };
+  }, [setConfirmDelete]);
 
   // Handle delete bot template
-  const handleDeleteTemplate = async () => {
+  const handleDeleteTemplate = useCallback(async () => {
     if (!confirmDelete.id) return;
 
     try {
@@ -205,7 +240,12 @@ const BotTemplate = () => {
     } catch (error) {
       console.error("Error deleting bot template:", error);
     }
-  };
+  }, [
+    confirmDelete.id,
+    deleteTemplate,
+    showNotification,
+    handleCloseDeleteConfirm,
+  ]);
 
   return (
     <Box>
@@ -295,10 +335,10 @@ const BotTemplate = () => {
         </DialogTitle>
         <DialogContent sx={{ p: 3, mt: 1 }}>
           {dialogMode === "view" && currentTemplate ? (
-            <BotTemplateDetail 
-              template={currentTemplate} 
-              isLoading={isLoading} 
-              onEdit={handleSwitchToEditMode} 
+            <BotTemplateDetail
+              template={currentTemplate}
+              isLoading={isLoading}
+              onEdit={handleSwitchToEditMode}
             />
           ) : (
             <BotTemplateForm
@@ -324,4 +364,4 @@ const BotTemplate = () => {
   );
 };
 
-export default BotTemplate;
+export default memo(BotTemplate, areEqual);

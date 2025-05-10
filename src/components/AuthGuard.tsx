@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
-import { isTokenExpired } from '../utils/tokenUtils';
+import { memo, useEffect } from "react";
+import { useAuth } from "../hooks/useAuth";
+import { isTokenExpired } from "../utils/tokenUtils";
+import { areEqual } from "@/utils/common";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -11,7 +12,7 @@ interface AuthGuardProps {
  */
 const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const { accessToken, refreshToken } = useAuth();
-  
+
   useEffect(() => {
     // Set up an interval to check token expiration
     const tokenCheckInterval = setInterval(() => {
@@ -20,13 +21,13 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
         // This interval just triggers the check more frequently
       }
     }, 60000); // Check every minute
-    
+
     return () => {
       clearInterval(tokenCheckInterval);
     };
   }, [accessToken]);
-  
+
   return <>{children}</>;
 };
 
-export default AuthGuard;
+export default memo(AuthGuard, areEqual);

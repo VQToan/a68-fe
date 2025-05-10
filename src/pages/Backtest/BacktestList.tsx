@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import moment from "moment";
 import {
   Box,
   Table,
@@ -28,6 +27,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import type { BacktestProcess, BacktestStatus } from "@services/backtest.service";
+import { formatDate } from "@utils/common";
 
 interface BacktestListProps {
   processes: BacktestProcess[];
@@ -158,15 +158,6 @@ const BacktestList = ({
     if (selectedId) {
       onStop(selectedId);
       handleMenuClose();
-    }
-  };
-
-  // Format date
-  const formatDate = (dateString: string) => {
-    try {
-      return moment(new Date(dateString)).format("DD/MM/YYYY HH:mm:ss");
-    } catch (error) {
-      return "Invalid date";
     }
   };
 

@@ -1,15 +1,17 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { Navigate, Outlet } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import { memo } from "react";
+import { areEqual } from "@/utils/common";
 
 interface ProtectedRouteProps {
   redirectPath?: string;
 }
 
-export const ProtectedRoute = ({ 
-  redirectPath = '/login'
+export const ProtectedRoute = ({
+  redirectPath = "/login",
 }: ProtectedRouteProps) => {
   const { isLoggedIn } = useAuth();
-  
+
   if (!isLoggedIn) {
     return <Navigate to={redirectPath} replace />;
   }
@@ -17,4 +19,4 @@ export const ProtectedRoute = ({
   return <Outlet />;
 };
 
-export default ProtectedRoute;
+export default memo(ProtectedRoute, areEqual);

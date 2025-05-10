@@ -1,10 +1,12 @@
-import { Container, Typography, Button, Box, Paper } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { areEqual } from "@/utils/common";
+import { Container, Typography, Button, Box, Paper } from "@mui/material";
+import { memo } from "react";
+import { Link as RouterLink } from "react-router-dom";
 
 const NotFound = () => {
   return (
     <Container maxWidth="md">
-      <Paper elevation={3} sx={{ p: 4, mt: 8, textAlign: 'center' }}>
+      <Paper elevation={3} sx={{ p: 4, mt: 8, textAlign: "center" }}>
         <Typography variant="h1" component="h1" gutterBottom>
           404
         </Typography>
@@ -15,10 +17,10 @@ const NotFound = () => {
           The page you are looking for doesn't exist or has been moved.
         </Typography>
         <Box sx={{ mt: 4 }}>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            component={RouterLink} 
+          <Button
+            variant="contained"
+            color="primary"
+            component={RouterLink}
             to="/"
           >
             Go to Home
@@ -29,4 +31,4 @@ const NotFound = () => {
   );
 };
 
-export default NotFound;
+export default memo(NotFound, areEqual);

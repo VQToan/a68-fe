@@ -1,22 +1,23 @@
-import React from 'react';
-import { 
-  Box, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
+import React, { memo } from "react";
+import {
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
   TableRow,
   Paper,
   Typography,
   IconButton,
   Tooltip,
-  CircularProgress
-} from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import type { BotTemplate } from '../../types/botTemplate.types';
+  CircularProgress,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import type { BotTemplate } from "../../types/botTemplate.types";
+import { areEqual, formatDate } from "@/utils/common";
 
 interface BotTemplateListProps {
   templates: BotTemplate[];
@@ -26,28 +27,16 @@ interface BotTemplateListProps {
   onView?: (id: string) => void;
 }
 
-const BotTemplateList: React.FC<BotTemplateListProps> = ({ 
-  templates, 
+const BotTemplateList: React.FC<BotTemplateListProps> = ({
+  templates,
   isLoading,
   onEdit,
   onDelete,
-  onView
+  onView,
 }) => {
-  // Format date to a more readable format
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
         <CircularProgress />
       </Box>
     );
@@ -55,7 +44,7 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
 
   if (templates.length === 0) {
     return (
-      <Paper sx={{ p: 3, textAlign: 'center' }}>
+      <Paper sx={{ p: 3, textAlign: "center" }}>
         <Typography variant="body1" color="text.secondary">
           Không có bot template nào được tìm thấy.
         </Typography>
@@ -78,7 +67,7 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
           {templates.map((template) => (
             <TableRow
               key={template._id}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               hover
             >
               <TableCell component="th" scope="row">
@@ -90,9 +79,9 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
                     variant="body2"
                     sx={{
                       maxWidth: 200,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {template.description}
@@ -101,11 +90,11 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
               </TableCell>
               <TableCell>{formatDate(template.created_at)}</TableCell>
               <TableCell>
-                <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box sx={{ display: "flex", gap: 1 }}>
                   {onView && (
                     <Tooltip title="Xem chi tiết">
-                      <IconButton 
-                        size="small" 
+                      <IconButton
+                        size="small"
                         color="info"
                         onClick={() => onView(template._id)}
                       >
@@ -113,11 +102,11 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
                       </IconButton>
                     </Tooltip>
                   )}
-                  
+
                   {onEdit && (
                     <Tooltip title="Sửa">
-                      <IconButton 
-                        size="small" 
+                      <IconButton
+                        size="small"
                         color="primary"
                         onClick={() => onEdit(template._id)}
                       >
@@ -125,11 +114,11 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
                       </IconButton>
                     </Tooltip>
                   )}
-                  
+
                   {onDelete && (
                     <Tooltip title="Xóa">
-                      <IconButton 
-                        size="small" 
+                      <IconButton
+                        size="small"
                         color="error"
                         onClick={() => onDelete(template._id, template.name)}
                       >
@@ -147,4 +136,4 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
   );
 };
 
-export default BotTemplateList;
+export default memo(BotTemplateList, areEqual);

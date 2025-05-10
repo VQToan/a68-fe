@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   Dialog,
   DialogActions,
@@ -10,6 +10,7 @@ import {
   IconButton,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { areEqual } from '@/utils/common';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -74,4 +75,4 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   );
 };
 
-export default ConfirmDialog;
+export default memo(ConfirmDialog, areEqual);

@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { Snackbar, Alert } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
@@ -30,21 +30,21 @@ export const NotificationProvider = ({ children }: NotificationProviderProps) =>
   });
 
   // Show notification
-  const showNotification = (message: string, severity: AlertColor) => {
+  const showNotification = useCallback((message: string, severity: AlertColor) => {
     setNotification({
       open: true,
       message,
       severity
     });
-  };
+  }, [setNotification]);
 
   // Close notification
-  const handleCloseNotification = () => {
+  const handleCloseNotification = useCallback(() => {
     setNotification(prev => ({
       ...prev,
       open: false
     }));
-  };
+  }, [setNotification]);
 
   return (
     <NotificationContext.Provider value={{ showNotification }}>
