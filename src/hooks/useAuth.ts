@@ -7,6 +7,7 @@ import {
   fetchCurrentUser,
   updateCurrentUser
 } from '@features/auth/authSlice';
+import { isTokenExpired } from '@/utils/tokenUtils';
 import type { LoginCredentials, RegisterCredentials, UserUpdate } from '../types/auth.types';
 
 export const useAuth = () => {
@@ -44,6 +45,22 @@ export const useAuth = () => {
       dispatch(fetchCurrentUser());
     }
   }, [auth.isLoggedIn, auth.user, auth.isLoading, dispatch]);
+
+  // Token refresh check (moved from AuthGuard)
+  useEffect(() => {
+    // Set up an interval to check token expiration
+    const tokenCheckInterval = setInterval(() => {
+      if (auth.accessToken && isTokenExpired(auth.accessToken)) {
+        // Token refresh logic should be handled in the auth slice
+        // This just triggers the check periodically
+        dispatch(fetchCurrentUser());
+      }
+    }, 60000); // Check every minute
+
+    return () => {
+      clearInterval(tokenCheckInterval);
+    };
+  }, [auth.accessToken, dispatch]);
 
   return {
     ...auth,

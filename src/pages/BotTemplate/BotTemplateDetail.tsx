@@ -53,17 +53,6 @@ const BotTemplateDetail: React.FC<BotTemplateDetailProps> = ({
 
   return (
     <Paper sx={{ p: 3 }}>
-      <Box
-        sx={{
-          mb: 2,
-        }}
-      >
-        <Typography variant="h6" component="h2">
-          Chi tiết Bot Template
-        </Typography>
-      </Box>
-
-      <Divider sx={{ mb: 3 }} />
 
       <Grid container spacing={2}>
         <Grid size={{ xs: 12 }}>

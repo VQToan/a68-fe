@@ -1,75 +1,84 @@
-import type { RouteObject } from 'react-router-dom';
-import ProtectedRoute from './ProtectedRoute';
+import type { RouteObject } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
+import AuthRedirectWrapper from "./AuthRedirectWrapper";
 
 // Import your pages here
-import Home from '../pages/Home';
-import Login from '../pages/Login';
-import Register from '../pages/Register';
-import Dashboard from '../pages/Dashboard';
-import ModuleBot from '../pages/ModuleBot';
-import Backtest from '../pages/Backtest';
-import BotTemplate from '../pages/BotTemplate';
-import NotFound from '../pages/NotFound';
-import MainLayout from '../layouts/MainLayout';
+import Home from "../pages/Home";
+import Login from "../pages/Login";
+import Register from "../pages/Register";
+import Dashboard from "../pages/Dashboard";
+import ModuleBot from "../pages/ModuleBot";
+import Backtest from "../pages/Backtest";
+import BotTemplate from "../pages/BotTemplate";
+import NotFound from "../pages/NotFound";
+import MainLayout from "../layouts/MainLayout";
 
 export const routes: RouteObject[] = [
-  // Auth routes without MainLayout
+  // Auth routes with redirect for authenticated users
   {
-    path: 'login',
-    element: <Login />
+    path: "login",
+    element: (
+      <AuthRedirectWrapper>
+        <Login />
+      </AuthRedirectWrapper>
+    ),
   },
   {
-    path: 'register',
-    element: <Register />
+    path: "register",
+    element: (
+      <AuthRedirectWrapper>
+        <Register />
+      </AuthRedirectWrapper>
+    ),
   },
   // Main routes with MainLayout
   {
-    path: '/',
+    path: "/",
     element: <MainLayout />,
     children: [
       // All routes inside MainLayout are now protected
       {
-        path: '/',
+        path: "/",
         element: <ProtectedRoute />,
         children: [
           {
             index: true, // This makes it the default route at '/'
-            element: <Home />
+            element: <Home />,
           },
           {
-            path: 'dashboard',
-            element: <Dashboard />
+            path: "dashboard",
+            element: <Dashboard />,
           },
           {
-            path: 'module-bot',
-            element: <ModuleBot />
+            path: "module-bot",
+            element: <ModuleBot />,
           },
           {
-            path: 'bot-template',
-            element: <BotTemplate />
+            path: "bot-template",
+            element: <BotTemplate />,
           },
           {
-            path: 'backtest',
-            element: <Backtest />
+            path: "backtest",
+            element: <Backtest />,
           },
           {
-            path: 'profile',
-            element: <div>Profile Page (Coming Soon)</div>
+            path: "profile",
+            element: <div>Profile Page (Coming Soon)</div>,
           },
           {
-            path: 'settings',
-            element: <div>Settings Page (Coming Soon)</div>
-          }
+            path: "settings",
+            element: <div>Settings Page (Coming Soon)</div>,
+          },
           // Add more protected routes here
-        ]
+        ],
       },
       // Only NotFound is still accessible without login
       {
-        path: '*',
-        element: <NotFound />
-      }
-    ]
-  }
+        path: "*",
+        element: <NotFound />,
+      },
+    ],
+  },
 ];
 
 export default routes;

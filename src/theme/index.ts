@@ -1,38 +1,52 @@
 import { createTheme } from '@mui/material/styles';
 
-// Theme dựa trên màu sắc logo AutoTrade68
+// Theme dựa trên thiết kế crypto admin dashboard
 const theme = createTheme({
   palette: {
+    mode: 'dark',
     primary: {
-      main: '#000000', // Đen từ viền logo
-      light: '#333333',
-      dark: '#000000',
-      contrastText: '#FFFFFF',
+      main: '#00E676', // Màu xanh lá neon
+      light: '#33EB91',
+      dark: '#00B248',
+      contrastText: '#0A0A0A',
     },
     secondary: {
-      main: '#008F39', // Xanh lá từ số 6 trong logo
-      light: '#2CAF5F',
-      dark: '#00692A',
-      contrastText: '#FFFFFF',
+      main: '#03DAC6', // Màu xanh cyan
+      light: '#33E2CF',
+      dark: '#018786',
+      contrastText: '#000000',
     },
     error: {
-      main: '#D92121', // Đỏ từ số 8 trong logo
-      light: '#E54545',
-      dark: '#B61919',
+      main: '#F44336', // Đỏ
+      light: '#E57373',
+      dark: '#D32F2F',
       contrastText: '#FFFFFF',
     },
     success: {
-      main: '#008F39', // Xanh lá từ logo
-      contrastText: '#FFFFFF',
+      main: '#00E676', // Xanh lá
+      contrastText: '#0A0A0A',
+    },
+    warning: {
+      main: '#FFA726', // Cam
+      light: '#FFB74D',
+      dark: '#F57C00',
+      contrastText: '#000000',
+    },
+    info: {
+      main: '#29B6F6', // Xanh dương
+      light: '#4FC3F7',
+      dark: '#0288D1',
+      contrastText: '#000000',
     },
     background: {
-      default: '#F5F5F5', // Background sáng
-      paper: '#FFFFFF',
+      default: '#0A0A0A', // Nền đen
+      paper: '#121212', // Card màu đen nhạt hơn
     },
     text: {
-      primary: '#121212',
-      secondary: '#676767',
+      primary: '#FFFFFF',
+      secondary: '#B0B0B0',
     },
+    divider: 'rgba(255, 255, 255, 0.12)',
   },
   typography: {
     fontFamily: "'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif",
@@ -63,17 +77,44 @@ const theme = createTheme({
     borderRadius: 8,
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          scrollbarColor: '#6b6b6b #0A0A0A',
+          '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
+            backgroundColor: '#0A0A0A',
+            width: '8px',
+            height: '8px',
+          },
+          '&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb': {
+            borderRadius: 8,
+            backgroundColor: '#6b6b6b',
+            border: '2px solid #0A0A0A',
+          },
+          '&::-webkit-scrollbar-thumb:focus, & *::-webkit-scrollbar-thumb:focus': {
+            backgroundColor: '#959595',
+          },
+          '&::-webkit-scrollbar-thumb:active, & *::-webkit-scrollbar-thumb:active': {
+            backgroundColor: '#959595',
+          },
+          '&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: '#959595',
+          },
+        },
+      },
+    },
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: '#000000', // Đen từ logo
+          backgroundColor: '#121212', // Header màu đen nhạt
+          boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.5)',
         }
       }
     },
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          backgroundColor: '#0A0A0A', // Nền đen cho sidebar
+          backgroundColor: '#0A0A0A', // Sidebar màu đen
           color: '#FFFFFF',
         }
       }
@@ -81,21 +122,15 @@ const theme = createTheme({
     MuiListItemIcon: {
       styleOverrides: {
         root: {
-          color: 'inherit', // Để icon thừa kế màu từ parent context
+          color: '#00E676', // Icon màu xanh lá
           minWidth: '36px', // Giảm khoảng cách icon
-          '.MuiDrawer-paper &': {
-            color: '#FFFFFF', // Icon màu trắng chỉ trong sidebar
-          }
         }
       }
     },
     MuiListItemText: {
       styleOverrides: {
         primary: {
-          color: 'inherit', // Để text thừa kế màu từ parent context  
-          '.MuiDrawer-paper &': {
-            color: '#FFFFFF', // Text màu trắng chỉ trong sidebar
-          }
+          color: '#FFFFFF', // Text màu trắng
         }
       }
     },
@@ -104,57 +139,34 @@ const theme = createTheme({
         root: {
           boxShadow: 'none',
           '&:hover': {
-            boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.15)',
+            boxShadow: '0px 2px 8px rgba(0, 230, 118, 0.25)',
           },
         },
         containedPrimary: {
-          backgroundColor: '#000000', // Đen từ logo
+          backgroundColor: '#00E676', // Button primary màu xanh lá
+          color: '#0A0A0A',
           '&:hover': {
-            backgroundColor: '#333333',
+            backgroundColor: '#00C853',
           },
         },
         containedSecondary: {
-          backgroundColor: '#008F39', // Xanh lá từ logo
+          backgroundColor: '#03DAC6', // Button secondary màu cyan
           '&:hover': {
-            backgroundColor: '#006D2C',
+            backgroundColor: '#018786',
           },
         },
         outlined: {
-          borderWidth: '2px',
+          borderWidth: '1px',
           '&:hover': {
-            borderWidth: '2px',
+            borderWidth: '1px',
+            borderColor: '#00E676',
           }
-        }
-      }
-    },
-    MuiPopover: {
-      styleOverrides: {
-        paper: {
-          boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.2)',
-          '&::-webkit-scrollbar': {
-            width: '6px',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'rgba(0, 143, 57, 0.4)',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            backgroundColor: 'rgba(0, 143, 57, 0.7)',
-          }
-        }
-      }
-    },
-    MuiMenuItem: {
-      styleOverrides: {
-        root: {
-          color: '#121212', // Đảm bảo text trong menu item có màu đen
+        },
+        outlinedPrimary: {
+          borderColor: '#00E676',
+          color: '#00E676',
           '&:hover': {
-            backgroundColor: 'rgba(0, 143, 57, 0.08)', // Hover màu xanh nhạt
-          },
-          '&.Mui-selected': {
-            backgroundColor: 'rgba(0, 143, 57, 0.12)',
-            '&:hover': {
-              backgroundColor: 'rgba(0, 143, 57, 0.18)',
-            }
+            backgroundColor: 'rgba(0, 230, 118, 0.08)',
           }
         }
       }
@@ -162,8 +174,11 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
+          backgroundColor: '#121212',
+          boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.3)',
           borderRadius: 12,
+          border: '1px solid rgba(255, 255, 255, 0.05)',
+          overflow: 'hidden',
         }
       }
     },
@@ -171,48 +186,45 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 4,
+        },
+        colorSuccess: {
+          backgroundColor: 'rgba(0, 230, 118, 0.15)',
+          color: '#00E676',
+          '& .MuiChip-icon': {
+            color: '#00E676',
+          }
+        },
+        colorError: {
+          backgroundColor: 'rgba(244, 67, 54, 0.15)',
+          color: '#F44336',
+          '& .MuiChip-icon': {
+            color: '#F44336',
+          }
         }
       }
     },
     MuiPaper: {
       styleOverrides: {
         root: {
+          backgroundColor: '#121212',
+          backgroundImage: 'none',
           scrollbarWidth: 'thin',
           '&::-webkit-scrollbar': {
             width: '6px',
             height: '6px',
           },
           '&::-webkit-scrollbar-track': {
-            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+            backgroundColor: '#0A0A0A',
             borderRadius: '4px',
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'rgba(0, 143, 57, 0.4)',
+            backgroundColor: '#6b6b6b',
             borderRadius: '4px',
             transition: 'background-color 0.3s ease',
           },
           '&::-webkit-scrollbar-thumb:hover': {
-            backgroundColor: 'rgba(0, 143, 57, 0.7)',
+            backgroundColor: '#959595',
           },
-        }
-      }
-    },
-    MuiSelect: {
-      styleOverrides: {
-        root: {
-          '& .MuiPaper-root': {
-            scrollbarWidth: 'thin',
-            '&::-webkit-scrollbar': {
-              width: '6px',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: 'rgba(0, 143, 57, 0.4)',
-              borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              backgroundColor: 'rgba(0, 143, 57, 0.7)',
-            }
-          }
         }
       }
     },
@@ -224,33 +236,284 @@ const theme = createTheme({
             height: '8px',
           },
           '&::-webkit-scrollbar-track': {
-            backgroundColor: 'rgba(0, 0, 0, 0.05)',
+            backgroundColor: '#0A0A0A',
             borderRadius: '4px',
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'rgba(0, 143, 57, 0.4)',
+            backgroundColor: '#6b6b6b',
             borderRadius: '4px',
             transition: 'background-color 0.3s ease',
           },
           '&::-webkit-scrollbar-thumb:hover': {
-            backgroundColor: 'rgba(0, 143, 57, 0.7)',
+            backgroundColor: '#959595',
           },
+        }
+      }
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+        },
+        head: {
+          fontWeight: 600,
+          color: '#B0B0B0',
+        }
+      }
+    },
+    MuiTableRow: {
+      styleOverrides: {
+        root: {
+          '&:nth-of-type(even)': {
+            backgroundColor: 'rgba(255, 255, 255, 0.02)',
+          },
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.04) !important',
+          }
+        }
+      }
+    },
+    MuiPopover: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: '#1E1E1E',
+          boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.5)',
+          '&::-webkit-scrollbar': {
+            width: '6px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#6b6b6b',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: '#959595',
+          }
+        }
+      }
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          color: '#FFFFFF',
+          '&:hover': {
+            backgroundColor: 'rgba(0, 230, 118, 0.08)',
+          },
+          '&.Mui-selected': {
+            backgroundColor: 'rgba(0, 230, 118, 0.12)',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 230, 118, 0.18)',
+            }
+          }
+        }
+      }
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          borderRadius: 8,
+          '&.Mui-focused': {
+            boxShadow: '0 0 0 2px rgba(0, 230, 118, 0.25)',
+          },
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+          }
+        },
+        input: {
+          '&::placeholder': {
+            color: 'rgba(255, 255, 255, 0.5)',
+            opacity: 1,
+          }
+        }
+      }
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'rgba(255, 255, 255, 0.15)',
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'rgba(255, 255, 255, 0.25)',
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#00E676',
+          }
         }
       }
     },
     MuiAutocomplete: {
       styleOverrides: {
         listbox: {
+          backgroundColor: '#1E1E1E',
           scrollbarWidth: 'thin',
           '&::-webkit-scrollbar': {
             width: '6px',
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'rgba(0, 143, 57, 0.4)',
+            backgroundColor: '#6b6b6b',
             borderRadius: '4px',
           },
           '&::-webkit-scrollbar-thumb:hover': {
-            backgroundColor: 'rgba(0, 143, 57, 0.7)',
+            backgroundColor: '#959595',
+          }
+        },
+        option: {
+          '&[data-focus="true"]': {
+            backgroundColor: 'rgba(0, 230, 118, 0.08)',
+          },
+          '&[aria-selected="true"]': {
+            backgroundColor: 'rgba(0, 230, 118, 0.12)',
+          }
+        }
+      }
+    },
+    MuiAccordion: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#121212',
+          '&.Mui-expanded': {
+            margin: 0,
+            border: 'none',
+            boxShadow: 'none',
+          }
+        }
+      }
+    },
+    MuiAccordionSummary: {
+      styleOverrides: {
+        root: {
+          padding: '0 8px',
+          minHeight: '48px',
+          '&.Mui-expanded': {
+            minHeight: '48px',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          }
+        },
+        content: {
+          margin: '12px 0',
+          '&.Mui-expanded': {
+            margin: '12px 0',
+          }
+        }
+      }
+    },
+    MuiAccordionDetails: {
+      styleOverrides: {
+        root: {
+          padding: '16px 8px',
+        }
+      }
+    },
+    MuiSwitch: {
+      styleOverrides: {
+        root: {
+          width: 42,
+          height: 26,
+          padding: 0,
+          '& .MuiSwitch-switchBase': {
+            padding: 0,
+            margin: 2,
+            transitionDuration: '300ms',
+            '&.Mui-checked': {
+              transform: 'translateX(16px)',
+              color: '#0A0A0A',
+              '& + .MuiSwitch-track': {
+                backgroundColor: '#00E676',
+                opacity: 1,
+                border: 0,
+              },
+              '&.Mui-disabled + .MuiSwitch-track': {
+                opacity: 0.5,
+              },
+            },
+            '&.Mui-focusVisible .MuiSwitch-thumb': {
+              color: '#00E676',
+              border: '6px solid #0A0A0A',
+            },
+            '&.Mui-disabled .MuiSwitch-thumb': {
+              color: '#303030',
+            },
+            '&.Mui-disabled + .MuiSwitch-track': {
+              opacity: 0.3,
+            },
+          },
+          '& .MuiSwitch-thumb': {
+            boxSizing: 'border-box',
+            width: 22,
+            height: 22,
+          },
+          '& .MuiSwitch-track': {
+            borderRadius: 26 / 2,
+            backgroundColor: '#4D4D4D',
+            opacity: 1,
+          },
+        },
+      },
+    },
+    MuiLinearProgress: {
+      styleOverrides: {
+        root: {
+          height: 8,
+          borderRadius: 4,
+          backgroundColor: 'rgba(255, 255, 255, 0.08)',
+        },
+        bar: {
+          borderRadius: 4,
+        },
+        colorPrimary: {
+          '& .MuiLinearProgress-bar': {
+            backgroundColor: '#00E676',
+          }
+        }
+      }
+    },
+    MuiBadge: {
+      styleOverrides: {
+        colorSuccess: {
+          backgroundColor: '#00E676',
+          color: '#0A0A0A',
+        },
+        colorError: {
+          backgroundColor: '#F44336',
+          color: '#FFFFFF',
+        },
+        colorWarning: {
+          backgroundColor: '#FFA726',
+          color: '#0A0A0A',
+        }
+      }
+    },
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+        },
+        standardSuccess: {
+          backgroundColor: 'rgba(0, 230, 118, 0.15)',
+          color: '#00E676',
+          '& .MuiAlert-icon': {
+            color: '#00E676',
+          }
+        },
+        standardError: {
+          backgroundColor: 'rgba(244, 67, 54, 0.15)',
+          color: '#F44336',
+          '& .MuiAlert-icon': {
+            color: '#F44336',
+          }
+        },
+        standardWarning: {
+          backgroundColor: 'rgba(255, 167, 38, 0.15)',
+          color: '#FFA726',
+          '& .MuiAlert-icon': {
+            color: '#FFA726',
+          }
+        },
+        standardInfo: {
+          backgroundColor: 'rgba(41, 182, 246, 0.15)',
+          color: '#29B6F6',
+          '& .MuiAlert-icon': {
+            color: '#29B6F6',
           }
         }
       }
