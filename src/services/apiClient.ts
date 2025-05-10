@@ -3,7 +3,7 @@ import type { AxiosInstance } from 'axios';
 import { getAccessToken, getRefreshToken, storeTokens, removeTokens } from '@utils/tokenUtils';
 import { store } from '@features/store';
 import { refreshToken as refreshTokenAction } from '@features/auth/authSlice';
-import type { Token } from '@types/auth.types';
+import type { Token } from '../types/auth.types';
 
 const API_URL = 'http://localhost:8001'; // URL của API backend
 
@@ -83,7 +83,7 @@ const createApiClient = (): AxiosInstance => {
           );
           
           // Update redux store with the new tokens
-          store.dispatch(refreshTokenAction(response.data));
+          store.dispatch(refreshTokenAction());
           
           // Update authorization header and retry the original request
           originalRequest.headers['Authorization'] = `Bearer ${access_token}`;

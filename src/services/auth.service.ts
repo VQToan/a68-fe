@@ -4,29 +4,35 @@ import type {
   RegisterCredentials,
   Token,
   User,
-  UserUpdate
-} from "@types/auth.types";
-import { 
-  storeTokens, 
-  removeTokens, 
-  getAccessTokenExpiresAt, 
-  getRefreshTokenExpiresAt 
+  UserUpdate,
+} from "../types/auth.types";
+import {
+  storeTokens,
+  removeTokens,
+  getAccessTokenExpiresAt,
+  getRefreshTokenExpiresAt,
 } from "@utils/tokenUtils";
 
 // Auth service functions
 const register = async (credentials: RegisterCredentials): Promise<User> => {
-  const response = await publicApi.post<User>("/api/v1/auth/register", credentials);
+  const response = await publicApi.post<User>(
+    "/api/v1/auth/register",
+    credentials
+  );
   return response.data;
 };
 
 const login = async (credentials: LoginCredentials): Promise<Token> => {
-  const response = await publicApi.post<Token>("/api/v1/auth/login", credentials);
-  
-  const { 
-    access_token, 
-    refresh_token, 
-    access_token_expires_at, 
-    refresh_token_expires_at 
+  const response = await publicApi.post<Token>(
+    "/api/v1/auth/login",
+    credentials
+  );
+
+  const {
+    access_token,
+    refresh_token,
+    access_token_expires_at,
+    refresh_token_expires_at,
   } = response.data;
 
   // Store tokens and their expiration timestamps
@@ -36,7 +42,7 @@ const login = async (credentials: LoginCredentials): Promise<Token> => {
     access_token_expires_at,
     refresh_token_expires_at
   );
-  
+
   return response.data;
 };
 
@@ -68,16 +74,16 @@ const updateCurrentUser = async (userData: UserUpdate): Promise<User> => {
 
 const refreshToken = async (refreshToken: string): Promise<Token> => {
   const response = await publicApi.post<Token>("/api/v1/auth/refresh", null, {
-    params: { refresh_token: refreshToken }
+    params: { refresh_token: refreshToken },
   });
 
-  const { 
-    access_token, 
-    refresh_token, 
-    access_token_expires_at, 
-    refresh_token_expires_at 
+  const {
+    access_token,
+    refresh_token,
+    access_token_expires_at,
+    refresh_token_expires_at,
   } = response.data;
-  
+
   // Store the new tokens and their expiration timestamps
   storeTokens(
     access_token,
@@ -85,7 +91,7 @@ const refreshToken = async (refreshToken: string): Promise<Token> => {
     access_token_expires_at,
     refresh_token_expires_at
   );
-  
+
   return response.data;
 };
 
@@ -107,7 +113,7 @@ const getTokenData = (): {
     accessToken: localStorage.getItem("accessToken"),
     refreshToken: localStorage.getItem("refreshToken"),
     accessTokenExpiresAt: getAccessTokenExpiresAt(),
-    refreshTokenExpiresAt: getRefreshTokenExpiresAt()
+    refreshTokenExpiresAt: getRefreshTokenExpiresAt(),
   };
 };
 
@@ -120,7 +126,7 @@ const authService = {
   refreshToken,
   getUserFromStorage,
   getTokenData,
-  api
+  api,
 };
 
 export default authService;
