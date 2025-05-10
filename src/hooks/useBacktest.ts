@@ -1,3 +1,4 @@
+import type { BacktestProcessCreate, BacktestProcessUpdate } from '@/types/backtest.type';
 import { useAppSelector, useAppDispatch } from './reduxHooks';
 import {
   fetchBacktestProcesses,
@@ -9,10 +10,6 @@ import {
   clearCurrentProcess as clearCurrentProcessAction,
   clearError as clearErrorAction
 } from '@features/backtest/backtestSlice';
-import type { 
-  BacktestProcessCreate, 
-  BacktestProcessUpdate 
-} from '@services/backtest.service';
 
 export const useBacktest = () => {
   const dispatch = useAppDispatch();

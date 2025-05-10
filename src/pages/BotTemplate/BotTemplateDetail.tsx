@@ -5,11 +5,9 @@ import {
   Paper,
   Grid,
   Divider,
-  Button,
   Chip,
   CircularProgress,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 import type { BotTemplate } from "../../types/botTemplate.types";
 import { useModule } from "@hooks/useModule";
 import { areEqual } from "@/utils/common";
@@ -17,13 +15,11 @@ import { areEqual } from "@/utils/common";
 interface BotTemplateDetailProps {
   template: BotTemplate | null;
   isLoading: boolean;
-  onEdit: () => void;
 }
 
 const BotTemplateDetail: React.FC<BotTemplateDetailProps> = ({
   template,
   isLoading,
-  onEdit,
 }) => {
   const { modules } = useModule();
 
@@ -59,18 +55,12 @@ const BotTemplateDetail: React.FC<BotTemplateDetailProps> = ({
     <Paper sx={{ p: 3 }}>
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
           mb: 2,
         }}
       >
         <Typography variant="h6" component="h2">
           Chi tiết Bot Template
         </Typography>
-        <Button variant="outlined" startIcon={<EditIcon />} onClick={onEdit}>
-          Chỉnh sửa
-        </Button>
       </Box>
 
       <Divider sx={{ mb: 3 }} />

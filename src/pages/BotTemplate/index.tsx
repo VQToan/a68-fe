@@ -6,23 +6,19 @@ import {
   Button,
   TextField,
   InputAdornment,
-  Dialog,
-  DialogTitle,
-  DialogContent,
   Grid,
-  IconButton,
   Divider,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
-import CloseIcon from "@mui/icons-material/Close";
 import { useDebounce } from "@utils/debounceUtils";
 import { useBotTemplate } from "@hooks/useBotTemplate";
 import { useModule } from "@hooks/useModule";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
+import Modal from "@components/Modal";
 import BotTemplateList from "./BotTemplateList";
 import BotTemplateForm from "./BotTemplateForm";
 import BotTemplateDetail from "./BotTemplateDetail";
@@ -247,6 +243,44 @@ const BotTemplate = () => {
     handleCloseDeleteConfirm,
   ]);
 
+  // Create form footer based on dialog mode
+  const getModalFooter = useCallback(() => {
+    if (dialogMode === "view") {
+      return (
+        <>
+          <Button
+            onClick={handleSwitchToEditMode}
+            variant="outlined"
+            color="primary"
+          >
+            Chỉnh sửa
+          </Button>
+          <Button onClick={handleCloseDialog} variant="contained">
+            Đóng
+          </Button>
+        </>
+      );
+    }
+    
+    return (
+      <>
+        <Button onClick={handleCloseDialog} variant="outlined">
+          Hủy
+        </Button>
+        <Button 
+          onClick={() => {
+            const form = document.getElementById('bot-template-form') as HTMLFormElement;
+            if (form) form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+          }} 
+          variant="contained"
+          disabled={isLoading}
+        >
+          Lưu
+        </Button>
+      </>
+    );
+  }, [dialogMode, handleCloseDialog, handleSwitchToEditMode, isLoading]);
+
   return (
     <Box>
       <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
@@ -299,58 +333,30 @@ const BotTemplate = () => {
         />
       </Paper>
 
-      {/* Dialog for creating, viewing or editing bot template */}
-      <Dialog
+      {/* Modal for creating, viewing or editing bot template */}
+      <Modal
         open={openDialog}
         onClose={handleCloseDialog}
-        fullWidth
+        title={dialogTitle}
         maxWidth="md"
         fullScreen={isMobile}
-        PaperProps={{
-          sx: {
-            borderRadius: isMobile ? 0 : 1,
-          },
-        }}
+        footer={getModalFooter()}
       >
-        <DialogTitle
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-            p: 2,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          {dialogTitle}
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseDialog}
-            sx={{
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent sx={{ p: 3, mt: 1 }}>
-          {dialogMode === "view" && currentTemplate ? (
-            <BotTemplateDetail
-              template={currentTemplate}
-              isLoading={isLoading}
-              onEdit={handleSwitchToEditMode}
-            />
-          ) : (
-            <BotTemplateForm
-              initialData={currentTemplate || undefined}
-              onSubmit={handleSubmit}
-              isSubmitting={isLoading}
-              isEditMode={dialogMode === "edit"}
-              onCancel={handleCloseDialog}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+        {dialogMode === "view" && currentTemplate ? (
+          <BotTemplateDetail
+            template={currentTemplate}
+            isLoading={isLoading}
+          />
+        ) : (
+          <BotTemplateForm
+            initialData={currentTemplate || undefined}
+            onSubmit={handleSubmit}
+            isSubmitting={isLoading}
+            isEditMode={dialogMode === "edit"}
+            formId="bot-template-form"
+          />
+        )}
+      </Modal>
 
       {/* Confirm Delete Dialog */}
       <ConfirmDialog

@@ -2,8 +2,6 @@ import React, { memo, useCallback, useEffect } from "react";
 import {
   Box,
   TextField,
-  Button,
-  DialogActions,
   FormControl,
   InputLabel,
   Select,
@@ -23,6 +21,7 @@ interface ModuleBotFormProps {
   onCancel?: () => void;
   mode?: FormMode;
   onEdit?: () => void;
+  formId?: string;
 }
 
 // Form field type
@@ -36,9 +35,8 @@ type FormFields = {
 const ModuleBotForm: React.FC<ModuleBotFormProps> = ({
   initialData = {},
   onSubmit,
-  onCancel,
   mode = "create",
-  onEdit,
+  formId = "module-bot-form"
 }) => {
   // Initialize React Hook Form
   const {
@@ -77,9 +75,10 @@ const ModuleBotForm: React.FC<ModuleBotFormProps> = ({
   return (
     <Box
       component="form"
+      id={formId}
       onSubmit={handleFormSubmit(onFormSubmit)}
       noValidate
-      sx={{ width: "100%", p: 2 }}
+      sx={{ width: "100%" }}
     >
       <Controller
         name="name"
@@ -196,40 +195,6 @@ const ModuleBotForm: React.FC<ModuleBotFormProps> = ({
           </FormControl>
         )}
       />
-
-      {/* Form action buttons */}
-      <DialogActions sx={{ p: 0, pt: 2 }}>
-        {mode === "view" && onEdit && (
-          <Button
-            onClick={onEdit}
-            variant="outlined"
-            color="primary"
-            sx={{ mr: "auto" }}
-          >
-            Chỉnh sửa
-          </Button>
-        )}
-
-        <Box sx={{ ml: "auto", display: "flex", gap: 1 }}>
-          {onCancel && (
-            <Button onClick={onCancel} variant="outlined">
-              Hủy
-            </Button>
-          )}
-
-          {mode !== "view" && (
-            <Button type="submit" variant="contained">
-              Lưu
-            </Button>
-          )}
-
-          {mode === "view" && (
-            <Button onClick={onCancel} variant="contained">
-              Đóng
-            </Button>
-          )}
-        </Box>
-      </DialogActions>
     </Box>
   );
 };

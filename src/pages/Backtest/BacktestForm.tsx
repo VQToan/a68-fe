@@ -1,13 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo, memo } from "react";
 import {
   Box,
-  Button,
   TextField,
   Typography,
-  Paper,
   Grid,
   CircularProgress,
-  Divider,
   FormControl,
   InputLabel,
   Select,
@@ -15,55 +12,56 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Checkbox,
+  ListItemText,
+  OutlinedInput,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useForm, Controller } from "react-hook-form";
+import { useBotTemplate } from "@hooks/useBotTemplate";
+import type { SelectChangeEvent } from "@mui/material";
 import type {
+  BacktestParameter,
   BacktestProcessCreate,
   BacktestProcessUpdate,
-} from "@services/backtest.service";
-import { useModule } from "@hooks/useModule";
-import type { SelectChangeEvent } from "@mui/material";
+} from "@/types/backtest.type";
+import { areEqual } from "@/utils/common";
 
 interface BacktestFormProps {
-  initialData?: BacktestProcessUpdate & { _id?: string };
+  initialData?: BacktestProcessUpdate & {
+    _id?: string;
+    bot_template_id?: string;
+  };
   onSubmit: (data: BacktestProcessCreate | BacktestProcessUpdate) => void;
   isSubmitting: boolean;
   isEditMode: boolean;
-  onCancel: () => void;
+  formId?: string;
 }
 
-// Default bot parameters based on provided example
-const defaultBotParams = {
-  BOT_NAME: "trade_RC_v28_4_new",
+// Default bot parameters based on the BacktestParameter type
+const defaultBotParams: Partial<BacktestParameter> = {
   SYMBOL: "btcusdt",
   INTERVAL_1: "5m",
   INTERVAL_2: "15m",
-  TRADE_MODE: 0, // BOTH
+  TRADE_MODE: 0, // both
   QUANTITY: 0.01,
   LEVERAGE: 10,
   TAKE_PROFIT: 20.0,
   MIN_MARGIN: 0.0,
   MAX_MARGIN: 20.0,
   FUNDS: 1000.0,
-  MAX_LOSS: 0.0,
-  TRAILING_PERCENTAGE: 1.0,
-  MIN_PROFIT_MARGIN: 3.0,
-  MIN_PROFIT_MULTIPLIER: 1.2,
   MIN_ROI: 8.0,
   MA_PERIOD: "8:20",
   DCA_GRID: 0.008,
   DCA_MULTIPLIER: 1.05,
-  DCA_AMOUNT: 100.0,
-  DCA_AMOUNT_MULTIPLIER: 1.0,
-  RSI_ENTRY_SHORT_CANDLE: 65,
   RSI_ENTRY_SHORT: 75,
-  RSI_EXIT_SHORT_CANDLE: 40,
   RSI_EXIT_SHORT: 25,
-  RSI_ENTRY_LONG_CANDLE: 35,
   RSI_ENTRY_LONG: 19,
-  RSI_EXIT_LONG_CANDLE: 60,
   RSI_EXIT_LONG: 75,
+  RSI_ENTRY_SHORT_CANCEL: 65,
+  RSI_ENTRY_LONG_CANCEL: 35,
+  RSI_EXIT_SHORT_CANCEL: 40,
+  RSI_EXIT_LONG_CANCEL: 60,
   TIME_BETWEEN_ORDERS: 0,
   PAUSE_TIME: "00:00-00:00",
   PAUSE_DAY: "",
@@ -71,9 +69,9 @@ const defaultBotParams = {
 
 // Trade mode options
 const tradeModeOptions = [
+  { value: -1, label: "SHORT ONLY" },
   { value: 0, label: "BOTH" },
   { value: 1, label: "LONG ONLY" },
-  { value: 2, label: "SHORT ONLY" },
 ];
 
 // Time interval options
@@ -95,23 +93,54 @@ const timeIntervalOptions = [
   "1M",
 ];
 
+// Pause day options
+const pauseDayOptions = [
+  { value: "0", label: "Monday" },
+  { value: "1", label: "Tuesday" },
+  { value: "2", label: "Wednesday" },
+  { value: "3", label: "Thursday" },
+  { value: "4", label: "Friday" },
+  { value: "5", label: "Saturday" },
+  { value: "6", label: "Sunday" },
+];
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
 const BacktestForm = ({
   initialData,
   onSubmit,
   isSubmitting,
   isEditMode,
-  onCancel,
+  formId = "backtest-form",
 }: BacktestFormProps) => {
-  // Get modules from the store for the module selection
-  const { modules, getModules, isLoading: isLoadingModules } = useModule();
+  // Get bot templates from the store
+  const {
+    templates,
+    getTemplates: getBotTemplates,
+    isLoading: isLoadingTemplates,
+  } = useBotTemplate();
 
-  // State for the selected module
-  const [selectedModule, setSelectedModule] = useState<string>("");
+  // State for the selected bot template
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
 
   // State for validation errors
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
-  // State for parameters (will be dynamically generated based on selected module)
+  // State for selected pause days
+  const [selectedPauseDays, setSelectedPauseDays] = useState<string[]>([]);
+
+  // State for parameters (will be dynamically generated based on selected bot template)
   const [parameters, setParameters] = useState<Record<string, any>>({
     ...defaultBotParams,
     ...(initialData?.parameters || {}),
@@ -126,13 +155,24 @@ const BacktestForm = ({
     defaultValues: {
       name: initialData?.name || "",
       description: initialData?.description || "",
+      bot_template_id: initialData?.bot_template_id || "",
       parameters: initialData?.parameters || defaultBotParams,
     },
   });
 
-  // Fetch modules on component mount
+  // Parse pause days from initialData if present
   useEffect(() => {
-    getModules();
+    if (initialData?.parameters?.PAUSE_DAY) {
+      const pauseDays = initialData.parameters.PAUSE_DAY.split(",").map(
+        (day: string) => day.trim()
+      );
+      setSelectedPauseDays(pauseDays);
+    }
+  }, [initialData]);
+
+  // Fetch bot templates on component mount
+  useEffect(() => {
+    getBotTemplates();
   }, []);
 
   // Set initial parameters if in edit mode
@@ -142,93 +182,142 @@ const BacktestForm = ({
         ...defaultBotParams,
         ...initialData.parameters,
       });
-      // Try to set selected module if it exists in parameters
-      if (initialData.parameters.module_name) {
-        setSelectedModule(initialData.parameters.module_name);
+      // Try to set selected bot template if it exists in initial data
+      if (initialData.bot_template_id) {
+        setSelectedTemplateId(initialData.bot_template_id);
       }
     }
   }, [isEditMode, initialData]);
 
-  // Handle module selection change
-  const handleModuleChange = (event: SelectChangeEvent) => {
-    const moduleName = event.target.value as string;
-    setSelectedModule(moduleName);
-
-    // Update parameters with the selected module
-    setParameters({
-      ...parameters,
-      module_name: moduleName,
-    });
-  };
-
   // Handle parameter changes
-  const handleParameterChange = (paramName: string, value: any) => {
-    setParameters({
-      ...parameters,
+  const handleParameterChange = useCallback((paramName: string, value: any) => {
+    setParameters((prevParams) => ({
+      ...prevParams,
       [paramName]: value,
-    });
-  };
+    }));
+  }, []);
+
+  // Handle pause days selection
+  const handlePauseDaysChange = useCallback(
+    (event: SelectChangeEvent<typeof selectedPauseDays>) => {
+      const {
+        target: { value },
+      } = event;
+
+      // On autofill we get a stringified value.
+      const days = typeof value === "string" ? value.split(",") : value;
+      setSelectedPauseDays(days);
+
+      // Update parameters with comma-separated list of pause days
+      setParameters((prevParams) => ({
+        ...prevParams,
+        PAUSE_DAY: days.join(","),
+      }));
+    },
+    []
+  );
 
   // Validate form data
-  const validateFormData = (data: any): boolean => {
-    const errors: Record<string, string> = {};
-    
-    if (!data.name?.trim()) {
-      errors.name = "Tên backtest là bắt buộc";
-    }
-    
-    if (!data.description?.trim()) {
-      errors.description = "Mô tả là bắt buộc";
-    }
-    
-    if (!selectedModule) {
-      errors.module = "Vui lòng chọn module";
-    }
-    
-    // Validate start_time and end_time if they exist
-    if (parameters.start_time && parameters.end_time) {
-      const startDate = new Date(parameters.start_time);
-      const endDate = new Date(parameters.end_time);
-      
-      if (startDate >= endDate) {
-        errors.time = "Thời gian kết thúc phải sau thời gian bắt đầu";
+  const validateFormData = useCallback(
+    (data: any): boolean => {
+      const errors: Record<string, string> = {};
+
+      if (!data.name?.trim()) {
+        errors.name = "Tên backtest là bắt buộc";
       }
-    }
-    
-    // You can add more parameter-specific validations here
-    
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
+
+      if (!data.description?.trim()) {
+        errors.description = "Mô tả là bắt buộc";
+      }
+
+      if (!selectedTemplateId) {
+        errors.template = "Vui lòng chọn bot template";
+      }
+
+      // Validate start_time and end_time if they exist
+      if (parameters.START_DATE && parameters.END_DATE) {
+        const startDate = new Date(parameters.START_DATE);
+        const endDate = new Date(parameters.END_DATE);
+
+        if (startDate >= endDate) {
+          errors.time = "Thời gian kết thúc phải sau thời gian bắt đầu";
+        }
+      }
+
+      // You can add more parameter-specific validations here
+
+      setValidationErrors(errors);
+      return Object.keys(errors).length === 0;
+    },
+    [parameters, selectedTemplateId]
+  );
+
+  // Format parameters before submission
+  const formatParameters = useCallback(
+    (params: Record<string, any>) => {
+      const formattedParams = { ...params };
+
+      // Convert dates to timestamps
+      if (formattedParams.START_DATE) {
+        formattedParams.START_DATE = new Date(
+          formattedParams.START_DATE
+        ).getTime();
+      }
+
+      if (formattedParams.END_DATE) {
+        formattedParams.END_DATE = new Date(formattedParams.END_DATE).getTime();
+      }
+
+      // Ensure PAUSE_DAY is correctly formatted as a comma-separated string
+      if (selectedPauseDays.length > 0) {
+        formattedParams.PAUSE_DAY = selectedPauseDays.join(",");
+      }
+
+      return formattedParams;
+    },
+    [selectedPauseDays]
+  );
 
   // Handle form submission
-  const onFormSubmit = (data: any) => {
-    // Add parameters to the form data
-    const formData = {
-      ...data,
-      parameters: parameters,
-    };
+  const onFormSubmit = useCallback(
+    (data: any) => {
+      // Combine the form data with formatted parameters
+      const formattedParameters = formatParameters(parameters);
 
-    if (validateFormData(formData)) {
-      onSubmit(formData);
-    }
-  };
+      const formData = {
+        name: data.name,
+        description: data.description,
+        bot_template_id: data.bot_template_id,
+        parameters: formattedParameters,
+      };
 
-  // Cancel form and reset
-  const handleCancel = () => {
-    reset();
-    setValidationErrors({});
-    onCancel();
-  };
+      // Validate the form data
+      if (validateFormData(formData)) {
+        onSubmit(formData as BacktestProcessCreate | BacktestProcessUpdate);
+        reset(); // Reset the form after submission
+      }
+    },
+    [parameters, onSubmit, validateFormData, formatParameters, reset]
+  );
+
+  // Render pause day display labels
+  const pauseDayLabels = useMemo(() => {
+    return selectedPauseDays
+      .map((dayValue) => {
+        const day = pauseDayOptions.find((opt) => opt.value === dayValue);
+        return day ? day.label : dayValue;
+      })
+      .join(", ");
+  }, [selectedPauseDays]);
 
   return (
-    <Paper sx={{ p: 3, mb: 3 }}>
-      <Typography variant="h6" gutterBottom>
-        {isEditMode ? "Chỉnh sửa Backtest" : "Tạo Backtest mới"}
-      </Typography>
-      <Divider sx={{ mb: 3 }} />
-
-      <Box component="form" onSubmit={handleSubmit(onFormSubmit)} noValidate>
+    <Box
+      component="form"
+      id={formId}
+      onSubmit={handleSubmit(onFormSubmit)}
+      noValidate
+    >
+      <Box sx={{ p: 3, mb: 3 }}>
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, sm: 6 }}>
             <Controller
@@ -269,28 +358,48 @@ const BacktestForm = ({
               Cấu hình Backtest
             </Typography>
 
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel id="module-select-label">Module Bot</InputLabel>
-              <Select
-                labelId="module-select-label"
-                id="module-select"
-                value={selectedModule}
-                label="Module Bot"
-                onChange={handleModuleChange}
-                disabled={isLoadingModules}
-              >
-                {isLoadingModules ? (
-                  <MenuItem value="">
-                    <CircularProgress size={24} />
-                  </MenuItem>
-                ) : (
-                  modules.map((module) => (
-                    <MenuItem key={module._id} value={module.name_in_source}>
-                      {module.name}
-                    </MenuItem>
-                  ))
+            <FormControl
+              fullWidth
+              sx={{ mb: 2 }}
+              error={!!validationErrors.template}
+            >
+              <InputLabel id="bot-template-select-label">
+                Bot Template
+              </InputLabel>
+              <Controller
+                name="bot_template_id"
+                control={control}
+                rules={{ required: "Bot Template là bắt buộc" }}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    labelId="bot-template-select-label"
+                    label="Bot Template"
+                    onChange={(e) => {
+                      field.onChange(e);
+                      setSelectedTemplateId(e.target.value as string);
+                    }}
+                    disabled={isLoadingTemplates}
+                  >
+                    {isLoadingTemplates ? (
+                      <MenuItem value="">
+                        <CircularProgress size={24} />
+                      </MenuItem>
+                    ) : (
+                      templates.map((template) => (
+                        <MenuItem key={template._id} value={template._id}>
+                          {template.name}
+                        </MenuItem>
+                      ))
+                    )}
+                  </Select>
                 )}
-              </Select>
+              />
+              {validationErrors.template && (
+                <Typography color="error" variant="caption">
+                  {validationErrors.template}
+                </Typography>
+              )}
             </FormControl>
 
             {/* Basic configuration */}
@@ -300,16 +409,6 @@ const BacktestForm = ({
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      label="Tên Bot"
-                      fullWidth
-                      value={parameters.BOT_NAME || defaultBotParams.BOT_NAME}
-                      onChange={(e) =>
-                        handleParameterChange("BOT_NAME", e.target.value)
-                      }
-                    />
-                  </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Cặp giao dịch"
@@ -389,9 +488,9 @@ const BacktestForm = ({
                       type="datetime-local"
                       fullWidth
                       InputLabelProps={{ shrink: true }}
-                      value={parameters.start_time || ""}
+                      value={parameters.START_DATE || ""}
                       onChange={(e) =>
-                        handleParameterChange("start_time", e.target.value)
+                        handleParameterChange("START_DATE", e.target.value)
                       }
                     />
                   </Grid>
@@ -401,9 +500,9 @@ const BacktestForm = ({
                       type="datetime-local"
                       fullWidth
                       InputLabelProps={{ shrink: true }}
-                      value={parameters.end_time || ""}
+                      value={parameters.END_DATE || ""}
                       onChange={(e) =>
-                        handleParameterChange("end_time", e.target.value)
+                        handleParameterChange("END_DATE", e.target.value)
                       }
                     />
                   </Grid>
@@ -477,24 +576,6 @@ const BacktestForm = ({
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="Trailing Percentage (%)"
-                      type="number"
-                      fullWidth
-                      value={
-                        parameters.TRAILING_PERCENTAGE ||
-                        defaultBotParams.TRAILING_PERCENTAGE
-                      }
-                      onChange={(e) =>
-                        handleParameterChange(
-                          "TRAILING_PERCENTAGE",
-                          Number(e.target.value)
-                        )
-                      }
-                      inputProps={{ step: "0.1" }}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
                       label="Thời gian nghỉ giữa các lệnh (giây)"
                       type="number"
                       fullWidth
@@ -524,15 +605,32 @@ const BacktestForm = ({
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      label="Tạm dừng theo ngày (PAUSE_DAY)"
-                      fullWidth
-                      placeholder="Mon,Tue,..."
-                      value={parameters.PAUSE_DAY || defaultBotParams.PAUSE_DAY}
-                      onChange={(e) =>
-                        handleParameterChange("PAUSE_DAY", e.target.value)
-                      }
-                    />
+                    <FormControl fullWidth>
+                      <InputLabel id="pause-day-select-label">
+                        Tạm dừng theo ngày
+                      </InputLabel>
+                      <Select
+                        labelId="pause-day-select-label"
+                        id="pause-day-select"
+                        multiple
+                        value={selectedPauseDays}
+                        onChange={handlePauseDaysChange}
+                        input={<OutlinedInput label="Tạm dừng theo ngày" />}
+                        renderValue={() => pauseDayLabels}
+                        MenuProps={MenuProps}
+                      >
+                        {pauseDayOptions.map((day) => (
+                          <MenuItem key={day.value} value={day.value}>
+                            <Checkbox
+                              checked={
+                                selectedPauseDays.indexOf(day.value) > -1
+                              }
+                            />
+                            <ListItemText primary={day.label} />
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                   </Grid>
                 </Grid>
               </AccordionDetails>
@@ -545,42 +643,6 @@ const BacktestForm = ({
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      label="Biên lợi nhuận tối thiểu (%)"
-                      type="number"
-                      fullWidth
-                      value={
-                        parameters.MIN_PROFIT_MARGIN ||
-                        defaultBotParams.MIN_PROFIT_MARGIN
-                      }
-                      onChange={(e) =>
-                        handleParameterChange(
-                          "MIN_PROFIT_MARGIN",
-                          Number(e.target.value)
-                        )
-                      }
-                      inputProps={{ step: "0.1" }}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      label="Hệ số lợi nhuận tối thiểu"
-                      type="number"
-                      fullWidth
-                      value={
-                        parameters.MIN_PROFIT_MULTIPLIER ||
-                        defaultBotParams.MIN_PROFIT_MULTIPLIER
-                      }
-                      onChange={(e) =>
-                        handleParameterChange(
-                          "MIN_PROFIT_MULTIPLIER",
-                          Number(e.target.value)
-                        )
-                      }
-                      inputProps={{ step: "0.1" }}
-                    />
-                  </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Lợi nhuận tối thiểu (MIN_ROI) %"
@@ -621,21 +683,6 @@ const BacktestForm = ({
                       onChange={(e) =>
                         handleParameterChange(
                           "MAX_MARGIN",
-                          Number(e.target.value)
-                        )
-                      }
-                      inputProps={{ step: "0.1" }}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      label="Thua lỗ tối đa (MAX_LOSS) %"
-                      type="number"
-                      fullWidth
-                      value={parameters.MAX_LOSS || defaultBotParams.MAX_LOSS}
-                      onChange={(e) =>
-                        handleParameterChange(
-                          "MAX_LOSS",
                           Number(e.target.value)
                         )
                       }
@@ -691,16 +738,16 @@ const BacktestForm = ({
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="RSI Long Entry Candle"
+                      label="RSI Long Entry Cancel"
                       type="number"
                       fullWidth
                       value={
-                        parameters.RSI_ENTRY_LONG_CANDLE ||
-                        defaultBotParams.RSI_ENTRY_LONG_CANDLE
+                        parameters.RSI_ENTRY_LONG_CANCEL ||
+                        defaultBotParams.RSI_ENTRY_LONG_CANCEL
                       }
                       onChange={(e) =>
                         handleParameterChange(
-                          "RSI_ENTRY_LONG_CANDLE",
+                          "RSI_ENTRY_LONG_CANCEL",
                           Number(e.target.value)
                         )
                       }
@@ -725,16 +772,16 @@ const BacktestForm = ({
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="RSI Long Exit Candle"
+                      label="RSI Long Exit Cancel"
                       type="number"
                       fullWidth
                       value={
-                        parameters.RSI_EXIT_LONG_CANDLE ||
-                        defaultBotParams.RSI_EXIT_LONG_CANDLE
+                        parameters.RSI_EXIT_LONG_CANCEL ||
+                        defaultBotParams.RSI_EXIT_LONG_CANCEL
                       }
                       onChange={(e) =>
                         handleParameterChange(
-                          "RSI_EXIT_LONG_CANDLE",
+                          "RSI_EXIT_LONG_CANCEL",
                           Number(e.target.value)
                         )
                       }
@@ -760,16 +807,16 @@ const BacktestForm = ({
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="RSI Short Entry Candle"
+                      label="RSI Short Entry Cancel"
                       type="number"
                       fullWidth
                       value={
-                        parameters.RSI_ENTRY_SHORT_CANDLE ||
-                        defaultBotParams.RSI_ENTRY_SHORT_CANDLE
+                        parameters.RSI_ENTRY_SHORT_CANCEL ||
+                        defaultBotParams.RSI_ENTRY_SHORT_CANCEL
                       }
                       onChange={(e) =>
                         handleParameterChange(
-                          "RSI_ENTRY_SHORT_CANDLE",
+                          "RSI_ENTRY_SHORT_CANCEL",
                           Number(e.target.value)
                         )
                       }
@@ -794,16 +841,16 @@ const BacktestForm = ({
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="RSI Short Exit Candle"
+                      label="RSI Short Exit Cancel"
                       type="number"
                       fullWidth
                       value={
-                        parameters.RSI_EXIT_SHORT_CANDLE ||
-                        defaultBotParams.RSI_EXIT_SHORT_CANDLE
+                        parameters.RSI_EXIT_SHORT_CANCEL ||
+                        defaultBotParams.RSI_EXIT_SHORT_CANCEL
                       }
                       onChange={(e) =>
                         handleParameterChange(
-                          "RSI_EXIT_SHORT_CANDLE",
+                          "RSI_EXIT_SHORT_CANCEL",
                           Number(e.target.value)
                         )
                       }
@@ -854,79 +901,21 @@ const BacktestForm = ({
                       inputProps={{ step: "0.01" }}
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      label="Số tiền DCA (DCA_AMOUNT)"
-                      type="number"
-                      fullWidth
-                      value={
-                        parameters.DCA_AMOUNT || defaultBotParams.DCA_AMOUNT
-                      }
-                      onChange={(e) =>
-                        handleParameterChange(
-                          "DCA_AMOUNT",
-                          Number(e.target.value)
-                        )
-                      }
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      label="Hệ số số tiền DCA (DCA_AMOUNT_MULTIPLIER)"
-                      type="number"
-                      fullWidth
-                      value={
-                        parameters.DCA_AMOUNT_MULTIPLIER ||
-                        defaultBotParams.DCA_AMOUNT_MULTIPLIER
-                      }
-                      onChange={(e) =>
-                        handleParameterChange(
-                          "DCA_AMOUNT_MULTIPLIER",
-                          Number(e.target.value)
-                        )
-                      }
-                      inputProps={{ step: "0.01" }}
-                    />
-                  </Grid>
                 </Grid>
               </AccordionDetails>
             </Accordion>
           </Grid>
-
-          <Grid size={{ xs: 12 }}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 2,
-                mt: 2,
-              }}
-            >
-              <Button
-                variant="outlined"
-                onClick={handleCancel}
-                disabled={isSubmitting}
-              >
-                Hủy
-              </Button>
-              <Button
-                variant="contained"
-                type="submit"
-                disabled={isSubmitting}
-                startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
-              >
-                {isSubmitting
-                  ? "Đang xử lý..."
-                  : isEditMode
-                  ? "Cập nhật"
-                  : "Tạo"}
-              </Button>
-            </Box>
-          </Grid>
         </Grid>
+
+        {/* Loading indicator when submitting */}
+        {isSubmitting && (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+            <CircularProgress size={24} />
+          </Box>
+        )}
       </Box>
-    </Paper>
+    </Box>
   );
 };
 
-export default BacktestForm;
+export default memo(BacktestForm, areEqual);

@@ -81,14 +81,21 @@ const theme = createTheme({
     MuiListItemIcon: {
       styleOverrides: {
         root: {
-          color: '#FFFFFF', // Icon màu trắng trong sidebar
+          color: 'inherit', // Để icon thừa kế màu từ parent context
+          minWidth: '36px', // Giảm khoảng cách icon
+          '.MuiDrawer-paper &': {
+            color: '#FFFFFF', // Icon màu trắng chỉ trong sidebar
+          }
         }
       }
     },
     MuiListItemText: {
       styleOverrides: {
         primary: {
-          color: '#FFFFFF', // Text màu trắng trong sidebar
+          color: 'inherit', // Để text thừa kế màu từ parent context  
+          '.MuiDrawer-paper &': {
+            color: '#FFFFFF', // Text màu trắng chỉ trong sidebar
+          }
         }
       }
     },
@@ -120,6 +127,38 @@ const theme = createTheme({
         }
       }
     },
+    MuiPopover: {
+      styleOverrides: {
+        paper: {
+          boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.2)',
+          '&::-webkit-scrollbar': {
+            width: '6px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(0, 143, 57, 0.4)',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: 'rgba(0, 143, 57, 0.7)',
+          }
+        }
+      }
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          color: '#121212', // Đảm bảo text trong menu item có màu đen
+          '&:hover': {
+            backgroundColor: 'rgba(0, 143, 57, 0.08)', // Hover màu xanh nhạt
+          },
+          '&.Mui-selected': {
+            backgroundColor: 'rgba(0, 143, 57, 0.12)',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 143, 57, 0.18)',
+            }
+          }
+        }
+      }
+    },
     MuiCard: {
       styleOverrides: {
         root: {
@@ -132,6 +171,87 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 4,
+        }
+      }
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          scrollbarWidth: 'thin',
+          '&::-webkit-scrollbar': {
+            width: '6px',
+            height: '6px',
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: 'rgba(0, 0, 0, 0.1)',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(0, 143, 57, 0.4)',
+            borderRadius: '4px',
+            transition: 'background-color 0.3s ease',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: 'rgba(0, 143, 57, 0.7)',
+          },
+        }
+      }
+    },
+    MuiSelect: {
+      styleOverrides: {
+        root: {
+          '& .MuiPaper-root': {
+            scrollbarWidth: 'thin',
+            '&::-webkit-scrollbar': {
+              width: '6px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: 'rgba(0, 143, 57, 0.4)',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              backgroundColor: 'rgba(0, 143, 57, 0.7)',
+            }
+          }
+        }
+      }
+    },
+    MuiTableContainer: {
+      styleOverrides: {
+        root: {
+          '&::-webkit-scrollbar': {
+            width: '8px',
+            height: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: 'rgba(0, 0, 0, 0.05)',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(0, 143, 57, 0.4)',
+            borderRadius: '4px',
+            transition: 'background-color 0.3s ease',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: 'rgba(0, 143, 57, 0.7)',
+          },
+        }
+      }
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        listbox: {
+          scrollbarWidth: 'thin',
+          '&::-webkit-scrollbar': {
+            width: '6px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(0, 143, 57, 0.4)',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: 'rgba(0, 143, 57, 0.7)',
+          }
         }
       }
     }

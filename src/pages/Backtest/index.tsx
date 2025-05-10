@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import {
   Box,
   Typography,
@@ -6,28 +6,21 @@ import {
   Button,
   TextField,
   InputAdornment,
-  Dialog,
-  DialogTitle,
-  DialogContent,
   Grid,
-  IconButton,
   Divider,
   Tabs,
   Tab,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
-import CloseIcon from "@mui/icons-material/Close";
 import BacktestList from "./BacktestList";
 import BacktestForm from "./BacktestForm";
 import { useBacktest } from "@hooks/useBacktest";
 import { useModule } from "@hooks/useModule";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
-import type {
-  BacktestProcess,
-  BacktestStatus,
-} from "@services/backtest.service";
+import Modal from "@components/Modal";
+import type { BacktestStatus, BacktestProcessCreate, BacktestProcessUpdate } from "@/types/backtest.type";
 
 export type FormMode = "create" | "view" | "edit";
 
@@ -82,7 +75,7 @@ const Backtest = () => {
   } = useBacktest();
 
   // Use the module hook to get available modules
-  const { getModules, modules } = useModule();
+  const { getModules } = useModule();
 
   // Use the notification context
   const { showNotification } = useNotification();
@@ -104,12 +97,6 @@ const Backtest = () => {
     id: null,
     name: "",
   });
-
-  // Format modules for dropdowns
-  const moduleOptions = modules.map((module) => ({
-    id: module._id,
-    name: module.name,
-  }));
 
   // Initial fetch of backtests and modules
   useEffect(() => {
@@ -153,7 +140,7 @@ const Backtest = () => {
     : processes;
 
   // Handle dialog open/close
-  const handleOpenDialog = (mode: FormMode = "create") => {
+  const handleOpenDialog = useCallback((mode: FormMode = "create") => {
     setDialogMode(mode);
 
     // Set dialog title based on mode
@@ -170,92 +157,87 @@ const Backtest = () => {
     }
 
     setOpenDialog(true);
-  };
+  }, []);
 
-  const handleCloseDialog = () => {
+  const handleCloseDialog = useCallback(() => {
     setOpenDialog(false);
     // Clear the current process when dialog closes
     clearCurrentProcess();
-  };
+  }, [clearCurrentProcess]);
 
   // Handle form submission (add or update backtest)
-  const handleSubmitBacktest = async (
-    formData: Omit<
-      BacktestProcess,
-      | "_id"
-      | "created_at"
-      | "status"
-      | "progress"
-      | "result_id"
-      | "completed_at"
-    >
-  ) => {
-    try {
-      if (dialogMode === "create") {
-        // Create new backtest
-        await createProcess(formData);
-        showNotification("Backtest đã được tạo thành công", "success");
-      } else if (dialogMode === "edit" && currentProcess) {
-        // Update existing backtest
-        await updateProcess(currentProcess._id, {
-          name: formData.name,
-          description: formData.description,
-          parameters: formData.parameters,
-        });
-        showNotification("Backtest đã được cập nhật thành công", "success");
+  const handleSubmitBacktest = useCallback(
+    async (formData: BacktestProcessCreate | BacktestProcessUpdate) => {
+      try {
+        if (dialogMode === "create") {
+          // Create new backtest
+          await createProcess(formData as BacktestProcessCreate);
+          showNotification("Backtest đã được tạo thành công", "success");
+        } else if (dialogMode === "edit" && currentProcess) {
+          // Update existing backtest
+          await updateProcess(currentProcess._id, formData as BacktestProcessUpdate);
+          showNotification("Backtest đã được cập nhật thành công", "success");
+        }
+        handleCloseDialog();
+      } catch (error) {
+        console.error("Error submitting backtest:", error);
       }
-      handleCloseDialog();
-    } catch (error) {
-      console.error("Error submitting backtest:", error);
-    }
-  };
+    },
+    [dialogMode, currentProcess, createProcess, updateProcess, showNotification, handleCloseDialog]
+  );
 
   // Handle edit mode toggle from view mode
-  const handleSwitchToEditMode = () => {
+  const handleSwitchToEditMode = useCallback(() => {
     setDialogMode("edit");
     setDialogTitle("Chỉnh Sửa Backtest");
-  };
+  }, []);
 
   // Handle view backtest details
-  const handleViewBacktest = async (id: string) => {
-    try {
-      await getProcessById(id);
-      handleOpenDialog("view");
-    } catch (error) {
-      console.error("Error fetching backtest details:", error);
-    }
-  };
+  const handleViewBacktest = useCallback(
+    async (id: string) => {
+      try {
+        await getProcessById(id);
+        handleOpenDialog("view");
+      } catch (error) {
+        console.error("Error fetching backtest details:", error);
+      }
+    },
+    [getProcessById, handleOpenDialog]
+  );
 
   // Handle edit backtest directly
-  const handleEditBacktest = async (id: string) => {
-    try {
-      await getProcessById(id);
-      handleOpenDialog("edit");
-    } catch (error) {
-      console.error("Error fetching backtest details:", error);
-    }
-  };
+  const handleEditBacktest = useCallback(
+    async (id: string) => {
+      try {
+        await getProcessById(id);
+        handleOpenDialog("edit");
+      } catch (error) {
+        console.error("Error fetching backtest details:", error);
+      }
+    },
+    [getProcessById, handleOpenDialog]
+  );
 
   // Handle opening confirm delete dialog
-  const handleOpenDeleteConfirm = (id: string, name: string) => {
+  const handleOpenDeleteConfirm = useCallback((id: string, name: string) => {
     setConfirmDelete({
       open: true,
       id,
       name,
     });
-  };
+  }, []);
 
   // Handle closing confirm delete dialog
-  const handleCloseDeleteConfirm = () => {
+  const handleCloseDeleteConfirm = useCallback(() => {
     setConfirmDelete({
       open: false,
       id: null,
       name: "",
     });
-  };
+  }, []);
 
   // Handle delete backtest
-  const handleDeleteBacktest = async () => {
+  const handleDeleteBacktest = useCallback(async () => {
     if (!confirmDelete.id) return;
 
     try {
@@ -265,27 +247,65 @@ const Backtest = () => {
     } catch (error) {
       console.error("Error deleting backtest:", error);
     }
-  };
+  }, [confirmDelete.id, deleteProcess, showNotification, handleCloseDeleteConfirm]);
 
   // Handle run backtest
-  const handleRunBacktest = async (id: string) => {
+  const handleRunBacktest = useCallback(async (id: string) => {
     try {
       await performAction(id, "run");
       showNotification("Backtest đã được bắt đầu chạy", "success");
     } catch (error) {
       console.error("Error running backtest:", error);
     }
-  };
+  }, [performAction, showNotification]);
 
   // Handle stop backtest
-  const handleStopBacktest = async (id: string) => {
+  const handleStopBacktest = useCallback(async (id: string) => {
     try {
       await performAction(id, "stop");
       showNotification("Backtest đã được dừng lại", "success");
     } catch (error) {
       console.error("Error stopping backtest:", error);
     }
-  };
+  }, [performAction, showNotification]);
+
+  // Create form footer based on dialog mode
+  const getModalFooter = useCallback(() => {
+    if (dialogMode === "view") {
+      return (
+        <>
+          <Button
+            onClick={handleSwitchToEditMode}
+            variant="outlined"
+            color="primary"
+          >
+            Chỉnh sửa
+          </Button>
+          <Button onClick={handleCloseDialog} variant="contained">
+            Đóng
+          </Button>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Button onClick={handleCloseDialog} variant="outlined">
+          Hủy
+        </Button>
+        <Button
+          onClick={() => {
+            const form = document.getElementById("backtest-form") as HTMLFormElement;
+            if (form) form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+          }}
+          variant="contained"
+          disabled={isLoading}
+        >
+          {dialogMode === "edit" ? "Cập nhật" : "Tạo"}
+        </Button>
+      </>
+    );
+  }, [dialogMode, handleCloseDialog, handleSwitchToEditMode, isLoading]);
 
   return (
     <Box>
@@ -359,44 +379,28 @@ const Backtest = () => {
         </TabPanel>
       </Paper>
 
-      {/* Dialog for creating, viewing or editing backtest */}
-      <Dialog
+      {/* Modal for creating, viewing or editing backtest */}
+      <Modal
         open={openDialog}
         onClose={handleCloseDialog}
-        fullWidth
+        title={dialogTitle}
         maxWidth="sm"
-        PaperProps={{
-          sx: {
-            borderRadius: 1,
-          },
-        }}
+        footer={getModalFooter()}
       >
-        <DialogTitle
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-            p: 2,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="h6">{dialogTitle}</Typography>
-          <IconButton onClick={handleCloseDialog} size="small" sx={{ p: 0.5 }}>
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent sx={{ p: 3, pt: 3 }}>
-          <BacktestForm
-            initialData={currentProcess || {}}
-            onSubmit={handleSubmitBacktest}
-            onCancel={handleCloseDialog}
-            mode={dialogMode}
-            onEdit={handleSwitchToEditMode}
-            moduleOptions={moduleOptions}
-          />
-        </DialogContent>
-      </Dialog>
+        <BacktestForm
+          initialData={currentProcess ? {
+            _id: currentProcess._id,
+            name: currentProcess.name,
+            description: currentProcess.description,
+            parameters: currentProcess.parameters,
+            bot_template_id: currentProcess.bot_template_id
+          } : undefined}
+          onSubmit={handleSubmitBacktest}
+          isSubmitting={isLoading}
+          isEditMode={dialogMode === "edit"}
+          formId="backtest-form"
+        />
+      </Modal>
 
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
@@ -412,4 +416,4 @@ const Backtest = () => {
   );
 };
 
-export default Backtest;
+export default memo(Backtest);

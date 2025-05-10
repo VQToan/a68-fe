@@ -3,12 +3,12 @@ export interface BotTemplate {
   _id: string;
   name: string;
   description: string;
-  entry_module?: string;
-  exit_module?: string;
-  dca_cutloss_module?: string;
-  entry_hedge_module?: string;
-  after_hedge_module?: string;
-  stop_loss_module?: string;
+  entry_module: string;
+  exit_module: string;
+  dca_cutloss_module: string;
+  entry_hedge_module: string;
+  after_hedge_module: string;
+  stop_loss_module: string;
   created_at: string;
   updated_at: string;
 }
@@ -17,24 +17,24 @@ export interface BotTemplate {
 export interface BotTemplateCreate {
   name: string;
   description: string;
-  entry_module?: string;
-  exit_module?: string;
-  dca_cutloss_module?: string;
-  entry_hedge_module?: string;
-  after_hedge_module?: string;
-  stop_loss_module?: string;
+  entry_module: string;
+  exit_module: string;
+  dca_cutloss_module: string;
+  entry_hedge_module: string;
+  after_hedge_module: string;
+  stop_loss_module: string;
 }
 
 // Interface for updating a bot template
 export interface BotTemplateUpdate {
   name?: string;
   description?: string;
-  entry_module?: string | null;
-  exit_module?: string | null;
-  dca_cutloss_module?: string | null;
-  entry_hedge_module?: string | null;
-  after_hedge_module?: string | null;
-  stop_loss_module?: string | null;
+  entry_module: string;
+  exit_module: string;
+  dca_cutloss_module: string;
+  entry_hedge_module: string;
+  after_hedge_module: string;
+  stop_loss_module: string;
 }
 
 // Module type enum to match backend

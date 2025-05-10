@@ -1,11 +1,7 @@
+import type { BacktestProcess, BacktestProcessCreate, BacktestProcessUpdate } from '@/types/backtest.type';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import * as backtestService from '@services/backtest.service';
-import type { 
-  BacktestProcess, 
-  BacktestProcessCreate, 
-  BacktestProcessUpdate 
-} from '@services/backtest.service';
 
 // Define the state interface
 interface BacktestState {

@@ -1,41 +1,5 @@
+import type { BacktestProcess, BacktestProcessCreate, BacktestProcessUpdate } from '@/types/backtest.type';
 import apiClient from './apiClient';
-
-// Backtest Process Status Type
-export type BacktestStatus = 'pending' | 'running' | 'completed' | 'failed' | 'stopped';
-
-// Backtest Process Type
-export interface BacktestProcess {
-  _id: string;
-  name: string;
-  description: string;
-  user_id: string;
-  parameters: Record<string, any>;
-  created_at: string;
-  status: BacktestStatus;
-  progress: number;
-  completed_at?: string | null;
-  result_id?: string | null;
-}
-
-// Create Backtest Process Type
-export interface BacktestProcessCreate {
-  name: string;
-  description: string;
-  user_id: string;
-  parameters?: Record<string, any>;
-}
-
-// Update Backtest Process Type
-export interface BacktestProcessUpdate {
-  name?: string | null;
-  description?: string | null;
-  parameters?: Record<string, any> | null;
-}
-
-// Backtest Process Action Type
-export interface BacktestProcessAction {
-  action: 'run' | 'stop';
-}
 
 const API_BASE_PATH = '/api/v1/backtest-processes';
 

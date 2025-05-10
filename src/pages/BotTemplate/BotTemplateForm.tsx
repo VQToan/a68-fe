@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, memo } from "react";
 import {
   Box,
-  Button,
   TextField,
   Typography,
   Grid,
@@ -29,7 +28,8 @@ interface BotTemplateFormProps {
   onSubmit: (data: BotTemplateCreate | BotTemplateUpdate) => void;
   isSubmitting: boolean;
   isEditMode: boolean;
-  onCancel: () => void;
+  onCancel?: () => void;
+  formId?: string;
 }
 
 interface ModuleOption {
@@ -53,7 +53,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
   onSubmit,
   isSubmitting,
   isEditMode,
-  onCancel,
+  formId = "bot-template-form",
 }) => {
   // Get modules from the store for the module selections
   const { modules, getModules, isLoading: isLoadingModules } = useModule();
@@ -142,27 +142,18 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
   // Handle form submission
   const onFormSubmit = useCallback(
     (data: any) => {
-      // Clean up data to include only non-empty module IDs
-      const cleanData = { ...data };
-
-      // Convert empty strings to null for optional fields
-      Object.values(ModuleType).forEach((type) => {
-        const field = moduleTypeToField[type];
-        if (cleanData[field] === "") {
-          cleanData[field] = null;
-        }
-      });
-
-      onSubmit(cleanData);
+      // Since all fields are now required, we don't need to clean empty values
+      onSubmit(data);
     },
-    [onSubmit, moduleTypeToField]
+    [onSubmit]
   );
 
   return (
     <Box
       component="form"
+      id={formId}
       onSubmit={handleSubmit(onFormSubmit)}
-      sx={{ mt: 1, px: 2 }}
+      sx={{ mt: 1 }}
     >
       {/* Basic information section */}
       <Box sx={{ mb: 4 }}>
@@ -225,10 +216,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="entry_module"
               control={control}
+              rules={{ required: "Module Entry là bắt buộc" }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
                   disabled={isSubmitting || isLoadingModules}
+                  error={!!errors.entry_module}
                 >
                   <InputLabel id="entry-module-label">
                     {moduleLabels[ModuleType.ENTRY]}
@@ -245,13 +238,17 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                       },
                     }}
                   >
-                    <MenuItem value="">Không chọn</MenuItem>
                     {moduleOptions[ModuleType.ENTRY].map((module) => (
                       <MenuItem key={module.id} value={module.id}>
                         {module.name}
                       </MenuItem>
                     ))}
                   </Select>
+                  {errors.entry_module && (
+                    <Typography color="error" variant="caption" sx={{ mt: 0.5, ml: 1.5 }}>
+                      {errors.entry_module.message}
+                    </Typography>
+                  )}
                 </FormControl>
               )}
             />
@@ -261,10 +258,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="exit_module"
               control={control}
+              rules={{ required: "Module Exit là bắt buộc" }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
                   disabled={isSubmitting || isLoadingModules}
+                  error={!!errors.exit_module}
                 >
                   <InputLabel id="exit-module-label">
                     {moduleLabels[ModuleType.EXIT]}
@@ -281,13 +280,17 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                       },
                     }}
                   >
-                    <MenuItem value="">Không chọn</MenuItem>
                     {moduleOptions[ModuleType.EXIT].map((module) => (
                       <MenuItem key={module.id} value={module.id}>
                         {module.name}
                       </MenuItem>
                     ))}
                   </Select>
+                  {errors.exit_module && (
+                    <Typography color="error" variant="caption" sx={{ mt: 0.5, ml: 1.5 }}>
+                      {errors.exit_module.message}
+                    </Typography>
+                  )}
                 </FormControl>
               )}
             />
@@ -298,10 +301,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="dca_cutloss_module"
               control={control}
+              rules={{ required: "Module DCA/Cutloss là bắt buộc" }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
                   disabled={isSubmitting || isLoadingModules}
+                  error={!!errors.dca_cutloss_module}
                 >
                   <InputLabel id="dca-cutloss-module-label">
                     {moduleLabels[ModuleType.DCA_CUTLOSS]}
@@ -318,13 +323,17 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                       },
                     }}
                   >
-                    <MenuItem value="">Không chọn</MenuItem>
                     {moduleOptions[ModuleType.DCA_CUTLOSS].map((module) => (
                       <MenuItem key={module.id} value={module.id}>
                         {module.name}
                       </MenuItem>
                     ))}
                   </Select>
+                  {errors.dca_cutloss_module && (
+                    <Typography color="error" variant="caption" sx={{ mt: 0.5, ml: 1.5 }}>
+                      {errors.dca_cutloss_module.message}
+                    </Typography>
+                  )}
                 </FormControl>
               )}
             />
@@ -334,10 +343,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="stop_loss_module"
               control={control}
+              rules={{ required: "Module Stop Loss là bắt buộc" }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
                   disabled={isSubmitting || isLoadingModules}
+                  error={!!errors.stop_loss_module}
                 >
                   <InputLabel id="stop-loss-module-label">
                     {moduleLabels[ModuleType.STOP_LOSS]}
@@ -354,13 +365,17 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                       },
                     }}
                   >
-                    <MenuItem value="">Không chọn</MenuItem>
                     {moduleOptions[ModuleType.STOP_LOSS].map((module) => (
                       <MenuItem key={module.id} value={module.id}>
                         {module.name}
                       </MenuItem>
                     ))}
                   </Select>
+                  {errors.stop_loss_module && (
+                    <Typography color="error" variant="caption" sx={{ mt: 0.5, ml: 1.5 }}>
+                      {errors.stop_loss_module.message}
+                    </Typography>
+                  )}
                 </FormControl>
               )}
             />
@@ -371,10 +386,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="entry_hedge_module"
               control={control}
+              rules={{ required: "Module Entry Hedge là bắt buộc" }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
                   disabled={isSubmitting || isLoadingModules}
+                  error={!!errors.entry_hedge_module}
                 >
                   <InputLabel id="entry-hedge-module-label">
                     {moduleLabels[ModuleType.ENTRY_HEDGE]}
@@ -391,13 +408,17 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                       },
                     }}
                   >
-                    <MenuItem value="">Không chọn</MenuItem>
                     {moduleOptions[ModuleType.ENTRY_HEDGE].map((module) => (
                       <MenuItem key={module.id} value={module.id}>
                         {module.name}
                       </MenuItem>
                     ))}
                   </Select>
+                  {errors.entry_hedge_module && (
+                    <Typography color="error" variant="caption" sx={{ mt: 0.5, ml: 1.5 }}>
+                      {errors.entry_hedge_module.message}
+                    </Typography>
+                  )}
                 </FormControl>
               )}
             />
@@ -407,10 +428,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="after_hedge_module"
               control={control}
+              rules={{ required: "Module After Hedge là bắt buộc" }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
                   disabled={isSubmitting || isLoadingModules}
+                  error={!!errors.after_hedge_module}
                 >
                   <InputLabel id="after-hedge-module-label">
                     {moduleLabels[ModuleType.AFTER_HEDGE]}
@@ -427,13 +450,17 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                       },
                     }}
                   >
-                    <MenuItem value="">Không chọn</MenuItem>
                     {moduleOptions[ModuleType.AFTER_HEDGE].map((module) => (
                       <MenuItem key={module.id} value={module.id}>
                         {module.name}
                       </MenuItem>
                     ))}
                   </Select>
+                  {errors.after_hedge_module && (
+                    <Typography color="error" variant="caption" sx={{ mt: 0.5, ml: 1.5 }}>
+                      {errors.after_hedge_module.message}
+                    </Typography>
+                  )}
                 </FormControl>
               )}
             />
@@ -441,30 +468,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
         </Grid>
       </Box>
 
-      {/* Buttons section */}
-      <Box
-        sx={{ display: "flex", justifyContent: "space-between", gap: 2, mt: 4 }}
-      >
-        <Button
-          variant="outlined"
-          onClick={onCancel}
-          disabled={isSubmitting}
-          size="large"
-          sx={{ px: 4, py: 1.5, minWidth: 120 }}
-        >
-          Hủy bỏ
-        </Button>
-        <Button
-          type="submit"
-          variant="contained"
-          disabled={isSubmitting}
-          startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
-          size="large"
-          sx={{ px: 4, py: 1.5, minWidth: 120, bgcolor: "black" }}
-        >
-          {isSubmitting ? "Đang lưu..." : isEditMode ? "Cập nhật" : "Tạo mới"}
-        </Button>
-      </Box>
+      {/* Loading indicator when submitting */}
+      {isSubmitting && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+          <CircularProgress size={24} />
+        </Box>
+      )}
     </Box>
   );
 };

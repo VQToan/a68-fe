@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, memo } from "react";
 import {
   Box,
   Table,
@@ -14,11 +14,11 @@ import {
   Tooltip,
   CircularProgress,
   Typography,
-  Menu,
   MenuItem,
   ListItemIcon,
   ListItemText,
   LinearProgress,
+  Popover,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -26,8 +26,8 @@ import StopIcon from "@mui/icons-material/Stop";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import type { BacktestProcess, BacktestStatus } from "@services/backtest.service";
 import { formatDate } from "@utils/common";
+import type { BacktestProcess, BacktestStatus } from "@/types/backtest.type";
 
 interface BacktestListProps {
   processes: BacktestProcess[];
@@ -40,20 +40,20 @@ interface BacktestListProps {
 }
 
 // Linear progress with label component
-function LinearProgressWithLabel(props: { value: number }) {
+const LinearProgressWithLabel = memo(({ value }: { value: number }) => {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
       <Box sx={{ width: '100%', mr: 1 }}>
-        <LinearProgress variant="determinate" value={props.value} />
+        <LinearProgress variant="determinate" value={value} />
       </Box>
       <Box sx={{ minWidth: 35 }}>
         <Typography variant="body2" color="text.secondary">{`${Math.round(
-          props.value,
+          value,
         )}%`}</Typography>
       </Box>
     </Box>
   );
-}
+});
 
 // Status color mapping
 const statusColors: Record<BacktestStatus, string> = {
@@ -92,52 +92,54 @@ const BacktestList = ({
   const open = Boolean(anchorEl);
 
   // Handle opening the menu
-  const handleMenuClick = (
-    event: React.MouseEvent<HTMLElement>,
-    id: string
-  ) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedId(id);
-  };
+  const handleMenuClick = useCallback(
+    (event: React.MouseEvent<HTMLElement>, id: string) => {
+      event.stopPropagation();
+      setAnchorEl(event.currentTarget);
+      setSelectedId(id);
+    },
+    []
+  );
 
   // Handle closing the menu
-  const handleMenuClose = () => {
+  const handleMenuClose = useCallback(() => {
     setAnchorEl(null);
     setSelectedId(null);
-  };
+  }, []);
 
   // Handle pagination change
-  const handleChangePage = (
-    _event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
-  ) => {
-    setPage(newPage);
-  };
+  const handleChangePage = useCallback(
+    (_event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+      setPage(newPage);
+    },
+    []
+  );
 
   // Handle rows per page change
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  const handleChangeRowsPerPage = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setRowsPerPage(parseInt(event.target.value, 10));
+      setPage(0);
+    },
+    []
+  );
 
   // Handle actions
-  const handleView = () => {
+  const handleView = useCallback(() => {
     if (selectedId) {
       onView(selectedId);
       handleMenuClose();
     }
-  };
+  }, [selectedId, onView, handleMenuClose]);
 
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     if (selectedId) {
       onEdit(selectedId);
       handleMenuClose();
     }
-  };
+  }, [selectedId, onEdit, handleMenuClose]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (selectedId) {
       const process = processes.find(p => p._id === selectedId);
       if (process) {
@@ -145,21 +147,21 @@ const BacktestList = ({
       }
       handleMenuClose();
     }
-  };
+  }, [selectedId, processes, onDelete, handleMenuClose]);
 
-  const handleRun = () => {
+  const handleRun = useCallback(() => {
     if (selectedId) {
       onRun(selectedId);
       handleMenuClose();
     }
-  };
+  }, [selectedId, onRun, handleMenuClose]);
 
-  const handleStop = () => {
+  const handleStop = useCallback(() => {
     if (selectedId) {
       onStop(selectedId);
       handleMenuClose();
     }
-  };
+  }, [selectedId, onStop, handleMenuClose]);
 
   // Sliced data for pagination
   const slicedData = processes.slice(
@@ -242,22 +244,13 @@ const BacktestList = ({
                   />
                 </TableCell>
                 <TableCell>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Box sx={{ width: 60 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        {process.progress}%
-                      </Typography>
-                    </Box>
-                    <Box sx={{ width: "100%", mr: 1 }}>
-                      <LinearProgressWithLabel value={process.progress} />
-                    </Box>
-                  </Box>
+                  <LinearProgressWithLabel value={process.progress} />
                 </TableCell>
                 <TableCell>{formatDate(process.created_at)}</TableCell>
                 <TableCell>
                   <IconButton
                     aria-label="more"
-                    aria-controls="backtest-menu"
+                    aria-controls={`backtest-menu-${process._id}`}
                     aria-haspopup="true"
                     onClick={(e) => handleMenuClick(e, process._id)}
                   >
@@ -283,14 +276,25 @@ const BacktestList = ({
         }
       />
 
-      {/* Actions Menu */}
-      <Menu
+      {/* Actions Menu - Using Popover for better positioning */}
+      <Popover
         id="backtest-menu"
-        anchorEl={anchorEl}
         open={open}
+        anchorEl={anchorEl}
         onClose={handleMenuClose}
-        MenuListProps={{
-          "aria-labelledby": "backtest-menu-button",
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        slotProps={{
+          paper: {
+            elevation: 3,
+            sx: { minWidth: 180 }
+          }
         }}
       >
         <MenuItem onClick={handleView}>
@@ -330,9 +334,9 @@ const BacktestList = ({
           </ListItemIcon>
           <ListItemText primary="Xóa" primaryTypographyProps={{ color: "error" }} />
         </MenuItem>
-      </Menu>
+      </Popover>
     </Paper>
   );
 };
 
-export default BacktestList;
+export default memo(BacktestList);

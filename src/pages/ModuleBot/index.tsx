@@ -6,16 +6,11 @@ import {
   Button,
   TextField,
   InputAdornment,
-  Dialog,
-  DialogTitle,
-  DialogContent,
   Grid,
-  IconButton,
   Divider,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
-import CloseIcon from "@mui/icons-material/Close";
 import ModuleBotList from "./ModuleBotList";
 import ModuleBotForm from "./ModuleBotForm";
 import type { FormMode } from "./ModuleBotForm";
@@ -23,6 +18,7 @@ import { useModule } from "@hooks/useModule";
 import { useDebounce } from "@utils/debounceUtils";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
+import Modal from "@components/Modal";
 import type { IModuleBot } from "@services/moduleBots.service";
 import { areEqual } from "@/utils/common";
 
@@ -213,6 +209,43 @@ const ModuleBot = () => {
     showNotification,
   ]);
 
+  // Create form footer based on dialog mode
+  const getModalFooter = useCallback(() => {
+    if (dialogMode === "view") {
+      return (
+        <>
+          <Button
+            onClick={handleSwitchToEditMode}
+            variant="outlined"
+            color="primary"
+          >
+            Chỉnh sửa
+          </Button>
+          <Button onClick={handleCloseDialog} variant="contained">
+            Đóng
+          </Button>
+        </>
+      );
+    }
+    
+    return (
+      <>
+        <Button onClick={handleCloseDialog} variant="outlined">
+          Hủy
+        </Button>
+        <Button 
+          onClick={() => {
+            const form = document.getElementById('module-bot-form') as HTMLFormElement;
+            if (form) form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+          }} 
+          variant="contained"
+        >
+          Lưu
+        </Button>
+      </>
+    );
+  }, [dialogMode, handleCloseDialog, handleSwitchToEditMode]);
+
   return (
     <Box>
       <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
@@ -265,43 +298,21 @@ const ModuleBot = () => {
         />
       </Paper>
 
-      {/* Dialog for creating, viewing or editing module */}
-      <Dialog
+      {/* Modal for creating, viewing or editing module */}
+      <Modal
         open={openDialog}
         onClose={handleCloseDialog}
-        fullWidth
+        title={dialogTitle}
         maxWidth="sm"
-        PaperProps={{
-          sx: {
-            borderRadius: 1,
-          },
-        }}
+        footer={getModalFooter()}
       >
-        <DialogTitle
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-            p: 2,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="h6">{dialogTitle}</Typography>
-          <IconButton onClick={handleCloseDialog} size="small" sx={{ p: 0.5 }}>
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent sx={{ p: 3, pt: 3 }}>
-          <ModuleBotForm
-            initialData={currentModule || {}}
-            onSubmit={handleSubmitModule}
-            onCancel={handleCloseDialog}
-            mode={dialogMode}
-            onEdit={handleSwitchToEditMode}
-          />
-        </DialogContent>
-      </Dialog>
+        <ModuleBotForm
+          initialData={currentModule || {}}
+          onSubmit={handleSubmitModule}
+          mode={dialogMode}
+          formId="module-bot-form"
+        />
+      </Modal>
 
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
