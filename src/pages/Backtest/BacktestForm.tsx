@@ -46,10 +46,10 @@ const defaultBotParams: Partial<BacktestParameter> = {
   TRADE_MODE: 0, // both
   QUANTITY: 0.01,
   LEVERAGE: 10,
-  TAKE_PROFIT: 20.0,
   MIN_MARGIN: 0.0,
   MAX_MARGIN: 20.0,
   FUNDS: 1000.0,
+  MAX_LOSS: 0.0,
   MIN_ROI: 8.0,
   MA_PERIOD: "8:20",
   DCA_GRID: 0.008,
@@ -58,10 +58,10 @@ const defaultBotParams: Partial<BacktestParameter> = {
   RSI_EXIT_SHORT: 25,
   RSI_ENTRY_LONG: 19,
   RSI_EXIT_LONG: 75,
-  RSI_ENTRY_SHORT_CANCEL: 65,
-  RSI_ENTRY_LONG_CANCEL: 35,
-  RSI_EXIT_SHORT_CANCEL: 40,
-  RSI_EXIT_LONG_CANCEL: 60,
+  RSI_ENTRY_SHORT_CANDLE: 65,
+  RSI_ENTRY_LONG_CANDLE: 35,
+  RSI_EXIT_SHORT_CANDLE: 40,
+  RSI_EXIT_LONG_CANDLE: 60,
   TIME_BETWEEN_ORDERS: 0,
   PAUSE_TIME: "00:00-00:00",
   PAUSE_DAY: "",
@@ -548,23 +548,6 @@ const BacktestForm = ({
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="Chốt lời (TAKE_PROFIT) %"
-                      type="number"
-                      fullWidth
-                      value={
-                        parameters.TAKE_PROFIT || defaultBotParams.TAKE_PROFIT
-                      }
-                      onChange={(e) =>
-                        handleParameterChange(
-                          "TAKE_PROFIT",
-                          Number(e.target.value)
-                        )
-                      }
-                      inputProps={{ step: "0.1" }}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
                       label="Vốn ban đầu (FUNDS)"
                       type="number"
                       fullWidth
@@ -689,6 +672,21 @@ const BacktestForm = ({
                       inputProps={{ step: "0.1" }}
                     />
                   </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      label="Lỗ tối đa (MAX_LOSS) %"
+                      type="number"
+                      fullWidth
+                      value={parameters.MAX_LOSS || defaultBotParams.MAX_LOSS}
+                      onChange={(e) =>
+                        handleParameterChange(
+                          "MAX_LOSS",
+                          Number(e.target.value)
+                        )
+                      }
+                      inputProps={{ step: "0.1" }}
+                    />
+                  </Grid>
                 </Grid>
               </AccordionDetails>
             </Accordion>
@@ -738,16 +736,16 @@ const BacktestForm = ({
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="RSI Long Entry Cancel"
+                      label="RSI Long Entry Candle"
                       type="number"
                       fullWidth
                       value={
-                        parameters.RSI_ENTRY_LONG_CANCEL ||
-                        defaultBotParams.RSI_ENTRY_LONG_CANCEL
+                        parameters.RSI_ENTRY_LONG_CANDLE ||
+                        defaultBotParams.RSI_ENTRY_LONG_CANDLE
                       }
                       onChange={(e) =>
                         handleParameterChange(
-                          "RSI_ENTRY_LONG_CANCEL",
+                          "RSI_ENTRY_LONG_CANDLE",
                           Number(e.target.value)
                         )
                       }
@@ -772,16 +770,16 @@ const BacktestForm = ({
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="RSI Long Exit Cancel"
+                      label="RSI Long Exit Candle"
                       type="number"
                       fullWidth
                       value={
-                        parameters.RSI_EXIT_LONG_CANCEL ||
-                        defaultBotParams.RSI_EXIT_LONG_CANCEL
+                        parameters.RSI_EXIT_LONG_CANDLE ||
+                        defaultBotParams.RSI_EXIT_LONG_CANDLE
                       }
                       onChange={(e) =>
                         handleParameterChange(
-                          "RSI_EXIT_LONG_CANCEL",
+                          "RSI_EXIT_LONG_CANDLE",
                           Number(e.target.value)
                         )
                       }
@@ -807,16 +805,16 @@ const BacktestForm = ({
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="RSI Short Entry Cancel"
+                      label="RSI Short Entry Candle"
                       type="number"
                       fullWidth
                       value={
-                        parameters.RSI_ENTRY_SHORT_CANCEL ||
-                        defaultBotParams.RSI_ENTRY_SHORT_CANCEL
+                        parameters.RSI_ENTRY_SHORT_CANDLE ||
+                        defaultBotParams.RSI_ENTRY_SHORT_CANDLE
                       }
                       onChange={(e) =>
                         handleParameterChange(
-                          "RSI_ENTRY_SHORT_CANCEL",
+                          "RSI_ENTRY_SHORT_CANDLE",
                           Number(e.target.value)
                         )
                       }
@@ -841,16 +839,16 @@ const BacktestForm = ({
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="RSI Short Exit Cancel"
+                      label="RSI Short Exit Candle"
                       type="number"
                       fullWidth
                       value={
-                        parameters.RSI_EXIT_SHORT_CANCEL ||
-                        defaultBotParams.RSI_EXIT_SHORT_CANCEL
+                        parameters.RSI_EXIT_SHORT_CANDLE ||
+                        defaultBotParams.RSI_EXIT_SHORT_CANDLE
                       }
                       onChange={(e) =>
                         handleParameterChange(
-                          "RSI_EXIT_SHORT_CANCEL",
+                          "RSI_EXIT_SHORT_CANDLE",
                           Number(e.target.value)
                         )
                       }

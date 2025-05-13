@@ -15,14 +15,22 @@ import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import BacktestList from "./BacktestList";
 import BacktestForm from "./BacktestForm";
+import BacktestResult from "./BacktestResult";
 import { useBacktest } from "@hooks/useBacktest";
 import { useModule } from "@hooks/useModule";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
 import type { BacktestStatus, BacktestProcessCreate, BacktestProcessUpdate } from "@/types/backtest.type";
+import { areEqual } from "@/utils/common";
 
 export type FormMode = "create" | "view" | "edit";
+
+// Component state enum để quản lý hiển thị
+enum BacktestView {
+  LIST = 'list',
+  RESULT = 'result'
+}
 
 // Tab interface
 interface TabPanelProps {
@@ -50,7 +58,8 @@ function TabPanel(props: TabPanelProps) {
 // Tab status mapping
 const tabStatusMap: Record<string, BacktestStatus | undefined> = {
   all: undefined,
-  pending: "pending",
+  created: "created",
+  queued: "queued",
   running: "running",
   completed: "completed",
   failed: "failed",
@@ -86,6 +95,10 @@ const Backtest = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
   const [dialogTitle, setDialogTitle] = useState("Tạo Backtest Mới");
+  
+  // Thêm state để quản lý hiển thị component
+  const [currentView, setCurrentView] = useState<BacktestView>(BacktestView.LIST);
+  const [selectedBacktestId, setSelectedBacktestId] = useState<string | null>(null);
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -192,18 +205,17 @@ const Backtest = () => {
     setDialogTitle("Chỉnh Sửa Backtest");
   }, []);
 
-  // Handle view backtest details
-  const handleViewBacktest = useCallback(
-    async (id: string) => {
-      try {
-        await getProcessById(id);
-        handleOpenDialog("view");
-      } catch (error) {
-        console.error("Error fetching backtest details:", error);
-      }
-    },
-    [getProcessById, handleOpenDialog]
-  );
+  // Hàm xử lý hiển thị kết quả backtest (thay vì navigate)
+  const handleShowBacktestResult = useCallback((id: string) => {
+    setSelectedBacktestId(id);
+    setCurrentView(BacktestView.RESULT);
+  }, []);
+
+  // Hàm xử lý quay lại danh sách backtest từ trang kết quả
+  const handleBackToList = useCallback(() => {
+    setCurrentView(BacktestView.LIST);
+    setSelectedBacktestId(null);
+  }, []);
 
   // Handle edit backtest directly
   const handleEditBacktest = useCallback(
@@ -307,6 +319,11 @@ const Backtest = () => {
     );
   }, [dialogMode, handleCloseDialog, handleSwitchToEditMode, isLoading]);
 
+  // Render dựa vào currentView
+  if (currentView === BacktestView.RESULT && selectedBacktestId) {
+    return <BacktestResult id={selectedBacktestId} onBack={handleBackToList} />;
+  }
+
   return (
     <Box>
       <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
@@ -342,7 +359,7 @@ const Backtest = () => {
             sx={{ mb: 2 }}
           >
             <Tab label="Tất cả" value="all" />
-            <Tab label="Đang chờ" value="pending" />
+            <Tab label="Đang chờ" value="created" />
             <Tab label="Đang chạy" value="running" />
             <Tab label="Hoàn thành" value="completed" />
             <Tab label="Thất bại" value="failed" />
@@ -372,7 +389,7 @@ const Backtest = () => {
             isLoading={isLoading}
             onEdit={handleEditBacktest}
             onDelete={(id, name) => handleOpenDeleteConfirm(id, name)}
-            onView={handleViewBacktest}
+            onView={handleShowBacktestResult} // Thay đổi để hiển thị BacktestResult trong cùng trang
             onRun={handleRunBacktest}
             onStop={handleStopBacktest}
           />
@@ -416,4 +433,4 @@ const Backtest = () => {
   );
 };
 
-export default memo(Backtest);
+export default memo(Backtest, areEqual);

@@ -1,6 +1,7 @@
 // Backtest Process Status Type
 export type BacktestStatus =
-  | "pending"
+  | "created"
+  | "queued"
   | "running"
   | "completed"
   | "failed"
@@ -19,10 +20,10 @@ export interface BacktestParameter {
   TRADE_MODE: -1 | 0 | 1; // -1: short, 0: both, 1: long
   QUANTITY: number;
   LEVERAGE: number;
-  TAKE_PROFIT: number;
   MIN_MARGIN: number;
   MAX_MARGIN: number;
   FUNDS: number;
+  MAX_LOSS: number;
   MIN_ROI: number;
   MA_PERIOD: string;
   DCA_GRID: number;
@@ -31,10 +32,10 @@ export interface BacktestParameter {
   RSI_ENTRY_LONG: number;
   RSI_EXIT_SHORT: number;
   RSI_EXIT_LONG: number;
-  RSI_ENTRY_SHORT_CANCEL: number;
-  RSI_ENTRY_LONG_CANCEL: number;
-  RSI_EXIT_SHORT_CANCEL: number;
-  RSI_EXIT_LONG_CANCEL: number;
+  RSI_ENTRY_SHORT_CANDLE: number;
+  RSI_ENTRY_LONG_CANDLE: number;
+  RSI_EXIT_SHORT_CANDLE: number;
+  RSI_EXIT_LONG_CANDLE: number;
   TIME_BETWEEN_ORDERS: number;
   PAUSE_TIME: string;
   PAUSE_DAY: string;
@@ -52,6 +53,7 @@ export interface BacktestProcess {
   progress: number;
   completed_at?: string | null;
   result_id?: string | null;
+  num_results?: number;
 }
 
 // Create Backtest Process Type

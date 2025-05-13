@@ -26,7 +26,7 @@ import StopIcon from "@mui/icons-material/Stop";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { formatDate } from "@utils/common";
+import { areEqual, formatDate } from "@utils/common";
 import type { BacktestProcess, BacktestStatus } from "@/types/backtest.type";
 
 interface BacktestListProps {
@@ -42,13 +42,13 @@ interface BacktestListProps {
 // Linear progress with label component
 const LinearProgressWithLabel = memo(({ value }: { value: number }) => {
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-      <Box sx={{ width: '100%', mr: 1 }}>
+    <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+      <Box sx={{ width: "100%", mr: 1 }}>
         <LinearProgress variant="determinate" value={value} />
       </Box>
       <Box sx={{ minWidth: 35 }}>
         <Typography variant="body2" color="text.secondary">{`${Math.round(
-          value,
+          value
         )}%`}</Typography>
       </Box>
     </Box>
@@ -57,7 +57,8 @@ const LinearProgressWithLabel = memo(({ value }: { value: number }) => {
 
 // Status color mapping
 const statusColors: Record<BacktestStatus, string> = {
-  pending: "default",
+  created: "default",
+  queued: "info",
   running: "primary",
   completed: "success",
   failed: "error",
@@ -66,7 +67,8 @@ const statusColors: Record<BacktestStatus, string> = {
 
 // Status labels in Vietnamese
 const statusLabels: Record<BacktestStatus, string> = {
-  pending: "Đang chờ",
+  created: "Đã tạo",
+  queued: "Đang chờ",
   running: "Đang chạy",
   completed: "Hoàn thành",
   failed: "Lỗi",
@@ -127,10 +129,15 @@ const BacktestList = ({
   // Handle actions
   const handleView = useCallback(() => {
     if (selectedId) {
-      onView(selectedId);
+      const process = processes.find((p) => p._id === selectedId);
+      if (process) {
+        // Thay vì sử dụng navigate, luôn gọi onView để component cha xử lý
+        // Truyền selectedId để component cha có thể xử lý dựa trên trạng thái
+        onView(selectedId);
+      }
       handleMenuClose();
     }
-  }, [selectedId, onView, handleMenuClose]);
+  }, [selectedId, processes, onView, handleMenuClose]);
 
   const handleEdit = useCallback(() => {
     if (selectedId) {
@@ -141,7 +148,7 @@ const BacktestList = ({
 
   const handleDelete = useCallback(() => {
     if (selectedId) {
-      const process = processes.find(p => p._id === selectedId);
+      const process = processes.find((p) => p._id === selectedId);
       if (process) {
         onDelete(selectedId, process.name);
       }
@@ -283,26 +290,31 @@ const BacktestList = ({
         anchorEl={anchorEl}
         onClose={handleMenuClose}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
+          vertical: "bottom",
+          horizontal: "right",
         }}
         transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
+          vertical: "top",
+          horizontal: "right",
         }}
         slotProps={{
           paper: {
             elevation: 3,
-            sx: { minWidth: 180 }
-          }
+            sx: { minWidth: 180 },
+          },
         }}
       >
-        <MenuItem onClick={handleView}>
-          <ListItemIcon>
-            <VisibilityIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary="Xem chi tiết" />
-        </MenuItem>
+        {selectedId &&
+          processes &&
+          processes.length > 0 &&
+          (processes.find((p) => p._id === selectedId)?.num_results || 0) > 0 && (
+            <MenuItem onClick={handleView}>
+              <ListItemIcon>
+                <VisibilityIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary="Xem chi tiết" />
+            </MenuItem>
+          )}
         <MenuItem onClick={handleEdit}>
           <ListItemIcon>
             <EditIcon fontSize="small" />
@@ -311,7 +323,9 @@ const BacktestList = ({
         </MenuItem>
         {selectedId && (
           <>
-            {processes.find(p => p._id === selectedId)?.status !== "running" ? (
+            {!["running", "queued"].includes(
+              processes.find((p) => p._id === selectedId)?.status as string
+            ) ? (
               <MenuItem onClick={handleRun}>
                 <ListItemIcon>
                   <PlayArrowIcon fontSize="small" />
@@ -332,11 +346,14 @@ const BacktestList = ({
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText primary="Xóa" primaryTypographyProps={{ color: "error" }} />
+          <ListItemText
+            primary="Xóa"
+            primaryTypographyProps={{ color: "error" }}
+          />
         </MenuItem>
       </Popover>
     </Paper>
   );
 };
 
-export default memo(BacktestList);
+export default memo(BacktestList, areEqual);
