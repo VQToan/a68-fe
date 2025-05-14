@@ -10,6 +10,7 @@ import {
 import { formatNumber } from "@utils/common";
 import type { BacktestMetrics } from "@/services/backtest.service";
 import { areEqual } from "@/utils/common";
+import moment from "moment";
 
 interface PerformanceStatsProps {
   metrics: BacktestMetrics;
@@ -238,9 +239,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({
             <Typography
               variant="h6"
               color={
-                (metrics.avg_long_roi || 0) >= 0
-                  ? "success.main"
-                  : "error.main"
+                (metrics.avg_long_roi || 0) >= 0 ? "success.main" : "error.main"
               }
             >
               {formatNumber(metrics.avg_long_roi || 0)}%
@@ -320,7 +319,9 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({
           >
             <Typography variant="body2">{key}:</Typography>
             <Typography variant="body2" fontWeight="bold">
-              {value}
+              {key.includes("DATE")
+                ? moment(value).format("YYYY-MM-DD HH:mm")
+                : value}
             </Typography>
           </Box>
         ))}

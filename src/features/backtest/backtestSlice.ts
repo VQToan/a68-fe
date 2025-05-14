@@ -118,24 +118,41 @@ export const deleteBacktestProcess = createAsyncThunk(
   }
 );
 
-// Async thunk for performing an action on a backtest process
-export const performBacktestAction = createAsyncThunk(
-  "backtest/performAction",
+// Async thunk for running a backtest process
+export const runBacktestProcess = createAsyncThunk(
+  "backtest/runProcess",
   async (
     {
       id,
-      action,
+      params
     }: {
       id: string;
-      action: "run" | "stop";
+      params: {
+        start_date: number;
+        end_date: number;
+      };
     },
     { rejectWithValue }
   ) => {
     try {
-      return await backtestService.performBacktestAction(id, action);
+      return await backtestService.runBacktestProcess(id, params);
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.detail || `Failed to ${action} backtest process`
+        error.response?.data?.detail || "Failed to run backtest process"
+      );
+    }
+  }
+);
+
+// Async thunk for stopping a backtest process
+export const stopBacktestProcess = createAsyncThunk(
+  "backtest/stopProcess",
+  async (id: string, { rejectWithValue }) => {
+    try {
+      return await backtestService.stopBacktestProcess(id);
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.detail || "Failed to stop backtest process"
       );
     }
   }
@@ -272,13 +289,13 @@ const backtestSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // Perform action on backtest process
-      .addCase(performBacktestAction.pending, (state) => {
+      // Run backtest process
+      .addCase(runBacktestProcess.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(
-        performBacktestAction.fulfilled,
+        runBacktestProcess.fulfilled,
         (state, action: PayloadAction<BacktestProcess>) => {
           state.isLoading = false;
           const index = state.processes.findIndex(
@@ -295,7 +312,35 @@ const backtestSlice = createSlice({
           }
         }
       )
-      .addCase(performBacktestAction.rejected, (state, action) => {
+      .addCase(runBacktestProcess.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+
+      // Stop backtest process
+      .addCase(stopBacktestProcess.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(
+        stopBacktestProcess.fulfilled,
+        (state, action: PayloadAction<BacktestProcess>) => {
+          state.isLoading = false;
+          const index = state.processes.findIndex(
+            (process) => process._id === action.payload._id
+          );
+          if (index !== -1) {
+            state.processes[index] = action.payload;
+          }
+          if (
+            state.currentProcess &&
+            state.currentProcess._id === action.payload._id
+          ) {
+            state.currentProcess = action.payload;
+          }
+        }
+      )
+      .addCase(stopBacktestProcess.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       })

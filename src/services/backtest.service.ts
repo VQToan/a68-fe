@@ -48,8 +48,6 @@ export interface BacktestMetrics {
   
   // Risk Metrics
   max_loss_occurrences: number;
-  max_loss_long: number;
-  max_loss_short: number;
   mdd: number;
   sharpe_ratio: number;
   profit_factor: number;
@@ -118,14 +116,23 @@ export const deleteBacktestProcess = async (id: string): Promise<void> => {
   await apiClient.delete(`${API_BASE_PATH}/${id}`);
 };
 
-// Perform an action on a backtest process (run or stop)
-export const performBacktestAction = async (
+// Run a backtest process
+export const runBacktestProcess = async (
   id: string,
-  action: "run" | "stop"
+  params: {
+    start_date: number;
+    end_date: number;
+  }
 ): Promise<BacktestProcess> => {
-  const response = await apiClient.post(`${API_BASE_PATH}/${id}/action`, {
-    action,
-  });
+  const response = await apiClient.post(`${API_BASE_PATH}/${id}/run`, params);
+  return response.data;
+};
+
+// Stop a backtest process
+export const stopBacktestProcess = async (
+  id: string
+): Promise<BacktestProcess> => {
+  const response = await apiClient.post(`${API_BASE_PATH}/${id}/stop`);
   return response.data;
 };
 

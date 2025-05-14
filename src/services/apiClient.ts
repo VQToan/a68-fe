@@ -5,7 +5,7 @@ import { store } from '@features/store';
 import { refreshToken as refreshTokenAction } from '@features/auth/authSlice';
 import type { Token } from '../types/auth.types';
 
-const API_URL = 'http://localhost:8001'; // URL của API backend
+const API_URL = import.meta.env.VITE_API_URL 
 
 // Create API client
 const createApiClient = (): AxiosInstance => {

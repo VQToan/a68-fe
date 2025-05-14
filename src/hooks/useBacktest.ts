@@ -9,7 +9,8 @@ import {
   createBacktestProcess,
   updateBacktestProcess,
   deleteBacktestProcess,
-  performBacktestAction,
+  runBacktestProcess,
+  stopBacktestProcess,
   clearCurrentProcess as clearCurrentProcessAction,
   clearError as clearErrorAction,
   getBacktestResult,
@@ -81,16 +82,36 @@ export const useBacktest = () => {
     [dispatch]
   );
 
-  // Perform an action on a backtest process (run, stop)
-  const handlePerformAction = useCallback(
-    async (id: string, action: "run" | "stop") => {
+  // Run a backtest process with date parameters
+  const handleRunProcess = useCallback(
+    async (id: string, startDate: string, endDate: string) => {
       try {
-        await dispatch(performBacktestAction({ id, action })).unwrap();
+        const params = {
+          start_date: new Date(startDate).getTime(),
+          end_date: new Date(endDate).getTime(),
+        };
+        await dispatch(runBacktestProcess({ id, params })).unwrap();
         // Fetch updated list after action completes
         await dispatch(fetchBacktestProcesses({}));
         return true;
       } catch (error) {
-        console.error("Failed to perform action:", error);
+        console.error("Failed to run backtest:", error);
+        return false;
+      }
+    },
+    [dispatch]
+  );
+
+  // Stop a backtest process
+  const handleStopProcess = useCallback(
+    async (id: string) => {
+      try {
+        await dispatch(stopBacktestProcess(id)).unwrap();
+        // Fetch updated list after action completes
+        await dispatch(fetchBacktestProcesses({}));
+        return true;
+      } catch (error) {
+        console.error("Failed to stop backtest:", error);
         return false;
       }
     },
@@ -126,7 +147,8 @@ export const useBacktest = () => {
     createProcess: handleCreateProcess,
     updateProcess: handleUpdateProcess,
     deleteProcess: handleDeleteProcess,
-    performAction: handlePerformAction,
+    runProcess: handleRunProcess,
+    stopProcess: handleStopProcess,
     clearCurrentProcess: handleClearCurrentProcess,
     clearResult: handleClearResult,
     clearError: handleClearError,

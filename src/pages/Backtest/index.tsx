@@ -10,12 +10,16 @@ import {
   Divider,
   Tabs,
   Tab,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import AddIcon from "@mui/icons-material/Add";
 import BacktestList from "./BacktestList";
 import BacktestForm from "./BacktestForm";
 import BacktestResult from "./BacktestResult";
+import RunBacktestDialog from "./components/RunBacktestDialog";
 import { useBacktest } from "@hooks/useBacktest";
 import { useModule } from "@hooks/useModule";
 import { useNotification } from "@context/NotificationContext";
@@ -78,7 +82,8 @@ const Backtest = () => {
     createProcess,
     updateProcess,
     deleteProcess,
-    performAction,
+    runProcess,
+    stopProcess,
     clearError,
     clearCurrentProcess,
   } = useBacktest();
@@ -102,6 +107,17 @@ const Backtest = () => {
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
+    open: boolean;
+    id: string | null;
+    name: string;
+  }>({
+    open: false,
+    id: null,
+    name: "",
+  });
+
+  // State for run backtest dialog
+  const [runBacktestDialog, setRunBacktestDialog] = useState<{
     open: boolean;
     id: string | null;
     name: string;
@@ -261,25 +277,61 @@ const Backtest = () => {
     }
   }, [confirmDelete.id, deleteProcess, showNotification, handleCloseDeleteConfirm]);
 
-  // Handle run backtest
-  const handleRunBacktest = useCallback(async (id: string) => {
-    try {
-      await performAction(id, "run");
-      showNotification("Backtest đã được bắt đầu chạy", "success");
-    } catch (error) {
-      console.error("Error running backtest:", error);
-    }
-  }, [performAction, showNotification]);
-
   // Handle stop backtest
   const handleStopBacktest = useCallback(async (id: string) => {
     try {
-      await performAction(id, "stop");
+      await stopProcess(id);
       showNotification("Backtest đã được dừng lại", "success");
     } catch (error) {
       console.error("Error stopping backtest:", error);
     }
-  }, [performAction, showNotification]);
+  }, [stopProcess, showNotification]);
+
+  // Handle refreshing the backtest list
+  const handleRefreshBacktests = useCallback(() => {
+    getProcesses(tabStatusMap[currentTab]);
+    showNotification("Danh sách backtest đã được cập nhật", "success");
+  }, [currentTab, getProcesses, showNotification]);
+
+  // Handle opening run backtest dialog
+  const handleOpenRunBacktestDialog = useCallback((id: string, name: string) => {
+    setRunBacktestDialog({
+      open: true,
+      id,
+      name,
+    });
+  }, [setRunBacktestDialog]);
+
+  // Handle closing run backtest dialog
+  const handleCloseRunBacktestDialog = useCallback(() => {
+    setRunBacktestDialog({
+      open: false,
+      id: null,
+      name: "",
+    });
+  }, [setRunBacktestDialog]);
+
+  // Handle run backtest (now opens the dialog)
+  const handleRunBacktest = useCallback(async (id: string) => {
+    // Find the backtest process to get its name
+    const process = processes.find(p => p._id === id);
+    if (process) {
+      handleOpenRunBacktestDialog(id, process.name);
+    }
+  }, [processes, handleOpenRunBacktestDialog]);
+
+  // Handle run backtest with date parameters
+  const handleRunBacktestWithDates = useCallback(async (startDate: string, endDate: string) => {
+    if (!runBacktestDialog.id) return;
+
+    try {
+      await runProcess(runBacktestDialog.id, startDate, endDate);
+      showNotification("Backtest đã được bắt đầu chạy", "success");
+      handleCloseRunBacktestDialog();
+    } catch (error) {
+      console.error("Error running backtest:", error);
+    }
+  }, [runBacktestDialog.id, runProcess, showNotification, handleCloseRunBacktestDialog]);
 
   // Create form footer based on dialog mode
   const getModalFooter = useCallback(() => {
@@ -380,6 +432,19 @@ const Backtest = () => {
                 <SearchIcon />
               </InputAdornment>
             ),
+            endAdornment: (
+              <InputAdornment position="end">
+                <Tooltip title="Làm mới danh sách">
+                  <IconButton 
+                    onClick={handleRefreshBacktests}
+                    disabled={isLoading}
+                    size="small"
+                  >
+                    <RefreshIcon />
+                  </IconButton>
+                </Tooltip>
+              </InputAdornment>
+            ),
           }}
         />
 
@@ -392,6 +457,7 @@ const Backtest = () => {
             onView={handleShowBacktestResult} // Thay đổi để hiển thị BacktestResult trong cùng trang
             onRun={handleRunBacktest}
             onStop={handleStopBacktest}
+            onRefresh={handleRefreshBacktests}
           />
         </TabPanel>
       </Paper>
@@ -428,6 +494,15 @@ const Backtest = () => {
         confirmColor="error"
         onConfirm={handleDeleteBacktest}
         onCancel={handleCloseDeleteConfirm}
+      />
+
+      {/* Run Backtest Dialog */}
+      <RunBacktestDialog
+        open={runBacktestDialog.open}
+        onClose={handleCloseRunBacktestDialog}
+        onConfirm={handleRunBacktestWithDates}
+        isLoading={isLoading}
+        backtestName={runBacktestDialog.name}
       />
     </Box>
   );

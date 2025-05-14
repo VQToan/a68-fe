@@ -115,14 +115,4 @@ export const formatNumber = (
   }
 };
 
-export const debounce = (func, timeout = 300) => {
-  let timer: NodeJS.Timeout | null = null;
-  return function (...args) {
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(() => {
-      timer = null;
-      func.apply(debounce, args);
-    }, timeout);
-  };
-};
 

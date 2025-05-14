@@ -37,6 +37,7 @@ interface BacktestListProps {
   onDelete: (id: string, name: string) => void;
   onRun: (id: string) => void;
   onStop: (id: string) => void;
+  onRefresh: () => void;
 }
 
 // Linear progress with label component
@@ -83,6 +84,7 @@ const BacktestList = ({
   onDelete,
   onRun,
   onStop,
+  onRefresh,
 }: BacktestListProps) => {
   // Pagination state
   const [page, setPage] = useState(0);
@@ -196,12 +198,13 @@ const BacktestList = ({
       <Box
         sx={{
           display: "flex",
+          flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
           height: "200px",
         }}
       >
-        <Typography variant="subtitle1" color="text.secondary">
+        <Typography variant="subtitle1" color="text.secondary" gutterBottom>
           Không có backtest nào được tìm thấy
         </Typography>
       </Box>

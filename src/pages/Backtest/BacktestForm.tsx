@@ -482,30 +482,7 @@ const BacktestForm = ({
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      label="Thời gian bắt đầu"
-                      type="datetime-local"
-                      fullWidth
-                      InputLabelProps={{ shrink: true }}
-                      value={parameters.START_DATE || ""}
-                      onChange={(e) =>
-                        handleParameterChange("START_DATE", e.target.value)
-                      }
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      label="Thời gian kết thúc"
-                      type="datetime-local"
-                      fullWidth
-                      InputLabelProps={{ shrink: true }}
-                      value={parameters.END_DATE || ""}
-                      onChange={(e) =>
-                        handleParameterChange("END_DATE", e.target.value)
-                      }
-                    />
-                  </Grid>
+                  {/* Removed Start Date and End Date fields as they will be requested when running the backtest */}
                 </Grid>
               </AccordionDetails>
             </Accordion>
