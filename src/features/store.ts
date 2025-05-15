@@ -3,6 +3,7 @@ import authReducer from './auth/authSlice';
 import moduleReducer from './module/moduleSlice';
 import backtestReducer from './backtest/backtestSlice';
 import botTemplateReducer from './botTemplate/botTemplateSlice';
+import botOptimizationReducer from './botOptimization/botOptimizationSlice';
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     module: moduleReducer,
     backtest: backtestReducer,
     botTemplate: botTemplateReducer,
+    botOptimization: botOptimizationReducer,
     // Add other reducers here as your application grows
   },
   devTools: process.env.NODE_ENV !== 'production',

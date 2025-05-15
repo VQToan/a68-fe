@@ -55,6 +55,8 @@ export interface BacktestMetrics {
 
 export interface BacktestResultItem {
   result_id: string;
+  start_date: number;
+  end_date: number;
   trades: BacktestTrade[];
   metrics: BacktestMetrics;
   created_at: string;

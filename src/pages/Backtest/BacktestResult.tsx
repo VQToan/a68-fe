@@ -33,7 +33,11 @@ import PerformanceStats from "./components/PerformanceStats";
 import { formatDate, formatNumber } from "@utils/common";
 import { useBacktest } from "@hooks/useBacktest";
 import { areEqual } from "@/utils/common";
-import type { BacktestMetrics, BacktestResult, BacktestTrade } from "@/services/backtest.service";
+import type {
+  BacktestMetrics,
+  BacktestResult,
+  BacktestTrade,
+} from "@/services/backtest.service";
 
 const INTERVALS = ["1m", "3m", "5m", "15m", "30m", "1h", "4h", "1d"];
 
@@ -92,7 +96,8 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
     if (result && result.results) {
       return result.results.map((item) => ({
         _id: item.result_id,
-        created_at: item.created_at,
+        start_date: item.start_date,
+        end_date: item.end_date,
       }));
     }
     return [];
@@ -108,19 +113,12 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
   }, [selectedResultId, result]);
 
   const metrics = useMemo(
-    () => selectedResult?.metrics || {} as BacktestMetrics,
+    () => selectedResult?.metrics || ({} as BacktestMetrics),
     [selectedResult]
   );
-  const trades = useMemo(() => selectedResult?.trades || [] as BacktestTrade[], [selectedResult]);
-
-  const profitableTrades = useMemo(
-    () => trades.filter((trade) => trade.position_pnl > 0),
-    [trades]
-  );
-
-  const unprofitableTrades = useMemo(
-    () => trades.filter((trade) => trade.position_pnl < 0),
-    [trades]
+  const trades = useMemo(
+    () => selectedResult?.trades || ([] as BacktestTrade[]),
+    [selectedResult]
   );
 
   // Lấy kết quả backtest và danh sách các kết quả
@@ -202,7 +200,9 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
               </Typography>
               <Box display="flex" flexWrap="wrap" gap={1}>
                 <Chip
-                  label={`Symbol: ${result.parameters?.SYMBOL || "N/A"}`}
+                  label={`Symbol: ${
+                    result.parameters?.SYMBOL?.toUpperCase() || "N/A"
+                  }`}
                   color="primary"
                   variant="outlined"
                 />
@@ -235,11 +235,12 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
                       disabled={resultLoading}
                     >
                       <MenuItem value="">
-                        Kết quả hiện tại ({formatDate(result.created_at)})
+                        <em>Chọn kết quả</em>
                       </MenuItem>
                       {resultsList.map((resultItem) => (
                         <MenuItem key={resultItem._id} value={resultItem._id}>
-                          {formatDate(resultItem.created_at)}
+                          {formatDate(resultItem.start_date / 1000)} -{" "}
+                          {formatDate(resultItem.end_date / 1000)}
                         </MenuItem>
                       ))}
                     </Select>
@@ -303,8 +304,8 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
         </Grid>
 
         <Grid size={{ xs: 12, md: 4 }}>
-          <PerformanceStats 
-            metrics={metrics} 
+          <PerformanceStats
+            metrics={metrics}
             parameters={result.parameters || {}}
           />
         </Grid>
@@ -331,7 +332,7 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
                     {trades.length > 0 ? (
                       trades.map((trade, index) => (
                         <TableRow key={index}>
-                          <TableCell>{formatDate(trade.time/1000)}</TableCell>
+                          <TableCell>{formatDate(trade.time / 1000)}</TableCell>
                           <TableCell>
                             <Chip
                               label={trade.side}

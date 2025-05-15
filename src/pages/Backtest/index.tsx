@@ -16,12 +16,16 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddIcon from "@mui/icons-material/Add";
+import OptimizeIcon from "@mui/icons-material/Psychology";
 import BacktestList from "./BacktestList";
 import BacktestForm from "./BacktestForm";
 import BacktestResult from "./BacktestResult";
 import RunBacktestDialog from "./components/RunBacktestDialog";
+import OptimizationDialog from "./components/OptimizationDialog";
+import OptimizationResults from "./components/OptimizationResults";
 import { useBacktest } from "@hooks/useBacktest";
 import { useModule } from "@hooks/useModule";
+import { useBotOptimization } from "@hooks/useBotOptimization";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
@@ -126,6 +130,22 @@ const Backtest = () => {
     id: null,
     name: "",
   });
+
+  // State for optimization dialog and results
+  const [optimizationDialog, setOptimizationDialog] = useState<{
+    open: boolean;
+  }>({
+    open: false,
+  });
+
+  const [optimizationResultsDialog, setOptimizationResultsDialog] = useState<{
+    open: boolean;
+  }>({
+    open: false,
+  });
+
+  // Get optimization related state
+  const { optimizationResults, isLoading: isOptimizationLoading } = useBotOptimization();
 
   // Initial fetch of backtests and modules
   useEffect(() => {
@@ -333,6 +353,34 @@ const Backtest = () => {
     }
   }, [runBacktestDialog.id, runProcess, showNotification, handleCloseRunBacktestDialog]);
 
+  // Handle opening optimization dialog
+  const handleOpenOptimizationDialog = useCallback(() => {
+    setOptimizationDialog({
+      open: true,
+    });
+  }, []);
+
+  // Handle closing optimization dialog
+  const handleCloseOptimizationDialog = useCallback(() => {
+    setOptimizationDialog({
+      open: false,
+    });
+  }, []);
+
+  // Handle optimization success
+  const handleOptimizationSuccess = useCallback(() => {
+    setOptimizationResultsDialog({
+      open: true,
+    });
+  }, []);
+
+  // Handle closing optimization results dialog
+  const handleCloseOptimizationResultsDialog = useCallback(() => {
+    setOptimizationResultsDialog({
+      open: false,
+    });
+  }, []);
+
   // Create form footer based on dialog mode
   const getModalFooter = useCallback(() => {
     if (dialogMode === "view") {
@@ -391,13 +439,23 @@ const Backtest = () => {
             </Typography>
           </Grid>
           <Grid size={{ xs: "auto" }}>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => handleOpenDialog("create")}
-            >
-              Tạo backtest mới
-            </Button>
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <Button
+                variant="outlined"
+                color="secondary"
+                startIcon={<OptimizeIcon />}
+                onClick={handleOpenOptimizationDialog}
+              >
+                Tối ưu hóa với LLM
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => handleOpenDialog("create")}
+              >
+                Tạo backtest mới
+              </Button>
+            </Box>
           </Grid>
         </Grid>
 
@@ -503,6 +561,20 @@ const Backtest = () => {
         onConfirm={handleRunBacktestWithDates}
         isLoading={isLoading}
         backtestName={runBacktestDialog.name}
+      />
+
+      {/* Optimization Dialog */}
+      <OptimizationDialog
+        open={optimizationDialog.open}
+        onClose={handleCloseOptimizationDialog}
+        backtestProcesses={processes}
+        onSuccess={handleOptimizationSuccess}
+      />
+
+      {/* Optimization Results Dialog */}
+      <OptimizationResults
+        open={optimizationResultsDialog.open}
+        onClose={handleCloseOptimizationResultsDialog}
       />
     </Box>
   );
