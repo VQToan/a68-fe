@@ -191,8 +191,8 @@ const Register = () => {
             {isLoading ? "Signing up..." : "Sign Up"}
           </Button>
           <Grid container justifyContent="flex-end">
-            <Grid size={{ xs: "auto" }}>
-              <Link component={RouterLink} to="/login" variant="body2">
+            <Grid size={12}>
+                <Link component={RouterLink} to="/login" variant="body2" reloadDocument>
                 Already have an account? Sign in
               </Link>
             </Grid>

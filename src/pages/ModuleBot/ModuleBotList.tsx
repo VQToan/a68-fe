@@ -28,6 +28,12 @@ interface ModuleBotListProps {
   onView?: (id: string) => void;
 }
 
+// Helper function to truncate text with ellipsis
+const truncateText = (text: string, maxLength: number = 50): string => {
+  if (!text) return '';
+  return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+};
+
 const ModuleBotList: React.FC<ModuleBotListProps> = ({ 
   modules, 
   isLoading,
@@ -86,7 +92,13 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
                   variant="outlined" 
                 />
               </TableCell>
-              <TableCell>{module.description}</TableCell>
+              <TableCell>
+                <Tooltip title={module.description}>
+                  <Typography variant="body2">
+                    {truncateText(module.description)}
+                  </Typography>
+                </Tooltip>
+              </TableCell>
               <TableCell>{formatDate(module.created_at)}</TableCell>
               <TableCell>
                 <Box>

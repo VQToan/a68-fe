@@ -84,7 +84,6 @@ const BacktestList = ({
   onDelete,
   onRun,
   onStop,
-  onRefresh,
 }: BacktestListProps) => {
   // Pagination state
   const [page, setPage] = useState(0);

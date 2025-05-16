@@ -303,7 +303,7 @@ const ModuleBot = () => {
         open={openDialog}
         onClose={handleCloseDialog}
         title={dialogTitle}
-        maxWidth="sm"
+        maxWidth="md"
         footer={getModalFooter()}
       >
         <ModuleBotForm

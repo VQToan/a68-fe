@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useState } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Container,
@@ -107,8 +107,8 @@ const Login = () => {
             {isLoading ? "Signing in..." : "Sign In"}
           </Button>
           <Grid container>
-            <Grid size={{ xs: "auto" }}>
-              <Link component={RouterLink} to="/register" variant="body2">
+            <Grid size={12}>
+              <Link component={RouterLink} to="/register" variant="body2" reloadDocument>
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>

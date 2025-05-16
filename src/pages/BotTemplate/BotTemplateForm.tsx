@@ -14,7 +14,6 @@ import { useForm, Controller } from "react-hook-form";
 import { useModule } from "@hooks/useModule";
 import {
   ModuleType,
-  moduleTypeToField,
   type BotTemplateCreate,
   type BotTemplateUpdate,
 } from "../../types/botTemplate.types";
@@ -27,9 +26,9 @@ interface BotTemplateFormProps {
   initialData?: BotTemplateUpdate & { _id?: string };
   onSubmit: (data: BotTemplateCreate | BotTemplateUpdate) => void;
   isSubmitting: boolean;
-  isEditMode: boolean;
   onCancel?: () => void;
   formId?: string;
+  isEditMode?: boolean;
 }
 
 interface ModuleOption {
@@ -52,7 +51,6 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
   initialData,
   onSubmit,
   isSubmitting,
-  isEditMode,
   formId = "bot-template-form",
 }) => {
   // Get modules from the store for the module selections

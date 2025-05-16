@@ -25,7 +25,6 @@ import OptimizationDialog from "./components/OptimizationDialog";
 import OptimizationResults from "./components/OptimizationResults";
 import { useBacktest } from "@hooks/useBacktest";
 import { useModule } from "@hooks/useModule";
-import { useBotOptimization } from "@hooks/useBotOptimization";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
@@ -48,7 +47,7 @@ interface TabPanelProps {
 }
 
 function TabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+  const { children, value, index } = props;
 
   return (
     <div
@@ -56,7 +55,6 @@ function TabPanel(props: TabPanelProps) {
       hidden={value !== index}
       id={`backtest-tabpanel-${index}`}
       aria-labelledby={`backtest-tab-${index}`}
-      {...other}
     >
       {value === index && <Box sx={{ pt: 2 }}>{children}</Box>}
     </div>
@@ -143,9 +141,6 @@ const Backtest = () => {
   }>({
     open: false,
   });
-
-  // Get optimization related state
-  const { optimizationResults, isLoading: isOptimizationLoading } = useBotOptimization();
 
   // Initial fetch of backtests and modules
   useEffect(() => {

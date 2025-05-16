@@ -37,7 +37,7 @@ const BacktestChart: React.FC<BacktestChartProps> = ({
   symbol,
   interval,
 }) => {
-  const { fetchCandles, loading: apiLoading, error: apiError } = useChart();
+  const { fetchCandles, error: apiError } = useChart();
   const [chartData, setChartData] = useState<any[]>([]);
   const [visibleBars, setVisibleBars] = useState<number>(100);
   const [loading, setLoading] = useState(false);

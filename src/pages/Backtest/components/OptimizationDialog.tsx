@@ -23,6 +23,7 @@ import {
   Alert,
   Tooltip,
   IconButton,
+  type SelectChangeEvent,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { useBotOptimization } from "@/hooks/useBotOptimization";
@@ -99,12 +100,12 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
   );
 
   // Handle template selection change
-  const handleTemplateChange = useCallback((event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleTemplateChange = useCallback((event: SelectChangeEvent) => {
     setSelectedTemplate(event.target.value as string);
   }, []);
 
   // Handle provider selection change
-  const handleProviderChange = useCallback((event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleProviderChange = useCallback((event: SelectChangeEvent) => {
     const newProvider = event.target.value as string;
     setSelectedProvider(newProvider);
     setSelectedModel(""); // Reset model when provider changes
@@ -136,7 +137,7 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
   }, [selectedProvider, debouncedFetchModels]);
 
   // Handle model selection change
-  const handleModelChange = useCallback((event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleModelChange = useCallback((event: SelectChangeEvent) => {
     setSelectedModel(event.target.value as string);
   }, []);
 
@@ -200,7 +201,7 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
     if (open && templates.length === 0) {
       getTemplates();
     }
-  }, [open, templates.length, getTemplates]);
+  }, [open]);
 
   // Reset form when dialog closes
   useEffect(() => {
@@ -279,7 +280,6 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
                   {completedBacktests.map((backtest) => (
                     <React.Fragment key={backtest._id}>
                       <ListItem
-                        button
                         onClick={handleBacktestToggle(backtest._id)}
                         dense
                       >

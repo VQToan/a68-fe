@@ -11,6 +11,7 @@ export interface BotTemplate {
   stop_loss_module: string;
   created_at: string;
   updated_at: string;
+  parameters?: Record<string, any>;
 }
 
 // Interface for creating a new bot template

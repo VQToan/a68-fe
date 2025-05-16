@@ -64,7 +64,7 @@ const OptimizationResults: React.FC<OptimizationResultsProps> = ({
 
     try {
       // Get current parameters from the bot template
-      const currentParams = { ...botTemplate?.parameters || {} };
+      const currentParams: Record<string, any> = { ...botTemplate?.parameters || {} };
       
       // Apply optimized parameters
       optimizationResults.optimized_parameters.forEach((param) => {

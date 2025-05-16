@@ -17,7 +17,7 @@ import BacktestResult from "@pages/Backtest/BacktestResult";
 export const routes: RouteObject[] = [
   // Auth routes with redirect for authenticated users
   {
-    path: "login",
+    path: "/login",
     element: (
       <AuthRedirectWrapper>
         <Login />
@@ -25,7 +25,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "register",
+    path: "/register",
     element: (
       <AuthRedirectWrapper>
         <Register />

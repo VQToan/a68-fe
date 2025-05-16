@@ -150,7 +150,7 @@ const BacktestForm = ({
     control,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { /* errors */ },
   } = useForm({
     defaultValues: {
       name: initialData?.name || "",
