@@ -617,7 +617,7 @@ const BacktestForm = ({
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="Biên độ tối thiểu (MIN_MARGIN) %"
+                      label="Biên độ tối thiểu (MIN_MARGIN) USDT"
                       type="number"
                       fullWidth
                       value={
@@ -634,7 +634,7 @@ const BacktestForm = ({
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="Biên độ tối đa (MAX_MARGIN) %"
+                      label="Biên độ tối đa (MAX_MARGIN) USDT"
                       type="number"
                       fullWidth
                       value={
