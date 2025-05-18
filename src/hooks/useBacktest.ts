@@ -32,9 +32,9 @@ export const useBacktest = () => {
   const resultLoading = useAppSelector(
     (state) => state.backtest.resultLoading
   );
-  const totalCount = useAppSelector((state) => state.backtest.processes.length);
+  const pagination = useAppSelector((state) => state.backtest.pagination);
 
-  // Get all backtest processes (with optional status filtering)
+  // Get all backtest processes (with optional status filtering and pagination)
   const handleGetProcesses = useCallback(
     (status?: string, skip?: number, limit?: number) => {
       return dispatch(fetchBacktestProcesses({ status, skip, limit }));
@@ -140,7 +140,7 @@ export const useBacktest = () => {
     error,
     result,
     resultLoading,
-    totalCount,
+    pagination,
     getProcesses: handleGetProcesses,
     getProcessById: handleGetProcessById,
     getResult: handleGetResult,

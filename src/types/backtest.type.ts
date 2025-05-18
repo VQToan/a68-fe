@@ -25,6 +25,7 @@ export interface BacktestParameter {
   FUNDS: number;
   MAX_LOSS: number;
   MIN_ROI: number;
+  R2R: string; // Risk to Reward ratio, default "1:2"
   MA_PERIOD: string;
   DCA_GRID: number;
   DCA_MULTIPLIER: number;

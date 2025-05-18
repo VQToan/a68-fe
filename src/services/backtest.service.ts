@@ -72,12 +72,21 @@ export interface BacktestResult {
   results: BacktestResultItem[];
 }
 
+// Response type with pagination metadata
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  page_size: number;
+  pages: number;
+}
+
 // Get all backtest processes with optional status filter
 export const getBacktestProcesses = async (
   status?: string,
   skip?: number,
   limit?: number
-): Promise<BacktestProcess[]> => {
+): Promise<PaginatedResponse<BacktestProcess>> => {
   const params = new URLSearchParams();
   if (status) params.append("status", status);
   if (skip !== undefined) params.append("skip", skip.toString());
@@ -85,6 +94,8 @@ export const getBacktestProcesses = async (
 
   const queryString = params.toString() ? `?${params.toString()}` : "";
   const response = await apiClient.get(`${API_BASE_PATH}${queryString}`);
+  
+  // Return the paginated response
   return response.data;
 };
 

@@ -79,6 +79,7 @@ const Backtest = () => {
     isLoading,
     error,
     currentProcess,
+    pagination,
     getProcesses,
     getProcessById,
     createProcess,
@@ -142,16 +143,30 @@ const Backtest = () => {
     open: false,
   });
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+
   // Initial fetch of backtests and modules
   useEffect(() => {
-    getProcesses(tabStatusMap[currentTab]);
+    fetchBacktests();
     getModules();
   }, []);
 
   // Fetch backtests when tab changes
   useEffect(() => {
-    getProcesses(tabStatusMap[currentTab]);
+    fetchBacktests();
   }, [currentTab]);
+
+  // Fetch backtests with pagination parameters
+  const fetchBacktests = useCallback(() => {
+    getProcesses(tabStatusMap[currentTab], (currentPage - 1) * rowsPerPage, rowsPerPage);
+  }, [currentTab, currentPage, rowsPerPage, getProcesses]);
+
+  // Re-fetch when pagination changes
+  useEffect(() => {
+    fetchBacktests();
+  }, [currentPage, rowsPerPage, fetchBacktests]);
 
   // Show error notification when error occurs
   useEffect(() => {
@@ -159,7 +174,7 @@ const Backtest = () => {
       showNotification(error, "error");
       clearError();
     }
-  }, [error]);
+  }, [error, showNotification, clearError]);
 
   // Handle search
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -172,6 +187,8 @@ const Backtest = () => {
   // Handle tab change
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setCurrentTab(newValue);
+    // Reset pagination when changing tabs
+    setCurrentPage(1);
   };
 
   // Filter processes based on search term if API doesn't support search
@@ -182,6 +199,16 @@ const Backtest = () => {
           process.description.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : processes;
+
+  // Pagination handlers
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+  }, []);
+
+  const handleRowsPerPageChange = useCallback((newRowsPerPage: number) => {
+    setRowsPerPage(newRowsPerPage);
+    setCurrentPage(1); // Reset to first page when changing rows per page
+  }, []);
 
   // Handle dialog open/close
   const handleOpenDialog = useCallback((mode: FormMode = "create") => {
@@ -223,11 +250,13 @@ const Backtest = () => {
           showNotification("Backtest đã được cập nhật thành công", "success");
         }
         handleCloseDialog();
+        // Re-fetch the list with latest data
+        fetchBacktests();
       } catch (error) {
         console.error("Error submitting backtest:", error);
       }
     },
-    [dialogMode, currentProcess, createProcess, updateProcess, showNotification, handleCloseDialog]
+    [dialogMode, currentProcess, createProcess, updateProcess, showNotification, handleCloseDialog, fetchBacktests]
   );
 
   // Handle edit mode toggle from view mode
@@ -287,26 +316,30 @@ const Backtest = () => {
       await deleteProcess(confirmDelete.id);
       showNotification("Backtest đã được xóa thành công", "success");
       handleCloseDeleteConfirm();
+      // Re-fetch the list with latest data
+      fetchBacktests();
     } catch (error) {
       console.error("Error deleting backtest:", error);
     }
-  }, [confirmDelete.id, deleteProcess, showNotification, handleCloseDeleteConfirm]);
+  }, [confirmDelete.id, deleteProcess, showNotification, handleCloseDeleteConfirm, fetchBacktests]);
 
   // Handle stop backtest
   const handleStopBacktest = useCallback(async (id: string) => {
     try {
       await stopProcess(id);
       showNotification("Backtest đã được dừng lại", "success");
+      // Re-fetch the list with latest data
+      fetchBacktests();
     } catch (error) {
       console.error("Error stopping backtest:", error);
     }
-  }, [stopProcess, showNotification]);
+  }, [stopProcess, showNotification, fetchBacktests]);
 
   // Handle refreshing the backtest list
   const handleRefreshBacktests = useCallback(() => {
-    getProcesses(tabStatusMap[currentTab]);
+    fetchBacktests();
     showNotification("Danh sách backtest đã được cập nhật", "success");
-  }, [currentTab, getProcesses, showNotification]);
+  }, [fetchBacktests, showNotification]);
 
   // Handle opening run backtest dialog
   const handleOpenRunBacktestDialog = useCallback((id: string, name: string) => {
@@ -343,10 +376,12 @@ const Backtest = () => {
       await runProcess(runBacktestDialog.id, startDate, endDate);
       showNotification("Backtest đã được bắt đầu chạy", "success");
       handleCloseRunBacktestDialog();
+      // Re-fetch the list with latest data
+      fetchBacktests();
     } catch (error) {
       console.error("Error running backtest:", error);
     }
-  }, [runBacktestDialog.id, runProcess, showNotification, handleCloseRunBacktestDialog]);
+  }, [runBacktestDialog.id, runProcess, showNotification, handleCloseRunBacktestDialog, fetchBacktests]);
 
   // Handle opening optimization dialog
   const handleOpenOptimizationDialog = useCallback(() => {
@@ -367,7 +402,9 @@ const Backtest = () => {
     setOptimizationResultsDialog({
       open: true,
     });
-  }, []);
+    // Re-fetch the list with latest data
+    fetchBacktests();
+  }, [fetchBacktests]);
 
   // Handle closing optimization results dialog
   const handleCloseOptimizationResultsDialog = useCallback(() => {
@@ -507,10 +544,13 @@ const Backtest = () => {
             isLoading={isLoading}
             onEdit={handleEditBacktest}
             onDelete={(id, name) => handleOpenDeleteConfirm(id, name)}
-            onView={handleShowBacktestResult} // Thay đổi để hiển thị BacktestResult trong cùng trang
+            onView={handleShowBacktestResult}
             onRun={handleRunBacktest}
             onStop={handleStopBacktest}
             onRefresh={handleRefreshBacktests}
+            pagination={pagination}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
           />
         </TabPanel>
       </Paper>

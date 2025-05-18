@@ -51,6 +51,7 @@ const defaultBotParams: Partial<BacktestParameter> = {
   FUNDS: 1000.0,
   MAX_LOSS: 0.0,
   MIN_ROI: 8.0,
+  R2R: "1:2", // Default Risk to Reward ratio
   MA_PERIOD: "8:20",
   DCA_GRID: 0.008,
   DCA_MULTIPLIER: 1.05,
@@ -613,6 +614,18 @@ const BacktestForm = ({
                         handleParameterChange("MIN_ROI", Number(e.target.value))
                       }
                       inputProps={{ step: "0.1" }}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      label="Risk to Reward Ratio (R2R)"
+                      fullWidth
+                      placeholder="1:2"
+                      value={parameters.R2R || defaultBotParams.R2R}
+                      onChange={(e) =>
+                        handleParameterChange("R2R", e.target.value)
+                      }
+                      helperText="Định dạng: 'rủi ro:phần thưởng' (vd: 1:2)"
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>

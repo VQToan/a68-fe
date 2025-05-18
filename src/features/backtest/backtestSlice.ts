@@ -15,6 +15,12 @@ interface BacktestState {
   error: string | null;
   result: backtestService.BacktestResult | null;
   resultLoading: boolean;
+  pagination: {
+    total: number;
+    page: number;
+    pageSize: number;
+    pages: number;
+  };
 }
 
 // Define initial state
@@ -25,6 +31,12 @@ const initialState: BacktestState = {
   error: null,
   result: null,
   resultLoading: false,
+  pagination: {
+    total: 0,
+    page: 1,
+    pageSize: 10,
+    pages: 1,
+  },
 };
 
 // Async thunk for fetching all backtest processes
@@ -197,9 +209,16 @@ const backtestSlice = createSlice({
       })
       .addCase(
         fetchBacktestProcesses.fulfilled,
-        (state, action: PayloadAction<BacktestProcess[]>) => {
+        (state, action) => {
           state.isLoading = false;
-          state.processes = action.payload;
+          // Handle the new paginated response format
+          state.processes = action.payload.items;
+          state.pagination = {
+            total: action.payload.total,
+            page: action.payload.page,
+            pageSize: action.payload.page_size,
+            pages: action.payload.pages
+          };
         }
       )
       .addCase(fetchBacktestProcesses.rejected, (state, action) => {

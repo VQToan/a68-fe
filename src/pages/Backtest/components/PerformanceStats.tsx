@@ -130,6 +130,16 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({
               {metrics.losing_trades || 0}
             </Typography>
           </Grid>
+          {parameters.R2R && (
+            <Grid size={6}>
+              <Typography variant="body2" color="text.secondary">
+                Risk/Reward
+              </Typography>
+              <Typography variant="h6" fontWeight="medium">
+                {parameters.R2R}
+              </Typography>
+            </Grid>
+          )}
         </Grid>
 
         {/* Metrics PnL */}

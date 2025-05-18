@@ -29,6 +29,14 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { areEqual, formatDate } from "@utils/common";
 import type { BacktestProcess, BacktestStatus } from "@/types/backtest.type";
 
+// Pagination metadata interface
+interface PaginationMetadata {
+  total: number;
+  page: number;
+  pageSize: number;
+  pages: number;
+}
+
 interface BacktestListProps {
   processes: BacktestProcess[];
   isLoading: boolean;
@@ -38,6 +46,10 @@ interface BacktestListProps {
   onRun: (id: string) => void;
   onStop: (id: string) => void;
   onRefresh: () => void;
+  // Pagination props
+  pagination: PaginationMetadata;
+  onPageChange: (page: number) => void;
+  onRowsPerPageChange: (rowsPerPage: number) => void;
 }
 
 // Linear progress with label component
@@ -84,11 +96,10 @@ const BacktestList = ({
   onDelete,
   onRun,
   onStop,
+  pagination,
+  onPageChange,
+  onRowsPerPageChange,
 }: BacktestListProps) => {
-  // Pagination state
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
   // Menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -113,18 +124,19 @@ const BacktestList = ({
   // Handle pagination change
   const handleChangePage = useCallback(
     (_event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-      setPage(newPage);
+      onPageChange(newPage + 1); // Convert from 0-based to 1-based for API
     },
-    []
+    [onPageChange]
   );
 
   // Handle rows per page change
   const handleChangeRowsPerPage = useCallback(
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setRowsPerPage(parseInt(event.target.value, 10));
-      setPage(0);
+      const newRowsPerPage = parseInt(event.target.value, 10);
+      onRowsPerPageChange(newRowsPerPage);
+      onPageChange(1); // Reset to first page when changing rows per page
     },
-    []
+    [onPageChange, onRowsPerPageChange]
   );
 
   // Handle actions
@@ -171,13 +183,7 @@ const BacktestList = ({
     }
   }, [selectedId, onStop, handleMenuClose]);
 
-  // Sliced data for pagination
-  const slicedData = processes.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
-
-  if (isLoading) {
+  if (isLoading && processes.length === 0) {
     return (
       <Box
         sx={{
@@ -212,6 +218,9 @@ const BacktestList = ({
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
+      {isLoading && (
+        <LinearProgress sx={{ position: "absolute", width: "100%", top: 0 }} />
+      )}
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label="backtest processes table">
           <TableHead>
@@ -225,7 +234,7 @@ const BacktestList = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {slicedData.map((process) => (
+            {processes.map((process) => (
               <TableRow hover key={process._id}>
                 <TableCell component="th" scope="row">
                   {process.name}
@@ -272,11 +281,11 @@ const BacktestList = ({
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
+        rowsPerPageOptions={[5, 10, 25, 50]}
         component="div"
-        count={processes.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
+        count={pagination.total}
+        rowsPerPage={pagination.pageSize}
+        page={pagination.page - 1} // Convert from 1-based to 0-based for Material-UI
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
         labelRowsPerPage="Dòng trên trang:"

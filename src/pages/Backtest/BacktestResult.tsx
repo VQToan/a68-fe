@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, memo } from "react";
+import React, { useState, useEffect, useMemo, useCallback, memo, useRef } from "react";
 import { useParams } from "react-router-dom";
 import {
   Box,
@@ -51,6 +51,8 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
 }) => {
   const { id: paramId } = useParams<{ id: string }>();
   const id = propId || paramId;
+  const statsRef = useRef<HTMLDivElement>(null);
+  const [statsHeight, setStatsHeight] = useState<number>(0);
 
   const { isLoading, error, getResult, clearResult, resultLoading, result } =
     useBacktest();
@@ -141,6 +143,31 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
       }
     }
   }, [result]);
+
+  // Update statsHeight when the component mounts or when the content changes
+  useEffect(() => {
+    const updateHeight = () => {
+      if (statsRef.current) {
+        // Get the height of the PerformanceStats component
+        const height = statsRef.current.getBoundingClientRect().height;
+        setStatsHeight(height - 24); // Subtracting padding
+      }
+    };
+
+    // Initial update
+    updateHeight();
+    
+    // Update on window resize
+    window.addEventListener('resize', updateHeight);
+    
+    // Update after a short delay to ensure content is rendered
+    const timer = setTimeout(updateHeight, 500);
+    
+    return () => {
+      window.removeEventListener('resize', updateHeight);
+      clearTimeout(timer);
+    };
+  }, [selectedResult, metrics]);
 
   if (isLoading) {
     return (
@@ -303,26 +330,63 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
         </Grid>
 
         <Grid size={{ xs: 12, md: 4 }}>
-          <PerformanceStats
-            metrics={metrics}
-            parameters={result.parameters || {}}
-          />
+          <Box ref={statsRef}>
+            <PerformanceStats
+              metrics={metrics}
+              parameters={result.parameters || {}}
+            />
+          </Box>
         </Grid>
 
         <Grid size={{ xs: 12, md: 8 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Danh sách giao dịch
-              </Typography>
-              <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
+          <Card sx={{ height: statsHeight > 0 ? `${statsHeight}px` : 'auto' }}>
+            <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                <Typography variant="h6">
+                  Danh sách giao dịch
+                </Typography>
+                <Typography variant="subtitle1" fontWeight="medium">
+                  Tổng số: <strong>{trades.length}</strong> giao dịch
+                </Typography>
+              </Box>
+              <TableContainer 
+                component={Paper} 
+                sx={{ 
+                  flex: 1, 
+                  maxHeight: statsHeight > 0 ? `calc(${statsHeight}px - 60px)` : '500px',
+                  overflow: 'auto' 
+                }}
+              >
                 <Table stickyHeader size="small">
                   <TableHead>
+                    <TableRow>
+                      <TableCell>
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Typography variant="body2" fontWeight="bold">
+                            Chi tiết giao dịch
+                          </Typography>
+                          <Box>
+                            <Chip 
+                              size="small" 
+                              color="success" 
+                              sx={{ mr: 1 }}
+                              label={`LONG: ${trades.filter(t => t.side.includes('LONG')).length}`}
+                            />
+                            <Chip 
+                              size="small" 
+                              color="error"
+                              label={`SHORT: ${trades.filter(t => t.side.includes('SHORT')).length}`}
+                            />
+                          </Box>
+                        </Box>
+                      </TableCell>
+                      <TableCell colSpan={5}></TableCell>
+                    </TableRow>
                     <TableRow>
                       <TableCell>Thời gian</TableCell>
                       <TableCell>Loại</TableCell>
                       <TableCell>Giá</TableCell>
-                      <TableCell>Khối lượng</TableCell>
+                      <TableCell>Số lượng</TableCell>
                       <TableCell>Lý do</TableCell>
                       <TableCell>PnL</TableCell>
                     </TableRow>
