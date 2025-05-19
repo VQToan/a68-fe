@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useMemo, useCallback, memo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  memo,
+  useRef,
+} from "react";
 import { useParams } from "react-router-dom";
 import {
   Box,
@@ -156,15 +163,15 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
 
     // Initial update
     updateHeight();
-    
+
     // Update on window resize
-    window.addEventListener('resize', updateHeight);
-    
+    window.addEventListener("resize", updateHeight);
+
     // Update after a short delay to ensure content is rendered
     const timer = setTimeout(updateHeight, 500);
-    
+
     return () => {
-      window.removeEventListener('resize', updateHeight);
+      window.removeEventListener("resize", updateHeight);
       clearTimeout(timer);
     };
   }, [selectedResult, metrics]);
@@ -339,43 +346,59 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
         </Grid>
 
         <Grid size={{ xs: 12, md: 8 }}>
-          <Card sx={{ height: statsHeight > 0 ? `${statsHeight}px` : 'auto' }}>
-            <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="h6">
-                  Danh sách giao dịch
-                </Typography>
+          <Card sx={{ height: statsHeight > 0 ? `${statsHeight}px` : "auto" }}>
+            <CardContent
+              sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+            >
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mb={2}
+              >
+                <Typography variant="h6">Danh sách giao dịch</Typography>
                 <Typography variant="subtitle1" fontWeight="medium">
                   Tổng số: <strong>{trades.length}</strong> giao dịch
                 </Typography>
               </Box>
-              <TableContainer 
-                component={Paper} 
-                sx={{ 
-                  flex: 1, 
-                  maxHeight: statsHeight > 0 ? `calc(${statsHeight}px - 60px)` : '500px',
-                  overflow: 'auto' 
+              <TableContainer
+                component={Paper}
+                sx={{
+                  flex: 1,
+                  maxHeight:
+                    statsHeight > 0 ? `calc(${statsHeight}px - 60px)` : "500px",
+                  overflow: "auto",
                 }}
               >
                 <Table stickyHeader size="small">
                   <TableHead>
                     <TableRow>
                       <TableCell>
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
                           <Typography variant="body2" fontWeight="bold">
                             Chi tiết giao dịch
                           </Typography>
                           <Box>
-                            <Chip 
-                              size="small" 
-                              color="success" 
+                            <Chip
+                              size="small"
+                              color="success"
                               sx={{ mr: 1 }}
-                              label={`LONG: ${trades.filter(t => t.side.includes('LONG')).length}`}
+                              label={`LONG: ${
+                                trades.filter((t) => t.side.includes("LONG"))
+                                  .length
+                              }`}
                             />
-                            <Chip 
-                              size="small" 
+                            <Chip
+                              size="small"
                               color="error"
-                              label={`SHORT: ${trades.filter(t => t.side.includes('SHORT')).length}`}
+                              label={`SHORT: ${
+                                trades.filter((t) => t.side.includes("SHORT"))
+                                  .length
+                              }`}
                             />
                           </Box>
                         </Box>
@@ -388,7 +411,8 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
                       <TableCell>Giá</TableCell>
                       <TableCell>Số lượng</TableCell>
                       <TableCell>Lý do</TableCell>
-                      <TableCell>PnL</TableCell>
+                      <TableCell>Order PnL</TableCell>
+                      <TableCell>Transaction PnL</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -410,6 +434,18 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
                           <TableCell>{formatNumber(trade.price)}</TableCell>
                           <TableCell>{trade.quantity}</TableCell>
                           <TableCell>{trade.reason}</TableCell>
+                          <TableCell
+                            sx={{
+                              color:
+                                (trade.pnl || 0) > 0
+                                  ? "success.main"
+                                  : (trade.pnl || 0) < 0
+                                  ? "error.main"
+                                  : "inherit",
+                            }}
+                          >
+                            {trade.pnl ? formatNumber(trade.pnl) : "-"}
+                          </TableCell>
                           <TableCell
                             sx={{
                               color:
