@@ -8,18 +8,15 @@ import {
   CardContent,
 } from "@mui/material";
 import { formatNumber } from "@utils/common";
-import type { BacktestMetrics } from "@/services/backtest.service";
 import { areEqual } from "@/utils/common";
-import moment from "moment";
+import type { BacktestResultMetrics } from "@/types/backtestResult.type";
 
 interface PerformanceStatsProps {
-  metrics: BacktestMetrics;
-  parameters: Record<string, any>;
+  metrics: BacktestResultMetrics;
 }
 
 const PerformanceStats: React.FC<PerformanceStatsProps> = ({
   metrics,
-  parameters,
 }) => {
   return (
     <Card>
@@ -130,16 +127,6 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({
               {metrics.losing_trades || 0}
             </Typography>
           </Grid>
-          {parameters.R2R && (
-            <Grid size={6}>
-              <Typography variant="body2" color="text.secondary">
-                Risk/Reward
-              </Typography>
-              <Typography variant="h6" fontWeight="medium">
-                {parameters.R2R}
-              </Typography>
-            </Grid>
-          )}
         </Grid>
 
         {/* Metrics PnL */}
@@ -313,28 +300,6 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({
             </Typography>
           </Grid>
         </Grid>
-
-        <Divider sx={{ my: 1 }} />
-        <Typography variant="body2" color="text.secondary">
-          Thông số chiến lược
-        </Typography>
-        {Object.entries(parameters || {}).map(([key, value]) => (
-          <Box
-            key={key}
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              my: 0.5,
-            }}
-          >
-            <Typography variant="body2">{key}:</Typography>
-            <Typography variant="body2" fontWeight="bold">
-              {key.includes("DATE")
-                ? moment(value).format("YYYY-MM-DD HH:mm")
-                : value}
-            </Typography>
-          </Box>
-        ))}
       </CardContent>
     </Card>
   );

@@ -13,8 +13,6 @@ import {
   stopBacktestProcess,
   clearCurrentProcess as clearCurrentProcessAction,
   clearError as clearErrorAction,
-  getBacktestResult,
-  clearBacktestResult,
 } from "@features/backtest/backtestSlice";
 import { useCallback } from "react";
 
@@ -28,10 +26,7 @@ export const useBacktest = () => {
   );
   const isLoading = useAppSelector((state) => state.backtest.isLoading);
   const error = useAppSelector((state) => state.backtest.error);
-  const result = useAppSelector((state) => state.backtest.result);
-  const resultLoading = useAppSelector(
-    (state) => state.backtest.resultLoading
-  );
+
   const pagination = useAppSelector((state) => state.backtest.pagination);
 
   // Get all backtest processes (with optional status filtering and pagination)
@@ -49,15 +44,6 @@ export const useBacktest = () => {
     },
     [dispatch]
   );
-
-  // Get backtest result by process ID
-  const handleGetResult = useCallback(
-    (id: string) => {
-      return dispatch(getBacktestResult(id));
-    },
-    [dispatch]
-  );
-
   // Create a new backtest process
   const handleCreateProcess = useCallback(
     (processData: BacktestProcessCreate) => {
@@ -123,11 +109,6 @@ export const useBacktest = () => {
     dispatch(clearCurrentProcessAction());
   }, [dispatch]);
 
-  // Clear backtest result
-  const handleClearResult = useCallback(() => {
-    dispatch(clearBacktestResult());
-  }, [dispatch]);
-
   // Clear error
   const handleClearError = useCallback(() => {
     dispatch(clearErrorAction());
@@ -138,19 +119,15 @@ export const useBacktest = () => {
     currentProcess,
     isLoading,
     error,
-    result,
-    resultLoading,
     pagination,
     getProcesses: handleGetProcesses,
     getProcessById: handleGetProcessById,
-    getResult: handleGetResult,
     createProcess: handleCreateProcess,
     updateProcess: handleUpdateProcess,
     deleteProcess: handleDeleteProcess,
     runProcess: handleRunProcess,
     stopProcess: handleStopProcess,
     clearCurrentProcess: handleClearCurrentProcess,
-    clearResult: handleClearResult,
     clearError: handleClearError,
   };
 };

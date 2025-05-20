@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './auth/authSlice';
 import moduleReducer from './module/moduleSlice';
 import backtestReducer from './backtest/backtestSlice';
+import backtestResultReducer from './backtestResult/backtestResultSlice';
 import botTemplateReducer from './botTemplate/botTemplateSlice';
 import botOptimizationReducer from './botOptimization/botOptimizationSlice';
 
@@ -10,6 +11,7 @@ export const store = configureStore({
     auth: authReducer,
     module: moduleReducer,
     backtest: backtestReducer,
+    backtestResult: backtestResultReducer,
     botTemplate: botTemplateReducer,
     botOptimization: botOptimizationReducer,
     // Add other reducers here as your application grows

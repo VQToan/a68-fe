@@ -19,7 +19,7 @@ import AddIcon from "@mui/icons-material/Add";
 import OptimizeIcon from "@mui/icons-material/Psychology";
 import BacktestList from "./BacktestList";
 import BacktestForm from "./BacktestForm";
-import BacktestResult from "./BacktestResult";
+import BacktestResult from "./components/Result";
 import RunBacktestDialog from "./components/RunBacktestDialog";
 import OptimizationDialog from "./components/OptimizationDialog";
 import OptimizationResults from "./components/OptimizationResults";

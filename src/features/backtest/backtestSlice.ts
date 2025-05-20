@@ -13,8 +13,6 @@ interface BacktestState {
   currentProcess: BacktestProcess | null;
   isLoading: boolean;
   error: string | null;
-  result: backtestService.BacktestResult | null;
-  resultLoading: boolean;
   pagination: {
     total: number;
     page: number;
@@ -29,8 +27,6 @@ const initialState: BacktestState = {
   currentProcess: null,
   isLoading: false,
   error: null,
-  result: null,
-  resultLoading: false,
   pagination: {
     total: 0,
     page: 1,
@@ -170,21 +166,6 @@ export const stopBacktestProcess = createAsyncThunk(
   }
 );
 
-// Async thunk for fetching backtest result by ID
-export const getBacktestResult = createAsyncThunk(
-  "backtest/getResult",
-  async (id: string, { rejectWithValue }) => {
-    try {
-      const response = await backtestService.getBacktestResult(id);
-      return response
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "Không thể tải kết quả backtest"
-      );
-    }
-  }
-);
-
 // Create backtest slice
 const backtestSlice = createSlice({
   name: "backtest",
@@ -195,9 +176,6 @@ const backtestSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
-    },
-    clearBacktestResult: (state) => {
-      state.result = null;
     },
   },
   extraReducers: (builder) => {
@@ -365,21 +343,7 @@ const backtestSlice = createSlice({
       })
 
       // Fetch backtest results list
-      .addCase(getBacktestResult.pending, (state) => {
-        state.resultLoading = true;
-        state.error = null;
-      })
-      .addCase(
-        getBacktestResult.fulfilled,
-        (state, action: PayloadAction<backtestService.BacktestResult>) => {
-          state.resultLoading = false;
-          state.result = action.payload;
-        }
-      )
-      .addCase(getBacktestResult.rejected, (state, action) => {
-        state.resultLoading = false;
-        state.error = action.payload as string;
-      });
+      
   },
 });
 
@@ -387,7 +351,6 @@ const backtestSlice = createSlice({
 export const {
   clearCurrentProcess,
   clearError,
-  clearBacktestResult,
 } = backtestSlice.actions;
 
 // Export reducer

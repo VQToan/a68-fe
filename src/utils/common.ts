@@ -115,4 +115,58 @@ export const formatNumber = (
   }
 };
 
+/**
+ * Download data as a JSON file
+ * @param data - The data to be downloaded as JSON
+ * @param filename - Name for the downloaded file (without extension)
+ * @param options - Additional options for the download
+ * @returns void
+ */
+export const downloadJson = (
+  data: any,
+  filename: string = "download",
+  options: {
+    indent?: number;
+    includeTimestamp?: boolean;
+  } = {}
+): void => {
+  try {
+    const { indent = 2, includeTimestamp = true } = options;
+
+    // Prepare the JSON data
+    const jsonString = JSON.stringify(data, null, indent);
+    const blob = new Blob([jsonString], { type: "application/json" });
+
+    // Create a download URL
+    const url = URL.createObjectURL(blob);
+
+    // Add timestamp to filename if requested
+    const timestampSuffix = includeTimestamp
+      ? `-${moment().format("YYYYMMDD-HHmmss")}`
+      : "";
+
+    // Create safe filename
+    const safeFilename = `${filename}${timestampSuffix}.json`.replace(
+      /[^a-zA-Z0-9-_]/g,
+      "_"
+    ); // Replace invalid chars with underscore
+
+    // Create a temporary anchor element to trigger the download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = safeFilename;
+
+    // Append to body, click, and clean up
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    // Release the URL object
+    setTimeout(() => URL.revokeObjectURL(url), 100);
+
+  } catch (error) {
+    console.error("Error downloading JSON file:", error);
+  }
+};
+
 

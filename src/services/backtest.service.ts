@@ -18,59 +18,7 @@ export interface BacktestTrade {
   position_pnl: number;
 }
 
-export interface BacktestMetrics {
-  // Trade Statistics
-  total_trades: number;
-  monthly_trades: number;
-  long_trades: number;
-  short_trades: number;
-  
-  // Win/Loss Ratios
-  winning_trades: number;
-  losing_trades: number;
-  win_rate: number;
-  long_win_rate: number;
-  short_win_rate: number;
-  
-  // PnL Metrics
-  total_pnl: number;
-  monthly_pnl: number;
-  avg_pnl_per_trade: number;
-  avg_long_pnl: number;
-  avg_short_pnl: number;
-  
-  // ROI Metrics
-  total_roi: number;
-  monthly_roi: number;
-  avg_roi_per_trade: number;
-  avg_long_roi: number;
-  avg_short_roi: number;
-  
-  // Risk Metrics
-  max_loss_occurrences: number;
-  mdd: number;
-  sharpe_ratio: number;
-  profit_factor: number;
-}
 
-export interface BacktestResultItem {
-  result_id: string;
-  start_date: number;
-  end_date: number;
-  trades: BacktestTrade[];
-  metrics: BacktestMetrics;
-  created_at: string;
-}
-
-export interface BacktestResult {
-  _id: string;
-  process_id: string;
-  name: string;
-  description: string;
-  parameters: Record<string, any>;
-  created_at: string;
-  results: BacktestResultItem[];
-}
 
 // Response type with pagination metadata
 export interface PaginatedResponse<T> {
@@ -146,15 +94,5 @@ export const stopBacktestProcess = async (
   id: string
 ): Promise<BacktestProcess> => {
   const response = await apiClient.post(`${API_BASE_PATH}/${id}/stop`);
-  return response.data;
-};
-
-/**
- * Get detailed backtest results for a specific process
- */
-export const getBacktestResult = async (
-  processId: string
-): Promise<BacktestResult> => {
-  const response = await apiClient.get(`${API_BASE_PATH}/${processId}/results`);
   return response.data;
 };

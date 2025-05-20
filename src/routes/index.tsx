@@ -12,7 +12,7 @@ import Backtest from "../pages/Backtest";
 import BotTemplate from "../pages/BotTemplate";
 import NotFound from "../pages/NotFound";
 import MainLayout from "../layouts/MainLayout";
-import BacktestResult from "@pages/Backtest/BacktestResult";
+import BacktestResult from "@/pages/Backtest/components/Result";
 
 export const routes: RouteObject[] = [
   // Auth routes with redirect for authenticated users

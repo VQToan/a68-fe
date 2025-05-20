@@ -49,7 +49,7 @@ export interface BacktestProcess {
   user_id: string;
   bot_template_id: string;
   parameters: Record<keyof BacktestParameter, any>;
-  created_at: string;
+  created_at: number;
   status: BacktestStatus;
   progress: number;
   completed_at?: string | null;
