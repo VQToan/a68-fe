@@ -12,10 +12,6 @@ import {
   Card,
   CardContent,
   Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Chip,
   Paper,
   Table,
@@ -26,7 +22,6 @@ import {
   TableBody,
   Divider,
   Skeleton,
-  CircularProgress,
 } from "@mui/material";
 import PerformanceStats from "./PerformanceStats";
 import { formatDate, formatNumber, areEqual } from "@/utils/common";

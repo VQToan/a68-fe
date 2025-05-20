@@ -5,16 +5,12 @@ import {
   Container,
   Typography,
   Grid,
-  Paper,
   IconButton,
-  Chip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { areEqual } from "@/utils/common";
-import { useBacktest } from "@hooks/useBacktest";
 import ResultList from "./ResultList";
 import ResultView from "./ResultView";
-import { formatDate } from "@utils/common";
 import Summary from "./Summary";
 
 interface BacktestResultProps {

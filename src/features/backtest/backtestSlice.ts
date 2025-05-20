@@ -12,6 +12,7 @@ import * as backtestService from "@services/backtest.service";
 interface BacktestState {
   processes: BacktestProcess[];
   currentProcess: BacktestProcess | null;
+  processesByTemplate: BacktestProcess[] | null;
   isLoading: boolean;
   error: string | null;
   pagination: {
@@ -25,6 +26,7 @@ interface BacktestState {
 // Define initial state
 const initialState: BacktestState = {
   processes: [],
+  processesByTemplate: null,
   currentProcess: null,
   isLoading: false,
   error: null,
