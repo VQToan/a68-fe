@@ -72,9 +72,14 @@ export const useBacktest = () => {
   const handleRunProcess = useCallback(
     async (id: string, startDate: string, endDate: string) => {
       try {
+        // convert date strings to timestamps utc
         const params = {
-          start_date: new Date(startDate).getTime(),
-          end_date: new Date(endDate).getTime(),
+          start_date:
+            new Date(startDate).getTime() -
+            new Date().getTimezoneOffset() * 60000,
+          end_date:
+            new Date(endDate).getTime() -
+            new Date().getTimezoneOffset() * 60000,
         };
         await dispatch(runBacktestProcess({ id, params })).unwrap();
         // Fetch updated list after action completes

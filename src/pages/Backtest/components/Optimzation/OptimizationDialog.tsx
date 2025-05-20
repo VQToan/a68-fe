@@ -37,7 +37,12 @@ interface OptimizationDialogProps {
   open: boolean;
   onClose: () => void;
   backtestProcesses: BacktestProcess[];
-  onSuccess: () => void;
+  onSuccess: (params: {
+    botTemplateId: string;
+    backtestProcessIds: string[];
+    llmProvider: string;
+    model: string;
+  }) => void;
 }
 
 // LLM Provider options
@@ -168,7 +173,13 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
 
     try {
       await optimizeBot(requestData).unwrap();
-      onSuccess();
+      // Pass optimization parameters to the parent component
+      onSuccess({
+        botTemplateId: selectedTemplate,
+        backtestProcessIds: selectedBacktests,
+        llmProvider: selectedProvider,
+        model: selectedModel,
+      });
       onClose();
     } catch (err) {
       console.error("Optimization failed:", err);

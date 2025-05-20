@@ -2,6 +2,7 @@ import type {
   BacktestProcess,
   BacktestProcessCreate,
   BacktestProcessUpdate,
+  BacktestStatus,
 } from "@/types/backtest.type";
 import apiClient from "./apiClient";
 
@@ -17,8 +18,6 @@ export interface BacktestTrade {
   position_result: string;
   position_pnl: number;
 }
-
-
 
 // Response type with pagination metadata
 export interface PaginatedResponse<T> {
@@ -95,4 +94,16 @@ export const stopBacktestProcess = async (
 ): Promise<BacktestProcess> => {
   const response = await apiClient.post(`${API_BASE_PATH}/${id}/stop`);
   return response.data;
+};
+
+// Get backtest processes by template ID
+export const getProcessesByTemplateId = (
+  templateId: string, 
+  status?: BacktestStatus
+) => {
+  let url = `/backtest-processes/by-template/${templateId}`;
+  if (status) {
+    url += `?status=${status}`;
+  }
+  return apiClient.get<BacktestProcess[]>(url);
 };

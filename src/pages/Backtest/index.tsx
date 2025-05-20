@@ -21,8 +21,8 @@ import BacktestList from "./BacktestList";
 import BacktestForm from "./BacktestForm";
 import BacktestResult from "./components/Result";
 import RunBacktestDialog from "./components/RunBacktestDialog";
-import OptimizationDialog from "./components/OptimizationDialog";
-import OptimizationResults from "./components/OptimizationResults";
+import OptimizationDialog from "./components/Optimzation/OptimizationDialog";
+import OptimizationResults from "./components/Optimzation/OptimizationResults";
 import { useBacktest } from "@hooks/useBacktest";
 import { useModule } from "@hooks/useModule";
 import { useNotification } from "@context/NotificationContext";
@@ -131,10 +131,16 @@ const Backtest = () => {
   });
 
   // State for optimization dialog and results
-  const [optimizationDialog, setOptimizationDialog] = useState<{
+  const [optimizationState, setOptimizationState] = useState<{
     open: boolean;
+    parametersData?: {
+      botTemplateId: string;
+      backtestProcessIds: string[];
+      llmProvider: string;
+      model: string;
+    };
   }>({
-    open: false,
+    open: false
   });
 
   const [optimizationResultsDialog, setOptimizationResultsDialog] = useState<{
@@ -385,23 +391,36 @@ const Backtest = () => {
 
   // Handle opening optimization dialog
   const handleOpenOptimizationDialog = useCallback(() => {
-    setOptimizationDialog({
+    setOptimizationState({
       open: true,
     });
   }, []);
 
   // Handle closing optimization dialog
   const handleCloseOptimizationDialog = useCallback(() => {
-    setOptimizationDialog({
+    setOptimizationState({
       open: false,
     });
   }, []);
 
   // Handle optimization success
-  const handleOptimizationSuccess = useCallback(() => {
+  const handleOptimizationSuccess = useCallback((params: {
+    botTemplateId: string;
+    backtestProcessIds: string[];
+    llmProvider: string;
+    model: string;
+  }) => {
+    // Store parameters for use in the results dialog
+    setOptimizationState(prev => ({
+      ...prev,
+      parametersData: params
+    }));
+    
+    // Open the results dialog
     setOptimizationResultsDialog({
       open: true,
     });
+    
     // Re-fetch the list with latest data
     fetchBacktests();
   }, [fetchBacktests]);
@@ -600,7 +619,7 @@ const Backtest = () => {
 
       {/* Optimization Dialog */}
       <OptimizationDialog
-        open={optimizationDialog.open}
+        open={optimizationState.open}
         onClose={handleCloseOptimizationDialog}
         backtestProcesses={processes}
         onSuccess={handleOptimizationSuccess}
@@ -610,6 +629,7 @@ const Backtest = () => {
       <OptimizationResults
         open={optimizationResultsDialog.open}
         onClose={handleCloseOptimizationResultsDialog}
+        parametersData={optimizationState.parametersData}
       />
     </Box>
   );

@@ -2,6 +2,7 @@ import type {
   BacktestProcess,
   BacktestProcessCreate,
   BacktestProcessUpdate,
+  BacktestStatus,
 } from "@/types/backtest.type";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
@@ -163,6 +164,21 @@ export const stopBacktestProcess = createAsyncThunk(
         error.response?.data?.detail || "Failed to stop backtest process"
       );
     }
+  }
+);
+
+// Get backtest processes by template ID
+export const getProcessesByTemplateId = createAsyncThunk(
+  'backtest/getProcessesByTemplateId',
+  async ({ 
+    templateId, 
+    status 
+  }: { 
+    templateId: string, 
+    status?: BacktestStatus 
+  }) => {
+    const response = await backtestService.getProcessesByTemplateId(templateId, status);
+    return response.data;
   }
 );
 
@@ -340,6 +356,20 @@ const backtestSlice = createSlice({
       .addCase(stopBacktestProcess.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+      })
+
+      // Get backtest processes by template ID
+      .addCase(getProcessesByTemplateId.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getProcessesByTemplateId.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.processesByTemplate = action.payload;
+      })
+      .addCase(getProcessesByTemplateId.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Failed to fetch backtest processes by template ID';
       })
 
       // Fetch backtest results list
