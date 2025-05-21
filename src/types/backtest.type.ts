@@ -51,6 +51,7 @@ export interface BacktestProcess {
   parameters: Record<keyof BacktestParameter, any>;
   created_at: number;
   status: BacktestStatus;
+  summary?: string;
   progress: number;
   completed_at?: string | null;
   result_id?: string | null;

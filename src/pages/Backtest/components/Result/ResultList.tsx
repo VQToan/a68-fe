@@ -164,7 +164,7 @@ const ResultList: React.FC<ResultListProps> = ({
                       <Box mt={1}>
                         <Chip
                           size="small"
-                          label={`Total ROI: ${resultItem.metrics.total_roi.toFixed(
+                          label={`ROI: ${resultItem.metrics.total_roi.toFixed(
                             2
                           )}%`}
                           color={
@@ -184,6 +184,12 @@ const ResultList: React.FC<ResultListProps> = ({
                               ? "success"
                               : "error"
                           }
+                        />
+                        <Chip
+                          size="small"
+                          label={`MDD: ${resultItem.metrics.mdd}`}
+                          color="info"
+                          sx={{ ml: 1 }}
                         />
                       </Box>
                     }

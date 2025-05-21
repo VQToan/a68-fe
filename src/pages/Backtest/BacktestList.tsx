@@ -228,7 +228,7 @@ const BacktestList = ({
               <TableCell>Tên</TableCell>
               <TableCell>Mô tả</TableCell>
               <TableCell>Trạng thái</TableCell>
-              <TableCell>Tiến độ</TableCell>
+              <TableCell>Kết quả</TableCell>
               <TableCell>Ngày tạo</TableCell>
               <TableCell>Thao tác</TableCell>
             </TableRow>
@@ -261,8 +261,31 @@ const BacktestList = ({
                     size="small"
                   />
                 </TableCell>
-                <TableCell>
-                  <LinearProgressWithLabel value={process.progress} />
+                <TableCell
+                  sx={{
+                    minWidth: 150,
+                  }}
+                >
+                  {process.status === "completed" ? (
+                    <Tooltip
+                      title={process.summary || "Không có thông tin"}
+                      arrow
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          maxWidth: 200,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {process.summary || "Không có thông tin"}
+                      </Typography>
+                    </Tooltip>
+                  ) : (
+                    <LinearProgressWithLabel value={process.progress} />
+                  )}
                 </TableCell>
                 <TableCell>{formatDate(process.created_at)}</TableCell>
                 <TableCell>
@@ -318,7 +341,8 @@ const BacktestList = ({
         {selectedId &&
           processes &&
           processes.length > 0 &&
-          (processes.find((p) => p._id === selectedId)?.num_results || 0) > 0 && (
+          (processes.find((p) => p._id === selectedId)?.num_results || 0) >
+            0 && (
             <MenuItem onClick={handleView}>
               <ListItemIcon>
                 <VisibilityIcon fontSize="small" />
