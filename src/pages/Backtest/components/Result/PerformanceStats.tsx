@@ -15,9 +15,7 @@ interface PerformanceStatsProps {
   metrics: BacktestResultMetrics;
 }
 
-const PerformanceStats: React.FC<PerformanceStatsProps> = ({
-  metrics,
-}) => {
+const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
   return (
     <Card>
       <CardContent>
@@ -76,6 +74,22 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({
               Giao dịch SHORT
             </Typography>
             <Typography variant="h6">{metrics.short_trades || 0}</Typography>
+          </Grid>
+          {/* total_orders */}
+          <Grid size={6}>
+            <Typography variant="body2" color="text.secondary">
+              Tổng lệnh
+            </Typography>
+            <Typography variant="h6">{metrics.total_orders || 0}</Typography>
+          </Grid>
+          {/* volume_orders */}
+          <Grid size={6}>
+            <Typography variant="body2" color="text.secondary">
+              Tổng khối lượng lệnh
+            </Typography>
+            <Typography variant="h6">
+              {formatNumber(metrics.volume_orders || 0)}
+            </Typography>
           </Grid>
         </Grid>
 

@@ -164,11 +164,11 @@ const ResultList: React.FC<ResultListProps> = ({
                       <Box mt={1}>
                         <Chip
                           size="small"
-                          label={`Win Rate: ${resultItem.metrics.win_rate.toFixed(
+                          label={`Total ROI: ${resultItem.metrics.total_roi.toFixed(
                             2
                           )}%`}
                           color={
-                            resultItem.metrics.win_rate > 50
+                            resultItem.metrics.total_roi > 10
                               ? "success"
                               : "error"
                           }
