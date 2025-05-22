@@ -19,6 +19,7 @@ export interface BacktestResultTrade {
   pnl: number;
   position_result: string;
   position_pnl: number;
+  balance?: number;
 }
 
 // Backtest Result Summary Type (for list view)

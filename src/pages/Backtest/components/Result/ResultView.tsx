@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  memo,
-  useRef,
-} from "react";
+import React, { useState, useEffect, useMemo, memo, useRef } from "react";
 import {
   Box,
   Grid,
@@ -24,11 +18,8 @@ import {
 } from "@mui/material";
 import PerformanceStats from "./PerformanceStats";
 import { formatDate, formatNumber, areEqual } from "@/utils/common";
-import type {
-  BacktestTrade,
-} from "@/services/backtest.service";
+import type { BacktestTrade } from "@/services/backtest.service";
 import { useBacktestResult } from "@/hooks/useBacktestResult";
-
 
 interface ResultViewProps {
   selectedResultId: string;
@@ -36,23 +27,22 @@ interface ResultViewProps {
   initialInterval?: string;
 }
 
-const ResultView: React.FC<ResultViewProps> = ({
-  selectedResultId,
-}) => {
+const ResultView: React.FC<ResultViewProps> = ({ selectedResultId }) => {
   const statsRef = useRef<HTMLDivElement>(null);
   const [statsHeight, setStatsHeight] = useState<number>(0);
 
-  const { getResultDetail, loading: loadingDetail, resultDetails } = useBacktestResult();
+  const {
+    getResultDetail,
+    loading: loadingDetail,
+    resultDetails,
+  } = useBacktestResult();
 
   const resultDetail = useMemo(
     () => resultDetails[selectedResultId],
     [resultDetails, selectedResultId]
   );
 
-  const metrics = useMemo(
-    () => resultDetail?.metrics || ({}),
-    [resultDetail]
-  );
+  const metrics = useMemo(() => resultDetail?.metrics || {}, [resultDetail]);
 
   const trades = useMemo(
     () => resultDetail?.trades || ([] as BacktestTrade[]),
@@ -184,7 +174,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                 <Table stickyHeader size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell colSpan={7}>
+                      <TableCell colSpan={9}>
                         <Box
                           display="flex"
                           justifyContent="space-between"
@@ -196,8 +186,16 @@ const ResultView: React.FC<ResultViewProps> = ({
                           <Box>
                             {loadingDetail ? (
                               <Box display="flex" gap={1}>
-                                <Skeleton variant="rounded" width={70} height={24} />
-                                <Skeleton variant="rounded" width={70} height={24} />
+                                <Skeleton
+                                  variant="rounded"
+                                  width={70}
+                                  height={24}
+                                />
+                                <Skeleton
+                                  variant="rounded"
+                                  width={70}
+                                  height={24}
+                                />
                               </Box>
                             ) : (
                               <>
@@ -206,16 +204,18 @@ const ResultView: React.FC<ResultViewProps> = ({
                                   color="success"
                                   sx={{ mr: 1 }}
                                   label={`LONG: ${
-                                    trades.filter((t) => t.side.includes("LONG"))
-                                      .length
+                                    trades.filter((t) =>
+                                      t.side.includes("LONG")
+                                    ).length
                                   }`}
                                 />
                                 <Chip
                                   size="small"
                                   color="error"
                                   label={`SHORT: ${
-                                    trades.filter((t) => t.side.includes("SHORT"))
-                                      .length
+                                    trades.filter((t) =>
+                                      t.side.includes("SHORT")
+                                    ).length
                                   }`}
                                 />
                               </>
@@ -232,22 +232,46 @@ const ResultView: React.FC<ResultViewProps> = ({
                       <TableCell>Lý do</TableCell>
                       <TableCell>Order PnL</TableCell>
                       <TableCell>Transaction PnL</TableCell>
+                      <TableCell>Balance</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {loadingDetail ? (
                       // Show loading skeleton rows
-                      Array(skeletonRowCount).fill(0).map((_, index) => (
-                        <TableRow key={`skeleton-${index}`}>
-                          <TableCell><Skeleton variant="text" /></TableCell>
-                          <TableCell><Skeleton variant="rounded" width={70} height={24} /></TableCell>
-                          <TableCell><Skeleton variant="text" /></TableCell>
-                          <TableCell><Skeleton variant="text" width={40} /></TableCell>
-                          <TableCell><Skeleton variant="text" /></TableCell>
-                          <TableCell><Skeleton variant="text" /></TableCell>
-                          <TableCell><Skeleton variant="text" /></TableCell>
-                        </TableRow>
-                      ))
+                      Array(skeletonRowCount)
+                        .fill(0)
+                        .map((_, index) => (
+                          <TableRow key={`skeleton-${index}`}>
+                            <TableCell>
+                              <Skeleton variant="text" />
+                            </TableCell>
+                            <TableCell>
+                              <Skeleton
+                                variant="rounded"
+                                width={70}
+                                height={24}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Skeleton variant="text" />
+                            </TableCell>
+                            <TableCell>
+                              <Skeleton variant="text" width={40} />
+                            </TableCell>
+                            <TableCell>
+                              <Skeleton variant="text" />
+                            </TableCell>
+                            <TableCell>
+                              <Skeleton variant="text" />
+                            </TableCell>
+                            <TableCell>
+                              <Skeleton variant="text" />
+                            </TableCell>
+                            <TableCell>
+                              <Skeleton variant="text" />
+                            </TableCell>
+                          </TableRow>
+                        ))
                     ) : trades.length > 0 ? (
                       trades.map((trade, index) => (
                         <TableRow key={index}>
@@ -291,6 +315,18 @@ const ResultView: React.FC<ResultViewProps> = ({
                             {trade.position_pnl
                               ? formatNumber(trade.position_pnl)
                               : "-"}
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              color:
+                                (trade.balance || 0) > 0
+                                  ? "success.main"
+                                  : (trade.balance || 0) < 0
+                                  ? "error.main"
+                                  : "inherit",
+                            }}
+                          >
+                            {trade.balance ? formatNumber(trade.balance) : "-"}
                           </TableCell>
                         </TableRow>
                       ))
