@@ -7,6 +7,7 @@ import {
   Button,
   TextField,
   FormControl,
+  FormControlLabel,
   InputLabel,
   Select,
   MenuItem,
@@ -28,15 +29,14 @@ import {
 import InfoIcon from "@mui/icons-material/Info";
 import { useBotOptimization } from "@/hooks/useBotOptimization";
 import { useBotTemplate } from "@/hooks/useBotTemplate";
+import { useBacktest } from "@/hooks/useBacktest";
 import type { BotOptimizationRequest, LLMModel } from "@/types/botOptimization.type";
-import type { BacktestProcess } from "@/types/backtest.type";
 import { areEqual } from "@/utils/common";
 import { debounce } from "@/utils/debounceUtils";
 
 interface OptimizationDialogProps {
   open: boolean;
   onClose: () => void;
-  backtestProcesses: BacktestProcess[];
   onSuccess: (params: {
     botTemplateId: string;
     backtestProcessIds: string[];
@@ -55,11 +55,13 @@ const LLM_PROVIDERS = [
 const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
   open,
   onClose,
-  backtestProcesses,
   onSuccess,
 }) => {
   // Get bot templates
   const { templates, getTemplates, isLoading: templatesLoading } = useBotTemplate();
+  
+  // Get backtest processes by template
+  const { processesByTemplate, getProcessesByTemplateId } = useBacktest();
   
   // Get optimization hook
   const { 
@@ -69,7 +71,10 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
     availableModels, 
     isLoadingModels, 
     fetchAvailableModels,
-    clearModels
+    clearModels,
+    defaultPrompt,
+    isLoadingDefaultPrompt,
+    fetchDefaultPrompt
   } = useBotOptimization();
 
   // Local state for form
@@ -79,13 +84,16 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
   const [apiKey, setApiKey] = useState<string>("");
   const [apiKeyValidated, setApiKeyValidated] = useState<boolean>(false);
   const [selectedBacktests, setSelectedBacktests] = useState<string[]>([]);
+  const [customPrompt, setCustomPrompt] = useState<string>("");
+  const [useCustomPrompt, setUseCustomPrompt] = useState<boolean>(false);
 
-  // Filter only completed backtest processes
+  // Filter only completed backtest processes from template-specific data
   const completedBacktests = useMemo(() => {
-    return backtestProcesses.filter(
+    if (!processesByTemplate) return [];
+    return processesByTemplate.filter(
       (process) => process.status === "completed" && (process?.num_results || 0) > 0
     );
-  }, [backtestProcesses]);
+  }, [processesByTemplate]);
 
   // Tạo hàm debounced để fetch models
   const debouncedFetchModels = useMemo(
@@ -106,8 +114,15 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
 
   // Handle template selection change
   const handleTemplateChange = useCallback((event: SelectChangeEvent) => {
-    setSelectedTemplate(event.target.value as string);
-  }, []);
+    const templateId = event.target.value as string;
+    setSelectedTemplate(templateId);
+    setSelectedBacktests([]); // Reset selected backtests when template changes
+    
+    // Fetch backtests for the selected template
+    if (templateId) {
+      getProcessesByTemplateId(templateId, "completed");
+    }
+  }, [getProcessesByTemplateId]);
 
   // Handle provider selection change
   const handleProviderChange = useCallback((event: SelectChangeEvent) => {
@@ -157,6 +172,21 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
     });
   }, []);
 
+  // Handle custom prompt toggle
+  const handleCustomPromptToggle = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setUseCustomPrompt(event.target.checked);
+    
+    // Reset custom prompt if toggled off
+    if (!event.target.checked) {
+      setCustomPrompt("");
+    }
+  }, []);
+
+  // Handle custom prompt change
+  const handleCustomPromptChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setCustomPrompt(event.target.value);
+  }, []);
+
   // Handle form submission
   const handleSubmit = useCallback(async () => {
     if (!selectedTemplate || !selectedProvider || !selectedModel || !apiKey || selectedBacktests.length === 0) {
@@ -169,6 +199,7 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
       llm_provider: selectedProvider as 'openai' | 'anthropic' | 'gemini',
       model: selectedModel,
       api_key: apiKey,
+      custom_prompt: useCustomPrompt ? customPrompt : undefined, // Include custom prompt if used
     };
 
     try {
@@ -193,6 +224,8 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
     optimizeBot,
     onSuccess,
     onClose,
+    customPrompt,
+    useCustomPrompt, // Add useCustomPrompt to dependencies
   ]);
 
   // Validation
@@ -214,12 +247,28 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
     }
   }, [open]);
 
+  // Load default prompt when custom prompt is toggled on
+  useEffect(() => {
+    if (useCustomPrompt && !customPrompt && !isLoadingDefaultPrompt && !defaultPrompt) {
+      fetchDefaultPrompt();
+    }
+  }, [useCustomPrompt, customPrompt, isLoadingDefaultPrompt, defaultPrompt, fetchDefaultPrompt]);
+
+  // Set custom prompt to default prompt when it's loaded
+  useEffect(() => {
+    if (useCustomPrompt && defaultPrompt && !customPrompt) {
+      setCustomPrompt(defaultPrompt);
+    }
+  }, [useCustomPrompt, defaultPrompt, customPrompt]);
+
   // Reset form when dialog closes
   useEffect(() => {
     if (!open) {
       setSelectedModel("");
       clearModels();
       setApiKeyValidated(false);
+      setCustomPrompt("");
+      setUseCustomPrompt(false);
     }
   }, [open, clearModels]);
 
@@ -397,6 +446,36 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
                   "Nhập API key hợp lệ để xem danh sách models"}
               </Typography>
             </FormControl>
+          </Box>
+
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+              4. Tùy chỉnh Prompt (Tùy chọn)
+            </Typography>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={useCustomPrompt}
+                  onChange={handleCustomPromptToggle}
+                  color="primary"
+                />
+              }
+              label="Sử dụng prompt tùy chỉnh"
+              sx={{ mb: 2 }}
+            />
+            {useCustomPrompt && (
+              <TextField
+                label="Custom Prompt"
+                fullWidth
+                value={customPrompt}
+                onChange={handleCustomPromptChange}
+                variant="outlined"
+                multiline
+                rows={6}
+                helperText="Nhập prompt tùy chỉnh cho LLM. Ví dụ: 'Tóm tắt kết quả backtest và đề xuất cải thiện'."
+                sx={{ mb: 2 }}
+              />
+            )}
           </Box>
         </Box>
       </DialogContent>

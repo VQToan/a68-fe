@@ -101,7 +101,7 @@ export const getProcessesByTemplateId = (
   templateId: string, 
   status?: BacktestStatus
 ) => {
-  let url = `/backtest-processes/by-template/${templateId}`;
+  let url = `${API_BASE_PATH}/by-template/${templateId}`;
   if (status) {
     url += `?status=${status}`;
   }

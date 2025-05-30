@@ -5,6 +5,7 @@ export interface BotOptimizationRequest {
   llm_provider: 'openai' | 'anthropic' | 'gemini';
   model: string;
   api_key: string;
+  custom_prompt?: string;
 }
 
 export interface OptimizedParameter {

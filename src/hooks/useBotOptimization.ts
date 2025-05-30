@@ -4,7 +4,8 @@ import {
   optimizeBot as optimizeBotAction, 
   clearResults as clearResultsAction,
   fetchAvailableModels as fetchAvailableModelsAction,
-  clearModels as clearModelsAction
+  clearModels as clearModelsAction,
+  fetchDefaultPrompt as fetchDefaultPromptAction
 } from "@/features/botOptimization/botOptimizationSlice";
 import type { BotOptimizationRequest } from "@/types/botOptimization.type";
 
@@ -17,6 +18,8 @@ export const useBotOptimization = () => {
   const error = useAppSelector((state) => state.botOptimization.error);
   const availableModels = useAppSelector((state) => state.botOptimization.availableModels);
   const isLoadingModels = useAppSelector((state) => state.botOptimization.isLoadingModels);
+  const defaultPrompt = useAppSelector((state) => state.botOptimization.defaultPrompt);
+  const isLoadingDefaultPrompt = useAppSelector((state) => state.botOptimization.isLoadingDefaultPrompt);
 
   // Function to optimize a bot
   const optimizeBot = useCallback((requestData: BotOptimizationRequest) => {
@@ -26,6 +29,11 @@ export const useBotOptimization = () => {
   // Function to fetch available models for a provider
   const fetchAvailableModels = useCallback((provider: string, apiKey: string) => {
     return dispatch(fetchAvailableModelsAction({ provider, apiKey }));
+  }, [dispatch]);
+
+  // Function to fetch default prompt template
+  const fetchDefaultPrompt = useCallback(() => {
+    return dispatch(fetchDefaultPromptAction());
   }, [dispatch]);
 
   // Function to clear optimization results
@@ -44,8 +52,11 @@ export const useBotOptimization = () => {
     error,
     availableModels,
     isLoadingModels,
+    defaultPrompt,
+    isLoadingDefaultPrompt,
     optimizeBot,
     fetchAvailableModels,
+    fetchDefaultPrompt,
     clearResults,
     clearModels
   };

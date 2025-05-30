@@ -26,3 +26,11 @@ export const getAvailableModels = async (
   });
   return response.data;
 };
+
+/**
+ * Get the default prompt template used for optimization
+ */
+export const getDefaultPrompt = async (): Promise<{ default_prompt: string }> => {
+  const response = await apiClient.get(`${API_PATH}/default-prompt`);
+  return response.data;
+};

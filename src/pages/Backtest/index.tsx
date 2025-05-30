@@ -621,7 +621,6 @@ const Backtest = () => {
       <OptimizationDialog
         open={optimizationState.open}
         onClose={handleCloseOptimizationDialog}
-        backtestProcesses={processes}
         onSuccess={handleOptimizationSuccess}
       />
 

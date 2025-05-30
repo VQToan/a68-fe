@@ -12,12 +12,16 @@ import type {
 const initialState: OptimizationState & {
   availableModels: LLMModel[];
   isLoadingModels: boolean;
+  defaultPrompt: string | null;
+  isLoadingDefaultPrompt: boolean;
 } = {
   optimizationResults: null,
   isLoading: false,
   error: null,
   availableModels: [],
   isLoadingModels: false,
+  defaultPrompt: null,
+  isLoadingDefaultPrompt: false,
 };
 
 // Async thunk for optimizing a bot
@@ -43,6 +47,20 @@ export const fetchAvailableModels = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.detail || "Failed to fetch available models"
+      );
+    }
+  }
+);
+
+// Async thunk for fetching default prompt
+export const fetchDefaultPrompt = createAsyncThunk(
+  "botOptimization/fetchDefaultPrompt",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await botOptimizationService.getDefaultPrompt();
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.detail || "Failed to fetch default prompt"
       );
     }
   }
@@ -96,6 +114,23 @@ const botOptimizationSlice = createSlice({
         state.isLoadingModels = false;
         state.error = action.payload as string;
         state.availableModels = [];
+      })
+      
+      // Fetch default prompt
+      .addCase(fetchDefaultPrompt.pending, (state) => {
+        state.isLoadingDefaultPrompt = true;
+        state.error = null;
+      })
+      .addCase(
+        fetchDefaultPrompt.fulfilled,
+        (state, action: PayloadAction<{ default_prompt: string }>) => {
+          state.isLoadingDefaultPrompt = false;
+          state.defaultPrompt = action.payload.default_prompt;
+        }
+      )
+      .addCase(fetchDefaultPrompt.rejected, (state, action) => {
+        state.isLoadingDefaultPrompt = false;
+        state.error = action.payload as string;
       });
   },
 });

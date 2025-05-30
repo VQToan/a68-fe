@@ -1,6 +1,7 @@
 import type {
   BacktestProcessCreate,
   BacktestProcessUpdate,
+  BacktestStatus,
 } from "@/types/backtest.type";
 import { useAppSelector, useAppDispatch } from "./reduxHooks";
 import {
@@ -11,6 +12,7 @@ import {
   deleteBacktestProcess,
   runBacktestProcess,
   stopBacktestProcess,
+  getProcessesByTemplateId,
   clearCurrentProcess as clearCurrentProcessAction,
   clearError as clearErrorAction,
 } from "@features/backtest/backtestSlice";
@@ -23,6 +25,9 @@ export const useBacktest = () => {
   const processes = useAppSelector((state) => state.backtest.processes);
   const currentProcess = useAppSelector(
     (state) => state.backtest.currentProcess
+  );
+  const processesByTemplate = useAppSelector(
+    (state) => state.backtest.processesByTemplate
   );
   const isLoading = useAppSelector((state) => state.backtest.isLoading);
   const error = useAppSelector((state) => state.backtest.error);
@@ -44,6 +49,15 @@ export const useBacktest = () => {
     },
     [dispatch]
   );
+
+  // Get backtest processes by template ID
+  const handleGetProcessesByTemplateId = useCallback(
+    (templateId: string, status?: BacktestStatus) => {
+      return dispatch(getProcessesByTemplateId({ templateId, status }));
+    },
+    [dispatch]
+  );
+
   // Create a new backtest process
   const handleCreateProcess = useCallback(
     (processData: BacktestProcessCreate) => {
@@ -121,12 +135,14 @@ export const useBacktest = () => {
 
   return {
     processes,
+    processesByTemplate,
     currentProcess,
     isLoading,
     error,
     pagination,
     getProcesses: handleGetProcesses,
     getProcessById: handleGetProcessById,
+    getProcessesByTemplateId: handleGetProcessesByTemplateId,
     createProcess: handleCreateProcess,
     updateProcess: handleUpdateProcess,
     deleteProcess: handleDeleteProcess,
