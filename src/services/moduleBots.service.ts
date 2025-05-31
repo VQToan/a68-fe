@@ -38,7 +38,7 @@ export const getModuleBots = async (
     params.keyword = keyword;
   }
   
-  const response: AxiosResponse<IModuleBot[]> = await api.get('/api/v1/module-bots/', { params });
+  const response: AxiosResponse<IModuleBot[]> = await api.get('/api/v1/module-bots', { params });
   return response.data;
 };
 

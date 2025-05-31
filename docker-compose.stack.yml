@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  a68-frontend:
+    image: 100.118.114.91:5000/a68-frontend:latest
+    ports:
+      - "30009:80"
+    environment:
+      - VITE_API_URL=https://api-a68.vqtoan1807.me/
+      - NODE_ENV=production
+    networks:
+      - shared-network
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == vqt
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          memory: 512M
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 300s
+      update_config:
+        parallelism: 1
+        delay: 30s
+        failure_action: pause
+        monitor: 60s
+        max_failure_ratio: 0.1
+        order: stop-first
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: pause
+        monitor: 60s
+        max_failure_ratio: 0.1
+networks:
+  shared-network:
+    external: true

@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Set environment variable for API URL (updated to match backend port)
-ENV VITE_API_BASE_URL=https://api-a68.vqtoan1807.me/
+ENV VITE_API_URL=https://api-a68.vqtoan1807.me/
 
 # Build the application
 RUN npm run build
