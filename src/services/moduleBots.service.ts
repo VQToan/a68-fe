@@ -44,7 +44,7 @@ export const getModuleBots = async (
 
 // Create a new module bot
 export const createModuleBot = async (moduleBot: ModuleBotCreate): Promise<IModuleBot> => {
-  const response: AxiosResponse<IModuleBot> = await api.post('/api/v1/module-bots/', moduleBot);
+  const response: AxiosResponse<IModuleBot> = await api.post('/api/v1/module-bots', moduleBot);
   return response.data;
 };
 
