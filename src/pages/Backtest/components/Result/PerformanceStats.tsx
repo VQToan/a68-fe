@@ -313,6 +313,15 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
               {metrics.max_loss_occurrences || 0}
             </Typography>
           </Grid>
+          {/* mdd_org_balance */}
+          <Grid size={6}>
+            <Typography variant="body2" color="text.secondary">
+              MDD so với số dư ban đầu
+            </Typography>
+            <Typography variant="h6" color="error.main">
+              {formatNumber(metrics.mdd_org_balance || 0)}%
+            </Typography>
+          </Grid>
         </Grid>
       </CardContent>
     </Card>

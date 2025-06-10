@@ -6,6 +6,7 @@ export interface BacktestResultMetrics {
   total_pnl: number;
   total_roi: number;
   mdd: number;
+  mdd_org_balance: number;
   [key: string]: any; // For additional metrics
 }
 

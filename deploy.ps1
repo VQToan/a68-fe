@@ -29,17 +29,17 @@ function Check-DockerRunning {
         return $true
     }
     catch {
-        Write-ColorOutput "❌ Docker is not running or not installed!" $Red
+        Write-ColorOutput "[ERROR] Docker is not running or not installed!" $Red
         return $false
     }
 }
 
 function Build-Frontend {
-    Write-ColorOutput "🔨 Building A68 Frontend..." $Blue
+    Write-ColorOutput "[BUILD] Building A68 Frontend..." $Blue
     
     # Check if package.json exists
     if (!(Test-Path "package.json")) {
-        Write-ColorOutput "❌ package.json not found! Are you in the correct directory?" $Red
+        Write-ColorOutput "[ERROR] package.json not found! Are you in the correct directory?" $Red
         exit 1
     }
 
@@ -50,59 +50,59 @@ function Build-Frontend {
     docker build -t $fullImageName .
     
     if ($LASTEXITCODE -eq 0) {
-        Write-ColorOutput "✅ Build completed successfully!" $Green
+        Write-ColorOutput "[SUCCESS] Build completed successfully!" $Green
         return $true
     } else {
-        Write-ColorOutput "❌ Build failed!" $Red
+        Write-ColorOutput "[ERROR] Build failed!" $Red
         return $false
     }
 }
 
 function Push-Image {
     $fullImageName = "$Registry/$ImageName`:$Tag"
-    Write-ColorOutput "🚀 Pushing image to registry..." $Blue
+    Write-ColorOutput "[PUSH] Pushing image to registry..." $Blue
     Write-ColorOutput "Pushing: $fullImageName" $Yellow
     
     docker push $fullImageName
     
     if ($LASTEXITCODE -eq 0) {
-        Write-ColorOutput "✅ Push completed successfully!" $Green
+        Write-ColorOutput "[SUCCESS] Push completed successfully!" $Green
         return $true
     } else {
-        Write-ColorOutput "❌ Push failed!" $Red
+        Write-ColorOutput "[ERROR] Push failed!" $Red
         return $false
     }
 }
 
 function Deploy-Stack {
-    Write-ColorOutput "🚢 Deploying to Docker Swarm..." $Blue
+    Write-ColorOutput "[DEPLOY] Deploying to Docker Swarm..." $Blue
     
     # Check if stack file exists
     $stackFile = "docker-compose.stack.yml"
     if (!(Test-Path $stackFile)) {
-        Write-ColorOutput "❌ Stack file not found: $stackFile" $Red
+        Write-ColorOutput "[ERROR] Stack file not found: $stackFile" $Red
         return $false
     }
     
     docker stack deploy -c $stackFile $StackName
     
     if ($LASTEXITCODE -eq 0) {
-        Write-ColorOutput "✅ Deployment completed successfully!" $Green
+        Write-ColorOutput "[SUCCESS] Deployment completed successfully!" $Green
         Write-ColorOutput "Stack name: $StackName" $Yellow
         
         # Show service status
-        Write-ColorOutput "📊 Service status:" $Blue
+        Write-ColorOutput "[INFO] Service status:" $Blue
         docker service ls --filter "label=com.docker.stack.namespace=$StackName"
         
         return $true
     } else {
-        Write-ColorOutput "❌ Deployment failed!" $Red
+        Write-ColorOutput "[ERROR] Deployment failed!" $Red
         return $false
     }
 }
 
 function Show-Usage {
-    Write-ColorOutput @"
+    $usageText = @"
 A68 Frontend Deployment Script
 
 Usage:
@@ -123,12 +123,12 @@ Examples:
     .\deploy.ps1 -Deploy                           # Build, push and deploy
     .\deploy.ps1 -SkipBuild -Deploy               # Only deploy (use existing image)
     .\deploy.ps1 -Tag dev -StackName a68-dev      # Build with dev tag and deploy to dev stack
-
-"@ $Blue
+"@
+    Write-ColorOutput $usageText $Blue
 }
 
 # Main execution
-Write-ColorOutput "🚀 A68 Trading Platform - Frontend Deployment" $Blue
+Write-ColorOutput "[START] A68 Trading Platform - Frontend Deployment" $Blue
 Write-ColorOutput "=============================================" $Blue
 
 # Check if help is requested
@@ -150,7 +150,7 @@ if (!$SkipBuild) {
         $success = $false
     }
 } else {
-    Write-ColorOutput "⏭️ Skipping build phase" $Yellow
+    Write-ColorOutput "[SKIP] Skipping build phase" $Yellow
 }
 
 # Push phase
@@ -159,7 +159,7 @@ if ($success -and !$SkipPush) {
         $success = $false
     }
 } elseif ($SkipPush) {
-    Write-ColorOutput "⏭️ Skipping push phase" $Yellow
+    Write-ColorOutput "[SKIP] Skipping push phase" $Yellow
 }
 
 # Deploy phase
@@ -168,31 +168,32 @@ if ($success -and $Deploy) {
         $success = $false
     }
 } elseif (!$Deploy) {
-    Write-ColorOutput "💡 Use -Deploy flag to deploy to Docker Swarm" $Yellow
+    Write-ColorOutput "[INFO] Use -Deploy flag to deploy to Docker Swarm" $Yellow
 }
 
 # Final status
 Write-ColorOutput "=============================================" $Blue
 if ($success) {
-    Write-ColorOutput "🎉 All operations completed successfully!" $Green
+    Write-ColorOutput "[SUCCESS] All operations completed successfully!" $Green
     
     if ($Deploy) {
-        Write-ColorOutput @"
-🌐 Frontend should be available at:
+        $deploymentInfo = @"
+Frontend should be available at:
    - Local: http://localhost:30009
    - Server: http://113.161.121.177:30009
 
-📊 Check service status:
+Check service status:
    docker service ls --filter label=com.docker.stack.namespace=$StackName
    docker service logs $StackName`_a68-frontend
 
-🔧 Useful commands:
+Useful commands:
    docker stack ps $StackName                    # Check stack status
    docker service scale $StackName`_a68-frontend=2   # Scale service
    docker stack rm $StackName                    # Remove stack
-"@ $Green
+"@
+        Write-ColorOutput $deploymentInfo $Green
     }
 } else {
-    Write-ColorOutput "❌ Some operations failed! Please check the errors above." $Red
+    Write-ColorOutput "[ERROR] Some operations failed! Please check the errors above." $Red
     exit 1
 }
