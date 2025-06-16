@@ -44,11 +44,11 @@ const defaultBotParams: Partial<BacktestParameter> = {
   INTERVAL_1: "5m",
   INTERVAL_2: "15m",
   TRADE_MODE: 0, // both
-  QUANTITY: 0.01,
+  ENTRY_PERCENTAGE: 0.01,
   LEVERAGE: 10,
   MIN_MARGIN: 0.0,
-  MAX_MARGIN: 20.0,
   FUNDS: 1000.0,
+  MAX_MARGIN_PERCENTAGE: 20.0,
   MAX_LOSS: 0.0,
   MIN_ROI: 8.0,
   R2R: "1:2", // Default Risk to Reward ratio
@@ -497,13 +497,13 @@ const BacktestForm = ({
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="Số lượng giao dịch (QUANTITY)"
+                      label="Tỷ lệ vào lệnh (ENTRY_PERCENTAGE)"
                       type="number"
                       fullWidth
-                      value={parameters.QUANTITY || defaultBotParams.QUANTITY}
+                      value={parameters.ENTRY_PERCENTAGE || defaultBotParams.ENTRY_PERCENTAGE}
                       onChange={(e) =>
                         handleParameterChange(
-                          "QUANTITY",
+                          "ENTRY_PERCENTAGE",
                           Number(e.target.value)
                         )
                       }
@@ -647,15 +647,15 @@ const BacktestForm = ({
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="Biên độ tối đa (MAX_MARGIN) USDT"
+                      label="Biên độ tối đa (MAX_MARGIN_PERCENTAGE) %"
                       type="number"
                       fullWidth
                       value={
-                        parameters.MAX_MARGIN || defaultBotParams.MAX_MARGIN
+                        parameters.MAX_MARGIN_PERCENTAGE || defaultBotParams.MAX_MARGIN_PERCENTAGE
                       }
                       onChange={(e) =>
                         handleParameterChange(
-                          "MAX_MARGIN",
+                          "MAX_MARGIN_PERCENTAGE",
                           Number(e.target.value)
                         )
                       }

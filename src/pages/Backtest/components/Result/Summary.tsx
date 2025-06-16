@@ -181,24 +181,22 @@ const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
         Xem thông số backtest
       </Button>
       <Chip
-        label={`Khung Trade: ${
-          currentProcess.parameters?.INTERVAL_1 || "N/A"
-        }`}
+        label={`Khung Trade: ${currentProcess.parameters?.INTERVAL_1 || "N/A"}`}
         color="secondary"
         variant="outlined"
         sx={{ mt: 1 }}
-        />
-        <Chip
-        label={`Khung Trend: ${
-          currentProcess.parameters?.INTERVAL_2 || "N/A"
-        }`}
+      />
+      <Chip
+        label={`Khung Trend: ${currentProcess.parameters?.INTERVAL_2 || "N/A"}`}
         color="secondary"
         variant="outlined"
         sx={{ mt: 1 }}
       />
       {/* quantity */}
       <Chip
-        label={`Số lượng: ${currentProcess.parameters?.QUANTITY || "N/A"}`}
+        label={`Số lượng: ${
+          currentProcess.parameters?.ENTRY_PERCENTAGE || "N/A"
+        }`}
         color="secondary"
         variant="outlined"
         sx={{ mt: 1 }}

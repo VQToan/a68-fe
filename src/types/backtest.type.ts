@@ -18,11 +18,11 @@ export interface BacktestParameter {
   INTERVAL_1: BacktestInterval;
   INTERVAL_2: BacktestInterval;
   TRADE_MODE: -1 | 0 | 1; // -1: short, 0: both, 1: long
-  QUANTITY: number;
   LEVERAGE: number;
-  MIN_MARGIN: number;
-  MAX_MARGIN: number;
   FUNDS: number;
+  ENTRY_PERCENTAGE: number;
+  MAX_MARGIN_PERCENTAGE: number;
+  MIN_MARGIN: number;
   MAX_LOSS: number;
   MIN_ROI: number;
   R2R: string; // Risk to Reward ratio, default "1:2"
