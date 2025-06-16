@@ -15,6 +15,7 @@ import {
   Checkbox,
   ListItemText,
   OutlinedInput,
+  InputAdornment,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useForm, Controller } from "react-hook-form";
@@ -44,7 +45,7 @@ const defaultBotParams: Partial<BacktestParameter> = {
   INTERVAL_1: "5m",
   INTERVAL_2: "15m",
   TRADE_MODE: 0, // both
-  ENTRY_PERCENTAGE: 0.01,
+  ENTRY_PERCENTAGE: 0.1,
   LEVERAGE: 10,
   MIN_MARGIN: 0.0,
   FUNDS: 1000.0,
@@ -151,7 +152,9 @@ const BacktestForm = ({
     control,
     handleSubmit,
     reset,
-    formState: { /* errors */ },
+    formState: {
+      /* errors */
+    },
   } = useForm({
     defaultValues: {
       name: initialData?.name || "",
@@ -500,7 +503,10 @@ const BacktestForm = ({
                       label="Tỷ lệ vào lệnh (ENTRY_PERCENTAGE)"
                       type="number"
                       fullWidth
-                      value={parameters.ENTRY_PERCENTAGE || defaultBotParams.ENTRY_PERCENTAGE}
+                      value={
+                        parameters.ENTRY_PERCENTAGE ||
+                        defaultBotParams.ENTRY_PERCENTAGE
+                      }
                       onChange={(e) =>
                         handleParameterChange(
                           "ENTRY_PERCENTAGE",
@@ -508,6 +514,13 @@ const BacktestForm = ({
                         )
                       }
                       inputProps={{ step: "0.001" }}
+                      slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">%</InputAdornment>
+                          ),
+                        },
+                      }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
@@ -533,6 +546,13 @@ const BacktestForm = ({
                       onChange={(e) =>
                         handleParameterChange("FUNDS", Number(e.target.value))
                       }
+                      slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">USDT</InputAdornment>
+                          ),
+                        },
+                      }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
@@ -550,6 +570,14 @@ const BacktestForm = ({
                           Number(e.target.value)
                         )
                       }
+                      inputProps={{ step: "1" }}
+                      slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">giây</InputAdornment>
+                          ),
+                        },
+                      }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
@@ -606,7 +634,7 @@ const BacktestForm = ({
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="Lợi nhuận tối thiểu (MIN_ROI) %"
+                      label="Lợi nhuận tối thiểu (MIN_ROI)"
                       type="number"
                       fullWidth
                       value={parameters.MIN_ROI || defaultBotParams.MIN_ROI}
@@ -614,6 +642,13 @@ const BacktestForm = ({
                         handleParameterChange("MIN_ROI", Number(e.target.value))
                       }
                       inputProps={{ step: "0.1" }}
+                      slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">%</InputAdornment>
+                          ),
+                        },
+                      }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
@@ -625,12 +660,11 @@ const BacktestForm = ({
                       onChange={(e) =>
                         handleParameterChange("R2R", e.target.value)
                       }
-                      helperText="Định dạng: 'rủi ro:phần thưởng' (vd: 1:2)"
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="Biên độ tối thiểu (MIN_MARGIN) USDT"
+                      label="Biên độ tối thiểu (MIN_MARGIN)"
                       type="number"
                       fullWidth
                       value={
@@ -643,15 +677,23 @@ const BacktestForm = ({
                         )
                       }
                       inputProps={{ step: "0.1" }}
+                      slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">%</InputAdornment>
+                          ),
+                        },
+                      }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="Biên độ tối đa (MAX_MARGIN_PERCENTAGE) %"
+                      label="Biên độ tối đa (MAX_MARGIN_PERCENTAGE)"
                       type="number"
                       fullWidth
                       value={
-                        parameters.MAX_MARGIN_PERCENTAGE || defaultBotParams.MAX_MARGIN_PERCENTAGE
+                        parameters.MAX_MARGIN_PERCENTAGE ||
+                        defaultBotParams.MAX_MARGIN_PERCENTAGE
                       }
                       onChange={(e) =>
                         handleParameterChange(
@@ -660,11 +702,18 @@ const BacktestForm = ({
                         )
                       }
                       inputProps={{ step: "0.1" }}
+                      slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">%</InputAdornment>
+                          ),
+                        },
+                      }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
-                      label="Lỗ tối đa (MAX_LOSS) %"
+                      label="Lỗ tối đa (MAX_LOSS)"
                       type="number"
                       fullWidth
                       value={parameters.MAX_LOSS || defaultBotParams.MAX_LOSS}
@@ -675,6 +724,13 @@ const BacktestForm = ({
                         )
                       }
                       inputProps={{ step: "0.1" }}
+                      slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">%</InputAdornment>
+                          ),
+                        },
+                      }}
                     />
                   </Grid>
                 </Grid>
@@ -697,6 +753,7 @@ const BacktestForm = ({
                       onChange={(e) =>
                         handleParameterChange("MA_PERIOD", e.target.value)
                       }
+                      helperText="Định dạng: 'chu kỳ ngắn:chu kỳ dài' (vd: 8:20)"
                     />
                   </Grid>
 
