@@ -49,7 +49,7 @@ const defaultBotParams: Partial<BacktestParameter> = {
   LEVERAGE: 10,
   MIN_MARGIN: 0.0,
   FUNDS: 1000.0,
-  MAX_MARGIN_PERCENTAGE: 20.0,
+  MAX_MARGIN_PERCENTAGE: 3.0,
   MAX_LOSS: 0.0,
   MIN_ROI: 8.0,
   R2R: "1:2", // Default Risk to Reward ratio
