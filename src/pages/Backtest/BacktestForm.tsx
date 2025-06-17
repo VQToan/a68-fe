@@ -45,7 +45,7 @@ const defaultBotParams: Partial<BacktestParameter> = {
   INTERVAL_1: "5m",
   INTERVAL_2: "15m",
   TRADE_MODE: 0, // both
-  ENTRY_PERCENTAGE: 0.1,
+  ENTRY_PERCENTAGE: 1.0,
   LEVERAGE: 10,
   MIN_MARGIN: 0.0,
   FUNDS: 1000.0,
