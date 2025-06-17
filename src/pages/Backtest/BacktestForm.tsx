@@ -42,8 +42,8 @@ interface BacktestFormProps {
 // Default bot parameters based on the BacktestParameter type
 const defaultBotParams: Partial<BacktestParameter> = {
   SYMBOL: "btcusdt",
-  INTERVAL_1: "5m",
-  INTERVAL_2: "15m",
+  INTERVAL_1: "1m",
+  INTERVAL_2: "5m",
   TRADE_MODE: 0, // both
   ENTRY_PERCENTAGE: 1.0,
   LEVERAGE: 10,
