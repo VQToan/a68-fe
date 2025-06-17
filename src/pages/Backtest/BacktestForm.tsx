@@ -55,7 +55,7 @@ const defaultBotParams: Partial<BacktestParameter> = {
   R2R: "1:2", // Default Risk to Reward ratio
   MA_PERIOD: "8:20",
   DCA_GRID: 0.008,
-  DCA_MULTIPLIER: 1.05,
+  DCA_MULTIPLIER: 1.1,
   RSI_ENTRY_SHORT: 75,
   RSI_EXIT_SHORT: 25,
   RSI_ENTRY_LONG: 19,
