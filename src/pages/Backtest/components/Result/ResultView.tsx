@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useMemo, memo, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  memo,
+  useRef,
+  useCallback,
+} from "react";
 import {
   Box,
   Grid,
@@ -15,11 +22,18 @@ import {
   TableBody,
   Divider,
   Skeleton,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import PerformanceStats from "./PerformanceStats";
 import { formatDate, formatNumber, areEqual } from "@/utils/common";
 import type { BacktestTrade } from "@/services/backtest.service";
 import { useBacktestResult } from "@/hooks/useBacktestResult";
+import BacktestChart from "./BacktestChart";
+
+const INTERVALS = ["1m", "5m", "15m", "30m", "1h", "4h", "1d"];
 
 interface ResultViewProps {
   selectedResultId: string;
@@ -27,9 +41,13 @@ interface ResultViewProps {
   initialInterval?: string;
 }
 
-const ResultView: React.FC<ResultViewProps> = ({ selectedResultId }) => {
+const ResultView: React.FC<ResultViewProps> = ({
+  selectedResultId,
+  symbol,
+}) => {
   const statsRef = useRef<HTMLDivElement>(null);
   const [statsHeight, setStatsHeight] = useState<number>(0);
+  const [selectedInterval, setSelectedInterval] = useState<string>("15m");
 
   const {
     getResultDetail,
@@ -48,6 +66,9 @@ const ResultView: React.FC<ResultViewProps> = ({ selectedResultId }) => {
     () => resultDetail?.trades || ([] as BacktestTrade[]),
     [resultDetail]
   );
+  const handleIntervalChange = useCallback((event: any) => {
+    setSelectedInterval(event.target.value as string);
+  }, []);
 
   // Update statsHeight when the component mounts or when the content changes
   useEffect(() => {
@@ -86,54 +107,6 @@ const ResultView: React.FC<ResultViewProps> = ({ selectedResultId }) => {
   return (
     <>
       <Divider sx={{ my: 3 }} />
-
-      {/* Chart */}
-      {/* <Grid container spacing={3} mb={3}>
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={2}
-              >
-                <Typography variant="h6">Biểu đồ giao dịch</Typography>
-                <FormControl
-                  variant="outlined"
-                  size="small"
-                  sx={{ minWidth: 120 }}
-                >
-                  <InputLabel id="interval-select-label">
-                    Khung thời gian
-                  </InputLabel>
-                  <Select
-                    labelId="interval-select-label"
-                    id="interval-select"
-                    value={selectedInterval}
-                    onChange={handleIntervalChange}
-                    label="Khung thời gian"
-                  >
-                    {INTERVALS.map((interval) => (
-                      <MenuItem key={interval} value={interval}>
-                        {interval}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Box>
-              <Box sx={{ height: 500, width: "100%" }}>
-                <BacktestChart
-                  trades={trades}
-                  symbol={symbol}
-                  interval={selectedInterval}
-                />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid> */}
-
       {/* Performance Stats and Trade List */}
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 4 }}>
@@ -141,7 +114,6 @@ const ResultView: React.FC<ResultViewProps> = ({ selectedResultId }) => {
             <PerformanceStats metrics={metrics} />
           </Box>
         </Grid>
-
         <Grid size={{ xs: 12, md: 8 }}>
           <Card sx={{ height: statsHeight > 0 ? `${statsHeight}px` : "auto" }}>
             <CardContent
@@ -340,6 +312,51 @@ const ResultView: React.FC<ResultViewProps> = ({ selectedResultId }) => {
                   </TableBody>
                 </Table>
               </TableContainer>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+      <Grid container spacing={3} mb={3}>
+        <Grid size={{ xs: 12 }}>
+          <Card>
+            <CardContent>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mb={2}
+              >
+                <Typography variant="h6">Biểu đồ giao dịch</Typography>
+                <FormControl
+                  variant="outlined"
+                  size="small"
+                  sx={{ minWidth: 120 }}
+                >
+                  <InputLabel id="interval-select-label">
+                    Khung thời gian
+                  </InputLabel>
+                  <Select
+                    labelId="interval-select-label"
+                    id="interval-select"
+                    value={selectedInterval}
+                    onChange={handleIntervalChange}
+                    label="Khung thời gian"
+                  >
+                    {INTERVALS.map((interval) => (
+                      <MenuItem key={interval} value={interval}>
+                        {interval}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+              <Box sx={{ height: 500, width: "100%" }}>
+                <BacktestChart
+                  trades={trades}
+                  symbol={symbol}
+                  interval={selectedInterval}
+                />
+              </Box>
             </CardContent>
           </Card>
         </Grid>

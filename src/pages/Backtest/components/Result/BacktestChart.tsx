@@ -42,10 +42,17 @@ const BacktestChart: React.FC<BacktestChartProps> = ({
   const [visibleBars, setVisibleBars] = useState<number>(100);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tooltip, setTooltip] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    content: string;
+  }>({ visible: false, x: 0, y: 0, content: '' });
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const candleSeriesRef = useRef<any>(null);
   const isDisposedRef = useRef<boolean>(false);
+  const crosshairMoveHandlerRef = useRef<any>(null);
   const [loadMoreParams, setLoadMoreParams] = useState<{
     barsToLoad: number;
     side: "L" | "R";
@@ -56,21 +63,84 @@ const BacktestChart: React.FC<BacktestChartProps> = ({
   const tradeMarkers = useMemo(() => {
     if (!trades?.length) return [];
 
+    // Define color and shape mapping for different trade types
+    const getMarkerStyle = (trade: BacktestTrade) => {
+      const isLong = trade.side.includes("LONG");
+      const isOpen = trade.reason === "ENTRY" || trade.reason === "DCA" || 
+                    trade.reason.includes("ENTRY HEDGE") || trade.reason.includes("DCA HEDGE");
+      const isClose = trade.reason === "EXIT" || trade.reason === "CUTLOSS" || trade.reason === "MAX LOSS" ||
+                     trade.reason.includes("EXIT HEDGE") || trade.reason.includes("CUT LOSS HEDGE");
+
+      let color: string;
+      let shape: "arrowUp" | "arrowDown" | "circle" | "square";
+      let text: string;
+      
+      // Position based on trade side
+      const position: "belowBar" | "aboveBar" = isLong ? "belowBar" : "aboveBar";
+
+      // Determine marker style based on trade type
+      if (isLong && isOpen) {
+        // LONG-OPEN: Purple B
+        color = "#9c27b0";
+        shape = "arrowUp";
+        text = "B";
+      } else if (isLong && isClose) {
+        // LONG-CLOSE: Purple S
+        color = "#9c27b0";
+        shape = "arrowDown";
+        text = "S";
+      } else if (!isLong && isOpen) {
+        // SHORT-OPEN: Dark Yellow S
+        color = "#f57f17";
+        shape = "arrowDown";
+        text = "S";
+      } else if (!isLong && isClose) {
+        // SHORT-CLOSE: Dark Yellow B
+        color = "#f57f17";
+        shape = "arrowUp";
+        text = "B";
+      } else {
+        // Default fallback
+        color = "#607d8b";
+        shape = "circle";
+        text = "?";
+      }
+
+      return { color, shape, position, text };
+    };
+
     return trades
-      .filter(
-        (trade) =>
-          trade.reason === "ENTRY" ||
-          trade.reason === "EXIT" ||
-          trade.reason === "TP" ||
-          trade.reason === "SL"
+      .filter((trade) => 
+        // Include all trade types for visualization
+        trade.reason === "ENTRY" ||
+        trade.reason === "EXIT" ||
+        trade.reason === "DCA" ||
+        trade.reason === "CUTLOSS" ||
+        trade.reason === "MAX LOSS" ||
+        trade.reason.includes("ENTRY HEDGE") ||
+        trade.reason.includes("EXIT HEDGE") ||
+        trade.reason.includes("CUT LOSS HEDGE") ||
+        trade.reason.includes("DCA HEDGE")
       )
-      .map((trade) => ({
-        time: (trade.time / 1000) as UTCTimestamp, // Convert milliseconds to seconds for lightweight-charts
-        position: trade.side.includes("LONG") ? "belowBar" : "aboveBar",
-        color: trade.side.includes("LONG") ? "#26a69a" : "#ef5350",
-        shape: trade.reason === "ENTRY" ? "arrowUp" : "arrowDown",
-        text: `${trade.reason} ${trade.price.toFixed(2)}`,
-      })) as any[];
+      .map((trade) => {
+        const style = getMarkerStyle(trade);
+        return {
+          time: (trade.time / 1000) as UTCTimestamp, // Convert milliseconds to seconds for lightweight-charts
+          position: style.position,
+          color: style.color,
+          shape: style.shape,
+          text: style.text,
+          size: 1,
+          // Store trade info for tooltip
+          tradeInfo: {
+            reason: trade.reason,
+            price: trade.price,
+            pnl: trade.pnl,
+            side: trade.side,
+            quantity: trade.quantity
+          }
+        };
+      }) as any[];
   }, [trades]);
 
   const loadMoreData = useCallback(
@@ -214,6 +284,43 @@ const BacktestChart: React.FC<BacktestChartProps> = ({
     candleSeries.setData(chartData);
     createSeriesMarkers(candleSeries, tradeMarkers); // Add trade markers to the chart
 
+    // Add mouse event handlers for tooltip
+    const crosshairMoveHandler = (param: any) => {
+      if (!param.point || !param.time) {
+        setTooltip(prev => ({ ...prev, visible: false }));
+        return;
+      }
+
+      // Find all markers at the same time point (within tolerance)
+      const hoveredMarkers = tradeMarkers.filter(marker => {
+        const markerTime = marker.time;
+        const timeDiff = Math.abs(Number(param.time) - Number(markerTime));
+        return timeDiff < 60; // Within 1 minute tolerance
+      });
+
+      if (hoveredMarkers.length > 0) {
+        // Create tooltip content for all markers at this time point
+        const tooltipContent = hoveredMarkers.map((marker, index) => {
+          const info = marker.tradeInfo;
+          return `${index > 0 ? '\n---\n' : ''}${info.reason} - ${info.side}
+Price: ${info.price.toFixed(3)}
+Quantity: ${info.quantity.toFixed(3)}${info.pnl ? `\nPnL: ${info.pnl.toFixed(3)}` : ''}`;
+        }).join('');
+
+        setTooltip({
+          visible: true,
+          x: param.point.x + 10,
+          y: param.point.y - 50,
+          content: tooltipContent
+        });
+      } else {
+        setTooltip(prev => ({ ...prev, visible: false }));
+      }
+    };
+
+    chart.subscribeCrosshairMove(crosshairMoveHandler);
+    crosshairMoveHandlerRef.current = crosshairMoveHandler;
+
     // Handle window resize
     const handleResize = () => {
       if (chartContainerRef.current && chartRef.current && !isDisposedRef.current) {
@@ -257,8 +364,12 @@ const BacktestChart: React.FC<BacktestChartProps> = ({
       if (chart) {
         try {
           chart.timeScale().unsubscribeVisibleLogicalRangeChange(handleVisibleRangeChange);
+          // Clean up crosshair subscription
+          if (crosshairMoveHandlerRef.current) {
+            chart.unsubscribeCrosshairMove(crosshairMoveHandlerRef.current);
+          }
         } catch (e) {
-          console.error("Error unsubscribing from range change:", e);
+          console.error("Error unsubscribing from chart events:", e);
         }
       }
       if (chartRef.current) {
@@ -270,6 +381,8 @@ const BacktestChart: React.FC<BacktestChartProps> = ({
         }
         chartRef.current = null;
       }
+      // Hide tooltip on cleanup
+      setTooltip(prev => ({ ...prev, visible: false }));
     };
   }, [chartData, loadMoreData, setVisibleBars, visibleBars, tradeMarkers]);
 
@@ -387,13 +500,71 @@ const BacktestChart: React.FC<BacktestChartProps> = ({
   }
 
   return (
-    <div
-      ref={chartContainerRef}
-      style={{
-        width: "100%",
-        height: "100%",
-      }}
-    />
+    <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+      {/* Trade Legend */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: 8,
+          left: 8,
+          zIndex: 1000,
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
+          padding: 1,
+          borderRadius: 1,
+          fontSize: "0.75rem",
+          boxShadow: 1,
+          maxWidth: 200,
+        }}
+      >
+        <Typography variant="caption" sx={{ fontWeight: "bold", display: "block" }}>
+          Trade Markers:
+        </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
+          <Typography variant="caption" sx={{ color: "#9c27b0" }}>
+            B Long Open (Purple)
+          </Typography>
+          <Typography variant="caption" sx={{ color: "#9c27b0" }}>
+            S Long Close (Purple)
+          </Typography>
+          <Typography variant="caption" sx={{ color: "#f57f17" }}>
+            S Short Open (Dark Yellow)
+          </Typography>
+          <Typography variant="caption" sx={{ color: "#f57f17" }}>
+            B Short Close (Dark Yellow)
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Tooltip */}
+      {tooltip.visible && (
+        <Box
+          sx={{
+            position: "absolute",
+            left: tooltip.x,
+            top: tooltip.y,
+            zIndex: 1001,
+            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            color: "white",
+            padding: 1,
+            borderRadius: 1,
+            fontSize: "0.75rem",
+            whiteSpace: "pre-line",
+            pointerEvents: "none",
+          }}
+        >
+          {tooltip.content}
+        </Box>
+      )}
+      
+      {/* Chart Container */}
+      <Box
+        ref={chartContainerRef}
+        sx={{
+          width: "100%",
+          height: "100%",
+        }}
+      />
+    </Box>
   );
 };
 

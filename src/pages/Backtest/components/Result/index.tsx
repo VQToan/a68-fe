@@ -38,26 +38,6 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
     }
   }, [onBack, navigate]);
 
-  // const handleExportResults = useCallback(() => {
-  //   if (!result) return;
-
-  //   const dataStr = JSON.stringify(result, null, 2);
-  //   const blob = new Blob([dataStr], { type: "application/json" });
-  //   const url = URL.createObjectURL(blob);
-
-  //   const a = document.createElement("a");
-  //   a.href = url;
-  //   a.download = `backtest-result-${id}-${
-  //     new Date().toISOString().split("T")[0]
-  //   }.json`;
-  //   document.body.appendChild(a);
-  //   a.click();
-  //   document.body.removeChild(a);
-  //   URL.revokeObjectURL(url);
-  // }, [result, id]);
-
-  // Fetch backtest process and results
-
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
