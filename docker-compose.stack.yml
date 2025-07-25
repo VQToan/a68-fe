@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  a68-frontend:
+    image: a68-frontend:latest
+    ports:
+      - "30009:80"
+    networks:
+      - shared-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.hostname == vqt  # Deploy trên node chính
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 10s
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  shared-network:
+    external: true
