@@ -629,7 +629,7 @@ const TradingForm = ({
                         value={selectedPauseDays}
                         onChange={handlePauseDaysChange}
                         MenuProps={MenuProps}
-                        renderValue={(selected) => pauseDayLabels}
+                        renderValue={() => pauseDayLabels}
                       >
                         {pauseDayOptions.map((option) => (
                           <MenuItem key={option.value} value={option.value}>
