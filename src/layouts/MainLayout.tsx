@@ -33,6 +33,7 @@ import SmartToyIcon from "@mui/icons-material/SmartToy";
 import CurrencyBitcoinIcon from "@mui/icons-material/CurrencyBitcoin";
 import BarChartIcon from "@mui/icons-material/BarChart"; // Import icon for Backtest
 import DescriptionIcon from "@mui/icons-material/Description"; // Import icon for Bot Template
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance"; // Import icon for Trading Account
 import { useAuth } from "@hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import theme from "../theme";
@@ -291,7 +292,7 @@ const MainLayout = () => {
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{
-                  minHeight: 48,
+                  height: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
                   "&:hover": {
@@ -305,9 +306,20 @@ const MainLayout = () => {
                     minWidth: 0,
                     mr: open ? 3 : "auto",
                     justifyContent: "center",
+                    display: "flex",
+                    alignItems: "center",
+                    width: 24,
+                    height: 24,
                   }}
                 >
-                  <HomeIcon />
+                  <HomeIcon 
+                    sx={{ 
+                      fontSize: 24,
+                      width: 24,
+                      height: 24,
+                      transition: "none"
+                    }} 
+                  />
                 </ListItemIcon>
                 <ListItemText primary="Home" sx={{ opacity: open ? 1 : 0 }} />
               </ListItemButton>
@@ -316,7 +328,7 @@ const MainLayout = () => {
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{
-                  minHeight: 48,
+                  height: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
                   "&:hover": {
@@ -330,9 +342,20 @@ const MainLayout = () => {
                     minWidth: 0,
                     mr: open ? 3 : "auto",
                     justifyContent: "center",
+                    display: "flex",
+                    alignItems: "center",
+                    width: 24,
+                    height: 24,
                   }}
                 >
-                  <DashboardIcon />
+                  <DashboardIcon 
+                    sx={{ 
+                      fontSize: 24,
+                      width: 24,
+                      height: 24,
+                      transition: "none"
+                    }} 
+                  />
                 </ListItemIcon>
                 <ListItemText
                   primary="Dashboard"
@@ -344,7 +367,7 @@ const MainLayout = () => {
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{
-                  minHeight: 48,
+                  height: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
                   "&:hover": {
@@ -358,9 +381,20 @@ const MainLayout = () => {
                     minWidth: 0,
                     mr: open ? 3 : "auto",
                     justifyContent: "center",
+                    display: "flex",
+                    alignItems: "center",
+                    width: 24,
+                    height: 24,
                   }}
                 >
-                  <SmartToyIcon />
+                  <SmartToyIcon 
+                    sx={{ 
+                      fontSize: 24,
+                      width: 24,
+                      height: 24,
+                      transition: "none"
+                    }} 
+                  />
                 </ListItemIcon>
                 <ListItemText
                   primary="Module Bot"
@@ -372,7 +406,7 @@ const MainLayout = () => {
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{
-                  minHeight: 48,
+                  height: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
                   "&:hover": {
@@ -386,9 +420,20 @@ const MainLayout = () => {
                     minWidth: 0,
                     mr: open ? 3 : "auto",
                     justifyContent: "center",
+                    display: "flex",
+                    alignItems: "center",
+                    width: 24,
+                    height: 24,
                   }}
                 >
-                  <DescriptionIcon />
+                  <DescriptionIcon 
+                    sx={{ 
+                      fontSize: 24,
+                      width: 24,
+                      height: 24,
+                      transition: "none"
+                    }} 
+                  />
                 </ListItemIcon>
                 <ListItemText
                   primary="Bot Template"
@@ -400,7 +445,7 @@ const MainLayout = () => {
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{
-                  minHeight: 48,
+                  height: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
                   "&:hover": {
@@ -414,9 +459,20 @@ const MainLayout = () => {
                     minWidth: 0,
                     mr: open ? 3 : "auto",
                     justifyContent: "center",
+                    display: "flex",
+                    alignItems: "center",
+                    width: 24,
+                    height: 24,
                   }}
                 >
-                  <BarChartIcon />
+                  <BarChartIcon 
+                    sx={{ 
+                      fontSize: 24,
+                      width: 24,
+                      height: 24,
+                      transition: "none"
+                    }} 
+                  />
                 </ListItemIcon>
                 <ListItemText
                   primary="Backtest"
@@ -428,7 +484,7 @@ const MainLayout = () => {
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{
-                  minHeight: 48,
+                  height: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
                   "&:hover": {
@@ -442,12 +498,62 @@ const MainLayout = () => {
                     minWidth: 0,
                     mr: open ? 3 : "auto",
                     justifyContent: "center",
+                    display: "flex",
+                    alignItems: "center",
+                    width: 24,
+                    height: 24,
                   }}
                 >
-                  <CurrencyBitcoinIcon />
+                  <CurrencyBitcoinIcon 
+                    sx={{ 
+                      fontSize: 24,
+                      width: 24,
+                      height: 24,
+                      transition: "none"
+                    }} 
+                  />
                 </ListItemIcon>
                 <ListItemText
                   primary="Crypto Trading"
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
+              </ListItemButton>
+            </ListItem>
+
+            <ListItem disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                sx={{
+                  height: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                  },
+                }}
+                onClick={() => handleNavigation("/trading-account")}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center",
+                    display: "flex",
+                    alignItems: "center",
+                    width: 24,
+                    height: 24,
+                  }}
+                >
+                  <AccountBalanceIcon 
+                    sx={{ 
+                      fontSize: 24,
+                      width: 24,
+                      height: 24,
+                      transition: "none"
+                    }} 
+                  />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Tài khoản Trading"
                   sx={{ opacity: open ? 1 : 0 }}
                 />
               </ListItemButton>
@@ -458,7 +564,7 @@ const MainLayout = () => {
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{
-                  minHeight: 48,
+                  height: 48,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
                   "&:hover": {
@@ -472,9 +578,20 @@ const MainLayout = () => {
                     minWidth: 0,
                     mr: open ? 3 : "auto",
                     justifyContent: "center",
+                    display: "flex",
+                    alignItems: "center",
+                    width: 24,
+                    height: 24,
                   }}
                 >
-                  <LogoutIcon />
+                  <LogoutIcon 
+                    sx={{ 
+                      fontSize: 24,
+                      width: 24,
+                      height: 24,
+                      transition: "none"
+                    }} 
+                  />
                 </ListItemIcon>
                 <ListItemText primary="Logout" sx={{ opacity: open ? 1 : 0 }} />
               </ListItemButton>

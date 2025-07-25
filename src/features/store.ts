@@ -5,6 +5,8 @@ import backtestReducer from './backtest/backtestSlice';
 import backtestResultReducer from './backtestResult/backtestResultSlice';
 import botTemplateReducer from './botTemplate/botTemplateSlice';
 import botOptimizationReducer from './botOptimization/botOptimizationSlice';
+import tradingProcessReducer from './tradingProcess/tradingProcessSlice';
+import tradingAccountReducer from './tradingAccount/tradingAccountSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +16,8 @@ export const store = configureStore({
     backtestResult: backtestResultReducer,
     botTemplate: botTemplateReducer,
     botOptimization: botOptimizationReducer,
+    tradingProcess: tradingProcessReducer,
+    tradingAccount: tradingAccountReducer,
     // Add other reducers here as your application grows
   },
   devTools: process.env.NODE_ENV !== 'production',

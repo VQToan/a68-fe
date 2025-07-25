@@ -10,6 +10,8 @@ import Dashboard from "../pages/Dashboard";
 import ModuleBot from "../pages/ModuleBot";
 import Backtest from "../pages/Backtest";
 import BotTemplate from "../pages/BotTemplate";
+import Trading from "../pages/Trading";
+import TradingAccount from "../pages/TradingAccount";
 import NotFound from "../pages/NotFound";
 import MainLayout from "../layouts/MainLayout";
 import BacktestResult from "@/pages/Backtest/components/Result";
@@ -67,6 +69,14 @@ export const routes: RouteObject[] = [
                 element: <BacktestResult />,
               },
             ],
+          },
+          {
+            path: "trading",
+            element: <Trading />,
+          },
+          {
+            path: "trading-account",
+            element: <TradingAccount />,
           },
           {
             path: "profile",
