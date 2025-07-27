@@ -5,12 +5,12 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField,
   Box,
   Typography,
   CircularProgress,
 } from "@mui/material";
 import { areEqual } from "@/utils/common";
+import DateRangePicker from "@/components/DateRangePicker";
 
 interface RunBacktestDialogProps {
   open: boolean;
@@ -31,10 +31,16 @@ const RunBacktestDialog: React.FC<RunBacktestDialogProps> = ({
   const [endDate, setEndDate] = useState<string>("");
   const [validationError, setValidationError] = useState<string | null>(null);
 
+  const handleDateRangeChange = useCallback((start: string, end: string) => {
+    setStartDate(start);
+    setEndDate(end);
+    setValidationError(null);
+  }, []);
+
   const handleConfirm = useCallback(() => {
     // Validate dates
     if (!startDate || !endDate) {
-      setValidationError("Vui lòng nhập đầy đủ thời gian bắt đầu và kết thúc");
+      setValidationError("Vui lòng chọn đầy đủ thời gian bắt đầu và kết thúc");
       return;
     }
 
@@ -59,33 +65,18 @@ const RunBacktestDialog: React.FC<RunBacktestDialogProps> = ({
             Backtest: <strong>{backtestName}</strong>
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Vui lòng nhập khoảng thời gian để chạy backtest
+            Vui lòng chọn khoảng thời gian để chạy backtest
           </Typography>
 
-          <TextField
-            label="Thời gian bắt đầu"
-            type="datetime-local"
-            fullWidth
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-            sx={{ mb: 2 }}
+          <DateRangePicker
+            startDate={startDate}
+            endDate={endDate}
+            onChange={handleDateRangeChange}
+            label="Khoảng thời gian backtest"
+            placeholder="Chọn ngày bắt đầu - ngày kết thúc"
+            error={!!validationError}
+            helperText={validationError || ""}
           />
-
-          <TextField
-            label="Thời gian kết thúc"
-            type="datetime-local"
-            fullWidth
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            InputLabelProps={{ shrink: true }}
-          />
-
-          {validationError && (
-            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              {validationError}
-            </Typography>
-          )}
         </Box>
       </DialogContent>
       <DialogActions>
