@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   a68-frontend:
-    image: 100.118.114.91:5000/a68-frontend:latest
+    image: a68-frontend
     ports:
       - "30009:80"
     environment:
