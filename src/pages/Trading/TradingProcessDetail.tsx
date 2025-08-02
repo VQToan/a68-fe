@@ -19,10 +19,6 @@ import {
   IconButton,
   Tooltip,
   LinearProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from "@mui/material";
 import {
   PlayArrow as PlayIcon,
@@ -39,6 +35,7 @@ import { useTradingProcess } from "@hooks/useTradingProcess";
 import { useNotification } from "@context/NotificationContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { areEqual } from "@/utils/common";
+import TradingProcessSetupInfo from "./components/TradingProcessSetupInfo";
 
 // Mock interfaces for trading process metrics
 interface TradingProcessMetrics {
@@ -102,6 +99,52 @@ const TradingProcessDetail = () => {
     profit_factor: 1.85,
     sharpe_ratio: 1.42,
   });
+
+  // Mock trading process with parameters
+  const mockCurrentProcess = {
+    _id: id || "tp1",
+    name: "BTC-USDT Strategy RSI",
+    user_id: "user1",
+    bot_template_id: "template1",
+    trading_account_id: "account1",
+    description: "Chiến lược RSI cho BTC-USDT với DCA Grid",
+    status: "running" as const,
+    created_at: "2024-01-15T08:00:00Z",
+    updated_at: "2024-01-15T09:00:00Z",
+    started_at: "2024-01-15T09:00:00Z",
+    stopped_at: null,
+    trading_account_name: "Binance Main Account",
+    bot_template_name: "RSI DCA Strategy",
+    parameters: {
+      SYMBOL: "BTCUSDT",
+      LEVERAGE: 10,
+      TRADE_MODE: 0, // Both long and short
+      FUNDS: 1000,
+      ENTRY_PERCENTAGE: 25,
+      MAX_MARGIN_PERCENTAGE: 75,
+      MIN_MARGIN: 50,
+      MAX_LOSS: 200,
+      MIN_ROI: 5,
+      R2R: "1:2",
+      MA_PERIOD: "20,50",
+      DCA_GRID: 5,
+      DCA_MULTIPLIER: 1.5,
+      RSI_ENTRY_SHORT: 70,
+      RSI_ENTRY_LONG: 30,
+      RSI_EXIT_SHORT: 50,
+      RSI_EXIT_LONG: 50,
+      RSI_ENTRY_SHORT_CANDLE: 14,
+      RSI_ENTRY_LONG_CANDLE: 14,
+      RSI_EXIT_SHORT_CANDLE: 14,
+      RSI_EXIT_LONG_CANDLE: 14,
+      TIME_BETWEEN_ORDERS: 300, // 5 minutes
+      PAUSE_TIME: "02:00-04:00",
+      PAUSE_DAY: "Saturday,Sunday"
+    }
+  };
+
+  // Use mock data instead of currentProcess for demo
+  const processToShow = mockCurrentProcess;
 
   const [realTrades] = useState<RealTrade[]>([
     {
@@ -178,32 +221,33 @@ const TradingProcessDetail = () => {
 
   // Handle start/stop process
   const handleToggleProcess = useCallback(async () => {
-    if (!currentProcess) return;
+    if (!processToShow) return;
 
     try {
-      if (currentProcess.status === "running") {
-        await stopProcess(currentProcess._id);
+      if (processToShow.status === "running") {
+        await stopProcess(processToShow._id);
         showNotification("Trading process đã được dừng", "success");
       } else {
-        await startProcess(currentProcess._id);
+        await startProcess(processToShow._id);
         showNotification("Trading process đã được khởi động", "success");
       }
       await fetchProcessDetails(); // Refresh data
     } catch (error) {
       console.error("Error toggling process:", error);
     }
-  }, [currentProcess, startProcess, stopProcess, fetchProcessDetails, showNotification]);
+  }, [processToShow, startProcess, stopProcess, fetchProcessDetails, showNotification]);
 
   // Handle notifications toggle
   const handleNotificationsToggle = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setNotificationsEnabled(event.target.checked);
     showNotification(
       event.target.checked 
-        ? "Đã bật thông báo qua message" 
+        ? "Các thông tin về hoạt động của bot sẽ được cập nhật về tin nhắn của bạn" 
         : "Đã tắt thông báo qua message", 
-      "success"
+      "success",
+      
     );
-  }, [showNotification]);
+  }, [setNotificationsEnabled, showNotification]);
 
   // Get status color
   const getStatusColor = (status: string) => {
@@ -244,7 +288,7 @@ const TradingProcessDetail = () => {
     return `${value > 0 ? '+' : ''}${value.toFixed(2)}%`;
   };
 
-  if (!currentProcess && !isLoading) {
+  if (!processToShow && !isLoading) {
     return (
       <Box sx={{ p: 3 }}>
         <Typography variant="h6" color="error">
@@ -267,16 +311,16 @@ const TradingProcessDetail = () => {
               <Typography variant="h5" component="h1">
                 Chi tiết Trading Process
               </Typography>
-              {currentProcess && (
-                <Chip 
-                  label={getStatusDisplayText(currentProcess.status)}
-                  color={getStatusColor(currentProcess.status)}
+              {processToShow && (
+                <Chip
+                  label={getStatusDisplayText(processToShow.status)}
+                  color={getStatusColor(processToShow.status)}
                 />
               )}
             </Box>
-            {currentProcess && (
+            {processToShow && (
               <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                {currentProcess.name} • {currentProcess.bot_template_name || "N/A"}
+                {processToShow.name} • {processToShow.bot_template_name || "N/A"}
               </Typography>
             )}
           </Grid>
@@ -296,15 +340,15 @@ const TradingProcessDetail = () => {
               />
               
               {/* Start/Stop Button */}
-              {currentProcess && (
+              {processToShow && (
                 <Button
-                  variant={currentProcess.status === "running" ? "outlined" : "contained"}
-                  color={currentProcess.status === "running" ? "error" : "success"}
-                  startIcon={currentProcess.status === "running" ? <StopIcon /> : <PlayIcon />}
+                  variant={processToShow.status === "running" ? "outlined" : "contained"}
+                  color={processToShow.status === "running" ? "error" : "success"}
+                  startIcon={processToShow.status === "running" ? <StopIcon /> : <PlayIcon />}
                   onClick={handleToggleProcess}
                   disabled={isLoading}
                 >
-                  {currentProcess.status === "running" ? "Dừng" : "Khởi động"}
+                  {processToShow.status === "running" ? "Dừng" : "Khởi động"}
                 </Button>
               )}
               
@@ -512,88 +556,11 @@ const TradingProcessDetail = () => {
       </Paper>
 
       {/* Setup Info Dialog */}
-      <Dialog 
-        open={openSetupInfoDialog} 
+      <TradingProcessSetupInfo
+        open={openSetupInfoDialog}
         onClose={() => setOpenSetupInfoDialog(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>Thông tin Setup Trading Process</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={3} sx={{ pt: 2 }}>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Box sx={{ textAlign: "center", p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
-                <Typography variant="body2" color="textSecondary">
-                  Balance hiện tại
-                </Typography>
-                <Typography variant="h6" color="primary.main">
-                  {formatCurrency(processMetrics.current_balance)}
-                </Typography>
-              </Box>
-            </Grid>
-            
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Box sx={{ textAlign: "center", p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
-                <Typography variant="body2" color="textSecondary">
-                  Balance ban đầu
-                </Typography>
-                <Typography variant="h6">
-                  {formatCurrency(processMetrics.initial_balance)}
-                </Typography>
-              </Box>
-            </Grid>
-            
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Box sx={{ textAlign: "center", p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
-                <Typography variant="body2" color="textSecondary">
-                  Max Drawdown
-                </Typography>
-                <Typography variant="h6" color="error.main">
-                  {formatPercentage(processMetrics.max_drawdown)}
-                </Typography>
-              </Box>
-            </Grid>
-            
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <Box sx={{ textAlign: "center", p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
-                <Typography variant="body2" color="textSecondary">
-                  Profit Factor  
-                </Typography>
-                <Typography variant="h6" color="success.main">
-                  {processMetrics.profit_factor.toFixed(2)}
-                </Typography>
-              </Box>
-            </Grid>
-            
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Box sx={{ textAlign: "center", p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
-                <Typography variant="body2" color="textSecondary">
-                  Sharpe Ratio
-                </Typography>
-                <Typography variant="h6" color="info.main">
-                  {processMetrics.sharpe_ratio.toFixed(2)}
-                </Typography>
-              </Box>
-            </Grid>
-            
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Box sx={{ textAlign: "center", p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
-                <Typography variant="body2" color="textSecondary">
-                  Tổng số giao dịch
-                </Typography>
-                <Typography variant="h6" color="primary.main">
-                  {processMetrics.total_trades}
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenSetupInfoDialog(false)}>
-            Đóng
-          </Button>
-        </DialogActions>
-      </Dialog>
+        setupData={processToShow?.parameters}
+      />
     </Box>
   );
 };

@@ -3,6 +3,14 @@ import type { ReactNode } from 'react';
 import { Snackbar, Alert } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 
+// Define notification item type
+interface NotificationItem {
+  id: string;
+  message: string;
+  severity: AlertColor;
+  open: boolean;
+}
+
 // Define the notification context type
 interface NotificationContextType {
   showNotification: (message: string, severity: AlertColor) => void;
@@ -18,52 +26,77 @@ interface NotificationProviderProps {
 
 // Create the notification provider component
 export const NotificationProvider = ({ children }: NotificationProviderProps) => {
-  // State for notification
-  const [notification, setNotification] = useState<{
-    open: boolean;
-    message: string;
-    severity: AlertColor;
-  }>({
-    open: false,
-    message: '',
-    severity: 'info'
-  });
+  // State for notifications stack
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
   // Show notification
   const showNotification = useCallback((message: string, severity: AlertColor) => {
-    setNotification({
-      open: true,
+    const id = Date.now().toString() + Math.random().toString();
+    const newNotification: NotificationItem = {
+      id,
       message,
-      severity
-    });
-  }, [setNotification]);
+      severity,
+      open: true
+    };
+    
+    setNotifications(prev => [...prev, newNotification]);
+    
+    // Auto-hide this specific notification after 6 seconds
+    setTimeout(() => {
+      setNotifications(prev => 
+        prev.map(notification => 
+          notification.id === id 
+            ? { ...notification, open: false }
+            : notification
+        )
+      );
+      
+      // Remove notification after animation
+      setTimeout(() => {
+        setNotifications(prev => prev.filter(notification => notification.id !== id));
+      }, 300);
+    }, 6000);
+  }, []);
 
   // Close notification
-  const handleCloseNotification = useCallback(() => {
-    setNotification(prev => ({
-      ...prev,
-      open: false
-    }));
-  }, [setNotification]);
+  const handleCloseNotification = useCallback((id: string) => {
+    setNotifications(prev => 
+      prev.map(notification => 
+        notification.id === id 
+          ? { ...notification, open: false }
+          : notification
+      )
+    );
+    
+    // Remove notification after animation
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(notification => notification.id !== id));
+    }, 300);
+  }, []);
 
   return (
     <NotificationContext.Provider value={{ showNotification }}>
       {children}
       
-      {/* Global Notification Component */}
-      <Snackbar 
-        open={notification.open} 
-        autoHideDuration={6000} 
-        onClose={handleCloseNotification}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <Alert 
-          onClose={handleCloseNotification} 
-          severity={notification.severity}
+      {/* Global Notification Components Stack */}
+      {notifications.map((notification, index) => (
+        <Snackbar 
+          key={notification.id}
+          open={notification.open} 
+          onClose={() => handleCloseNotification(notification.id)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          style={{
+            bottom: 20 + (index * 70), // Stack notifications vertically
+          }}
         >
-          {notification.message}
-        </Alert>
-      </Snackbar>
+          <Alert 
+            onClose={() => handleCloseNotification(notification.id)} 
+            severity={notification.severity}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </NotificationContext.Provider>
   );
 };
