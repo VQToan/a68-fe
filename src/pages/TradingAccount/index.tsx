@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, memo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -61,6 +62,8 @@ const tabFilterMap: Record<string, { is_active?: boolean; exchange?: TradingExch
 };
 
 const TradingAccount = () => {
+  const navigate = useNavigate();
+  
   // Use the trading account hook for state management
   const {
     accounts,
@@ -222,15 +225,10 @@ const TradingAccount = () => {
 
   // Handle view trading account
   const handleViewTradingAccount = useCallback(
-    async (id: string) => {
-      try {
-        await getAccountById(id);
-        handleOpenDialog("view");
-      } catch (error) {
-        console.error("Error fetching trading account details:", error);
-      }
+    (id: string) => {
+      navigate(`/trading-account/${id}`);
     },
-    [getAccountById, handleOpenDialog]
+    [navigate]
   );
 
   // Handle edit trading account directly

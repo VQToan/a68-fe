@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, memo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -63,7 +64,9 @@ const tabStatusMap: Record<string, TradingStatusType | undefined> = {
 };
 
 const Trading = () => {
-  // Use the trading process hook for state management
+  const navigate = useNavigate();
+  
+  // Use hooks for state management
   const {
     processes,
     isLoading,
@@ -242,6 +245,14 @@ const Trading = () => {
       }
     },
     [getProcessById, handleOpenDialog]
+  );
+
+  // Handle view trading process detail
+  const handleViewTradingProcess = useCallback(
+    (id: string) => {
+      navigate(`/trading-process/${id}`);
+    },
+    [navigate]
   );
 
   // Handle opening confirm delete dialog
@@ -424,6 +435,7 @@ const Trading = () => {
           <TradingList
             processes={filteredProcesses}
             isLoading={isLoading}
+            onView={handleViewTradingProcess}
             onEdit={handleEditTradingProcess}
             onDelete={(id: string, name: string) => handleOpenDeleteConfirm(id, name)}
             onStart={handleStartTradingProcess}

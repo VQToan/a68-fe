@@ -12,6 +12,8 @@ import Backtest from "../pages/Backtest";
 import BotTemplate from "../pages/BotTemplate";
 import Trading from "../pages/Trading";
 import TradingAccount from "../pages/TradingAccount";
+import TradingAccountDetail from "../pages/TradingAccount/TradingAccountDetail";
+import TradingProcessDetail from "../pages/Trading/TradingProcessDetail";
 import NotFound from "../pages/NotFound";
 import MainLayout from "../layouts/MainLayout";
 import BacktestResult from "@/pages/Backtest/components/Result";
@@ -77,6 +79,14 @@ export const routes: RouteObject[] = [
           {
             path: "trading-account",
             element: <TradingAccount />,
+          },
+          {
+            path: "trading-account/:id",
+            element: <TradingAccountDetail />,
+          },
+          {
+            path: "trading-process/:id",
+            element: <TradingProcessDetail />,
           },
           {
             path: "profile",
