@@ -71,7 +71,6 @@ const TradingProcessDetail = () => {
   
   // Hooks
   const {
-    currentProcess,
     isLoading,
     error,
     getProcessById,
