@@ -19,12 +19,14 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import type { TradingProcess, TradingStatusType } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
 
 interface TradingListProps {
   processes: TradingProcess[];
   isLoading: boolean;
+  onView: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void;
   onStart: (id: string) => void;
@@ -82,6 +84,7 @@ const getStatusLabel = (status: TradingStatusType): string => {
 const TradingList = ({
   processes,
   isLoading,
+  onView,
   onEdit,
   onDelete,
   onStart,
@@ -187,6 +190,17 @@ const TradingList = ({
                 </TableCell>
                 <TableCell align="right">
                   <Box sx={{ display: "flex", gap: 0.5 }}>
+                    {/* View details button */}
+                    <Tooltip title="Xem chi tiết">
+                      <IconButton
+                        size="small"
+                        color="info"
+                        onClick={() => onView(process._id)}
+                      >
+                        <VisibilityIcon />
+                      </IconButton>
+                    </Tooltip>
+
                     {/* Start button - only show if not running */}
                     {process.status !== "running" && (
                       <Tooltip title="Bắt đầu trading">
