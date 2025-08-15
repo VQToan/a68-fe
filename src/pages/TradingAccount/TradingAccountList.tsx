@@ -18,7 +18,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import type { TradingAccount, TradingExchangeType } from "@/types/trading.types";
+import type { TradingAccount, TradingExchangeType, AccountStatusType } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
 
 interface TradingAccountListProps {
@@ -66,6 +66,41 @@ const getExchangeLabel = (exchange: TradingExchangeType): string => {
       return "Bitget";
     default:
       return String(exchange).toUpperCase();
+  }
+};
+
+// Status chip color mapping
+const getStatusColor = (status: AccountStatusType): "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" => {
+  switch (status) {
+    case "valid":
+      return "success";
+    case "invalid":
+      return "error";
+    case "pending":
+      return "warning";
+    case "error":
+      return "error";
+    case "unsupported":
+      return "default";
+    default:
+      return "default";
+  }
+};
+
+const getStatusLabel = (status: AccountStatusType): string => {
+  switch (status) {
+    case "valid":
+      return "Hợp lệ";
+    case "invalid":
+      return "Không hợp lệ";
+    case "pending":
+      return "Đang xác thực";
+    case "error":
+      return "Lỗi";
+    case "unsupported":
+      return "Không hỗ trợ";
+    default:
+      return String(status).toUpperCase();
   }
 };
 
@@ -125,6 +160,7 @@ const TradingAccountList = ({
               <TableCell>Sàn giao dịch</TableCell>
               <TableCell>API Key</TableCell>
               <TableCell>Trạng thái</TableCell>
+              <TableCell>Số dư</TableCell>
               <TableCell>Chat IDs</TableCell>
               <TableCell>Ngày tạo</TableCell>
               <TableCell align="right">Thao tác</TableCell>
@@ -156,10 +192,26 @@ const TradingAccountList = ({
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={account.is_active ? "Hoạt động" : "Không hoạt động"}
-                    color={account.is_active ? "success" : "default"}
+                    label={getStatusLabel(account.status)}
+                    color={getStatusColor(account.status)}
                     size="small"
                   />
+                </TableCell>
+                <TableCell>
+                  {account.balance ? (
+                    <Box>
+                      <Typography variant="body2" fontWeight="medium">
+                        ${account.balance.available_balance.toFixed(4)}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Khả dụng
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      Chưa có dữ liệu
+                    </Typography>
+                  )}
                 </TableCell>
                 <TableCell>
                   <Typography variant="body2" color="text.secondary">

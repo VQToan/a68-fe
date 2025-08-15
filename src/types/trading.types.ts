@@ -20,16 +20,132 @@ export interface TradingExchange {
 
 export type TradingExchangeType = "binance" | "bybit" | "okx" | "bitget";
 
+export type AccountStatusType = "pending" | "valid" | "invalid" | "error" | "unsupported";
+
+export interface AccountAsset {
+  asset: string;
+  wallet_balance: number;
+  unrealized_pnl: number;
+  margin_balance: number;
+  available_balance: number;
+  cross_wallet_balance: number;
+  cross_un_pnl: number;
+  margin_available: boolean;
+  update_time: number;
+}
+
+export interface AccountBalance {
+  total_wallet_balance: number;
+  total_unrealized_pnl: number;
+  total_margin_balance: number;
+  available_balance: number;
+  max_withdraw_amount: number;
+  assets: AccountAsset[];
+}
+
+// New types for dashboard and position management
+export interface BalanceSummary {
+  asset: string;
+  available: number;
+  in_order: number;
+  total: number;
+}
+
+export interface PositionSummary {
+  order_id: string;
+  symbol: string;
+  side: string;
+  position_side: string;
+  quantity: number;
+  entry_price: number;
+  mark_price: number;
+  liquidation_price: number;
+  unrealized_pnl: number;
+  pnl_percentage: number;
+  timestamp: string;
+}
+
+export interface DashboardData {
+  account_info: TradingAccount;
+  balance_summary: BalanceSummary[];
+  positions_summary: PositionSummary[];
+  total_balance_usd: number;
+  total_pnl: number;
+  positions_count: number;
+}
+
+export interface OpenPositionRequest {
+  symbol: string;
+  side: "BUY" | "SELL";
+  quantity: number;
+  position_side?: "BOTH" | "LONG" | "SHORT";
+  order_type?: "MARKET" | "LIMIT";
+  price?: number;
+  time_in_force?: "GTC" | "IOC" | "FOK";
+}
+
+export interface ClosePositionRequest {
+  symbol: string;
+  position_side?: "BOTH" | "LONG" | "SHORT";
+  reduce_only?: boolean;
+}
+
+export interface ClosePartialPositionRequest {
+  symbol: string;
+  quantity: number;
+  position_side: "BOTH" | "LONG" | "SHORT";
+  reduce_only?: boolean;
+}
+
+export interface OrderInfo {
+  symbol: string;
+  order_id: number;
+  client_order_id: string;
+  side: "BUY" | "SELL";
+  position_side?: "BOTH" | "LONG" | "SHORT";
+  type: string;
+  quantity: number;
+  executed_quantity?: number;
+  price: number;
+  avg_price: number;
+  stop_price: number;
+  status: string;
+  time_in_force: "GTC" | "IOC" | "FOK";
+  reduce_only: boolean;
+  close_position: boolean;
+  update_time: number;
+  remaining_position?: number;
+}
+
+export interface OrderResponse {
+  success: boolean;
+  order: OrderInfo;
+  message: string;
+}
+
+export interface ClosePositionResponse {
+  success: boolean;
+  orders: OrderInfo[];
+  message: string;
+}
+
+export interface ClosePartialPositionResponse {
+  success: boolean;
+  order: OrderInfo;
+  message: string;
+}
+
 export interface TradingAccount {
   _id: string;
   user_id: string;
   exchange: TradingExchangeType;
   account_name: string;
   chat_ids: string[];
-  is_active: boolean;
   created_at: string;
   updated_at: string;
   api_key_masked: string;
+  status: AccountStatusType;
+  balance?: AccountBalance;
 }
 
 export interface TradingAccountCreate {
@@ -38,7 +154,6 @@ export interface TradingAccountCreate {
   api_key: string;
   secret_key: string;
   chat_ids?: string[];
-  is_active?: boolean;
 }
 
 export interface TradingAccountUpdate {
@@ -46,7 +161,6 @@ export interface TradingAccountUpdate {
   api_key?: string;
   secret_key?: string;
   chat_ids?: string[];
-  is_active?: boolean;
 }
 
 export interface TradingProcess {

@@ -9,8 +9,6 @@ import {
   InputLabel,
   Select,
   type SelectChangeEvent,
-  Switch,
-  FormControlLabel,
   Chip,
   InputAdornment,
   IconButton,
@@ -59,7 +57,6 @@ const TradingAccountForm = ({
     api_key: "",
     secret_key: "",
     chat_ids: initialData?.chat_ids || [],
-    is_active: initialData?.is_active ?? true,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -74,7 +71,6 @@ const TradingAccountForm = ({
         api_key: "", // Don't prefill API key for security
         secret_key: "", // Don't prefill secret key for security
         chat_ids: initialData.chat_ids || [],
-        is_active: initialData.is_active ?? true,
       });
     }
   }, [initialData]);
@@ -123,7 +119,6 @@ const TradingAccountForm = ({
       const updateData: TradingAccountUpdate = {
         account_name: formData.account_name,
         chat_ids: formData.chat_ids,
-        is_active: formData.is_active,
       };
 
       // Only include API keys if they were provided
@@ -142,7 +137,6 @@ const TradingAccountForm = ({
         api_key: formData.api_key,
         secret_key: formData.secret_key,
         chat_ids: formData.chat_ids,
-        is_active: formData.is_active,
       } as TradingAccountCreate);
     }
   };
@@ -179,15 +173,6 @@ const TradingAccountForm = ({
         [name as string]: "",
       }));
     }
-  };
-
-  // Handle switch changes
-  const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = event.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: checked,
-    }));
   };
 
   // Handle adding chat ID
@@ -364,20 +349,6 @@ const TradingAccountForm = ({
               />
             )}
           </Box>
-        </Grid>
-
-        <Grid size={{ xs: 12 }}>
-          <FormControlLabel
-            control={
-              <Switch
-                name="is_active"
-                checked={formData.is_active}
-                onChange={handleSwitchChange}
-                disabled={isReadOnly}
-              />
-            }
-            label="Tài khoản hoạt động"
-          />
         </Grid>
       </Grid>
     </Box>
