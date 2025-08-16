@@ -51,10 +51,8 @@ function TabPanel(props: TabPanelProps) {
 }
 
 // Tab filter mapping
-const tabFilterMap: Record<string, { is_active?: boolean; exchange?: TradingExchangeType }> = {
+const tabFilterMap: Record<string, { exchange?: TradingExchangeType }> = {
   all: {},
-  active: { is_active: true },
-  inactive: { is_active: false },
   binance: { exchange: "binance" },
   bybit: { exchange: "bybit" },
   okx: { exchange: "okx" },
@@ -118,7 +116,7 @@ const TradingAccount = () => {
   // Fetch trading accounts with pagination parameters
   const fetchTradingAccounts = useCallback(() => {
     const filters = tabFilterMap[currentTab];
-    getAccounts(currentPage, rowsPerPage, filters.is_active, filters.exchange);
+    getAccounts(currentPage, rowsPerPage, filters.exchange);
   }, [currentTab, currentPage, rowsPerPage, getAccounts]);
 
   // Re-fetch when pagination changes
@@ -358,8 +356,6 @@ const TradingAccount = () => {
             sx={{ mb: 2 }}
           >
             <Tab label="Tất cả" value="all" />
-            <Tab label="Hoạt động" value="active" />
-            <Tab label="Không hoạt động" value="inactive" />
             <Tab label="Binance" value="binance" />
             <Tab label="Bybit" value="bybit" />
             <Tab label="OKX" value="okx" />
@@ -425,7 +421,6 @@ const TradingAccount = () => {
             account_name: currentAccount.account_name,
             exchange: currentAccount.exchange,
             chat_ids: currentAccount.chat_ids,
-            is_active: currentAccount.is_active,
             api_key_masked: currentAccount.api_key_masked,
           } : undefined}
           onSubmit={handleSubmitTradingAccount}

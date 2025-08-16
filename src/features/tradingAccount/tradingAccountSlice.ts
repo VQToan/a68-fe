@@ -14,15 +14,13 @@ export const fetchTradingAccounts = createAsyncThunk(
   async ({ 
     page = 1, 
     page_size = 20,
-    is_active,
     exchange 
   }: { 
     page?: number; 
     page_size?: number; 
-    is_active?: boolean;
     exchange?: string;
   } = {}) => {
-    return await tradingAccountService.getAll(page, page_size, is_active, exchange as any);
+    return await tradingAccountService.getAll(page, page_size, exchange as any);
   }
 );
 

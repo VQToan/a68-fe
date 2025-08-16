@@ -16,54 +16,64 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  IconButton,
-  Tooltip,
-  Divider,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import {
   AccountBalance as BalanceIcon,
   TrendingUp as TrendingUpIcon,
-  Schedule as ScheduleIcon,
-  Visibility as ViewIcon,
   Refresh as RefreshIcon,
-  Add as AddIcon,
-  ClearAll as ClearAllIcon,
-  RemoveCircle as RemoveCircleIcon,
+  ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
-import { useTradingAccount } from "@hooks/useTradingAccount";
-import { useTradingProcess } from "@hooks/useTradingProcess";
 import { useNotification } from "@context/NotificationContext";
 import { useNavigate, useParams } from "react-router-dom";
-import type { TradingProcess } from "@/types/trading.types";
+import type { DashboardData, PositionSummary, AccountStatusType } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
+import * as tradingAccountService from "@services/tradingAccount.service";
 
-// Mock data interfaces for balance and open orders
-interface AccountBalance {
-  asset: string;
-  free: string;
-  locked: string;
-  total: string;
-}
+// Status chip color mapping
+const getStatusColor = (status: AccountStatusType): "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" => {
+  switch (status) {
+    case "valid":
+      return "success";
+    case "invalid":
+      return "error";
+    case "pending":
+      return "warning";
+    case "error":
+      return "error";
+    case "unsupported":
+      return "default";
+    default:
+      return "default";
+  }
+};
 
-interface OpenOrder {
-  orderId: string;
-  symbol: string;
-  side: "BUY" | "SELL";
-  type: string;
-  quantity: string;
-  price: string;
-  liquid: string;
-  time: string;
-}
+const getStatusLabel = (status: AccountStatusType): string => {
+  switch (status) {
+    case "valid":
+      return "Hợp lệ";
+    case "invalid":
+      return "Không hợp lệ";
+    case "pending":
+      return "Đang xác thực";
+    case "error":
+      return "Lỗi";
+    case "unsupported":
+      return "Không hỗ trợ";
+    default:
+      return String(status).toUpperCase();
+  }
+};
+
+const getExchangeDisplayName = (exchange: string): string => {
+  const exchangeNames: Record<string, string> = {
+    binance: "Binance",
+    bybit: "Bybit",
+    okx: "OKX",
+    bitget: "Bitget",
+  };
+  return exchangeNames[exchange] || exchange.toUpperCase();
+};
 
 // Tab panel component
 interface TabPanelProps {
@@ -92,174 +102,114 @@ const TradingAccountDetail = () => {
   const navigate = useNavigate();
   const { showNotification } = useNotification();
   
-  // Hooks
-  const {
-    currentAccount,
-    isLoading: isLoadingAccount,
-    error: accountError,
-    getAccountById,
-    clearError: clearAccountError,
-  } = useTradingAccount();
-
-  const {
-    processes,
-    isLoading: isLoadingProcesses,
-    error: processError,
-    getProcesses,
-    clearError: clearProcessError,
-  } = useTradingProcess();
-
   // Local state
   const [currentTab, setCurrentTab] = useState<string>("balance");
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-  
-  // State for order dialogs
-  const [openNewOrderDialog, setOpenNewOrderDialog] = useState<boolean>(false);
-  const [openCloseOrderDialog, setOpenCloseOrderDialog] = useState<boolean>(false);
-  const [selectedOrder, setSelectedOrder] = useState<OpenOrder | null>(null);
-  const [closeOrderType, setCloseOrderType] = useState<"full" | "partial">("full");
-  const [partialQuantity, setPartialQuantity] = useState<string>("");
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [positions, setPositions] = useState<PositionSummary[]>([]);
+  const [isLoadingPositions, setIsLoadingPositions] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Mock data - in real app, these would come from API
-  const [accountBalance] = useState<AccountBalance[]>([
-    { asset: "USDT", free: "1,250.00", locked: "750.00", total: "2,000.00" },
-    { asset: "BTC", free: "0.05", locked: "0.02", total: "0.07" },
-    { asset: "ETH", free: "2.15", locked: "0.85", total: "3.00" },
-  ]);
+  // Fetch dashboard data
+  const fetchDashboardData = useCallback(async () => {
+    if (!id) return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const data = await tradingAccountService.getAccountSummary(id);
+      setDashboardData(data);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch dashboard data';
+      setError(errorMessage);
+      showNotification(errorMessage, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id, showNotification]);
 
-  const [openOrders] = useState<OpenOrder[]>([
-    {
-      orderId: "12345678",
-      symbol: "BTCUSDT",
-      side: "BUY",
-      type: "LIMIT",
-      quantity: "0.01",
-      price: "45,000.00",
-      liquid: "450.00",
-      time: "2025-01-15 10:30:00",
-    },
-    {
-      orderId: "12345679",
-      symbol: "ETHUSDT",
-      side: "SELL",
-      type: "LIMIT",
-      quantity: "0.5",
-      price: "3,200.00",
-      liquid: "1,600.00",
-      time: "2025-01-15 09:15:00",
-    },
-  ]);
+  // Fetch positions data
+  const fetchPositions = useCallback(async () => {
+    if (!id) return;
+    
+    setIsLoadingPositions(true);
+    
+    try {
+      const positionsData = await tradingAccountService.getPositions(id);
+      setPositions(positionsData);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch positions';
+      showNotification(errorMessage, 'error');
+    } finally {
+      setIsLoadingPositions(false);
+    }
+  }, [id, showNotification]);
+
+  // Handle refresh functionality
+  const handleRefresh = useCallback(async () => {
+    if (!id) return;
+    
+    setIsRefreshing(true);
+    try {
+      await tradingAccountService.refreshAccountData(id);
+      await Promise.all([fetchDashboardData(), fetchPositions()]);
+      showNotification('Dữ liệu đã được làm mới', 'success');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to refresh data';
+      showNotification(errorMessage, 'error');
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [id, fetchDashboardData, fetchPositions, showNotification]);
 
   // Fetch account details on mount
   useEffect(() => {
     if (id) {
-      fetchAccountDetails();
+      fetchDashboardData();
+      fetchPositions();
     }
-  }, [id]);
-
-  // Fetch trading processes for this account
-  useEffect(() => {
-    if (id) {
-      fetchTradingProcesses();
-    }
-  }, [id]);
-
-  // Handle errors
-  useEffect(() => {
-    if (accountError) {
-      showNotification(accountError, "error");
-      clearAccountError();
-    }
-  }, [accountError, showNotification, clearAccountError]);
-
-  useEffect(() => {
-    if (processError) {
-      showNotification(processError, "error");
-      clearProcessError();
-    }
-  }, [processError, showNotification, clearProcessError]);
-
-  // Fetch account details
-  const fetchAccountDetails = useCallback(async () => {
-    if (!id) return;
-    
-    try {
-      await getAccountById(id);
-    } catch (error) {
-      console.error("Error fetching account details:", error);
-    }
-  }, [id, getAccountById]);
-
-  // Fetch trading processes
-  const fetchTradingProcesses = useCallback(async () => {
-    if (!id) return;
-    
-    try {
-      await getProcesses(undefined, 0, 100); // Fetch all processes (will filter by account on backend)
-    } catch (error) {
-      console.error("Error fetching trading processes:", error);
-    }
-  }, [id, getProcesses]);
+  }, [id, fetchDashboardData, fetchPositions]);
 
   // Handle tab change
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setCurrentTab(newValue);
+    // Fetch positions when switching to positions tab
+    if (newValue === "positions" && positions.length === 0) {
+      fetchPositions();
+    }
   };
 
-  // Handle refresh
-  const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    await Promise.all([
-      fetchAccountDetails(),
-      fetchTradingProcesses(),
-    ]);
-    setIsRefreshing(false);
-    showNotification("Dữ liệu đã được cập nhật", "success");
-  }, [fetchAccountDetails, fetchTradingProcesses, showNotification]);
-
-  // Handle view trading process detail
-  const handleViewTradingProcess = useCallback((processId: string) => {
-    navigate(`/trading-process/${processId}`);
-  }, [navigate]);
-
-  // Format exchange name
-  const getExchangeDisplayName = (exchange: string) => {
-    const exchangeNames: Record<string, string> = {
-      binance: "Binance",
-      bybit: "Bybit",
-      okx: "OKX",
-      bitget: "Bitget",
-    };
-    return exchangeNames[exchange] || exchange.toUpperCase();
+  // Handle back navigation
+  const handleBack = () => {
+    navigate('/trading-accounts');
   };
 
-  // Get status color
-  const getStatusColor = (status: string) => {
-    const statusColors: Record<string, "success" | "error" | "warning" | "info" | "default"> = {
-      running: "success",
-      stopped: "error",
-      paused: "warning",
-      created: "info",
-      queued: "info",
-      failed: "error",
-    };
-    return statusColors[status] || "default";
-  };
+  // Loading state
+  if (isLoading && !dashboardData) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
-  // Get status display text
-  const getStatusDisplayText = (status: string) => {
-    const statusTexts: Record<string, string> = {
-      running: "Đang chạy",
-      stopped: "Đã dừng",
-      paused: "Tạm dừng",
-      created: "Đã tạo",
-      queued: "Chờ xử lý",
-      failed: "Lỗi",
-    };
-    return statusTexts[status] || status;
-  };
+  // Error state
+  if (error && !dashboardData) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h6" color="error">
+          {error}
+        </Typography>
+        <Button onClick={() => navigate(-1)} sx={{ mt: 2 }}>
+          Quay lại
+        </Button>
+      </Box>
+    );
+  }
 
-  if (!currentAccount && !isLoadingAccount) {
+  if (!dashboardData) {
     return (
       <Box sx={{ p: 3 }}>
         <Typography variant="h6" color="error">
@@ -272,6 +222,8 @@ const TradingAccountDetail = () => {
     );
   }
 
+  const { account_info, total_balance_usd, total_pnl, positions_count } = dashboardData;
+
   return (
     <Box>
       {/* Header */}
@@ -282,399 +234,388 @@ const TradingAccountDetail = () => {
               <Typography variant="h5" component="h1">
                 Chi tiết Tài khoản Trading
               </Typography>
-              {currentAccount && (
+              {account_info && (
                 <Chip 
-                  label={currentAccount.is_active ? "Hoạt động" : "Không hoạt động"}
-                  color={currentAccount.is_active ? "success" : "default"}
+                  label={getStatusLabel(account_info.status)}
+                  color={getStatusColor(account_info.status)}
                   size="small"
                 />
               )}
             </Box>
-            {currentAccount && (
+            {account_info && (
               <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                {currentAccount.account_name} • {getExchangeDisplayName(currentAccount.exchange)}
+                {account_info.account_name} • {getExchangeDisplayName(account_info.exchange)}
               </Typography>
             )}
           </Grid>
           <Grid size={{ xs: "auto" }}>
             <Box sx={{ display: "flex", gap: 1 }}>
-              <Tooltip title="Làm mới">
-                <IconButton 
-                  onClick={handleRefresh}
-                  disabled={isRefreshing}
-                >
-                  <RefreshIcon />
-                </IconButton>
-              </Tooltip>
-              <Button 
-                variant="outlined" 
-                onClick={() => navigate(-1)}
+              <Button
+                variant="outlined"
+                startIcon={<ArrowBackIcon />}
+                onClick={handleBack}
               >
                 Quay lại
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<RefreshIcon />}
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+              >
+                {isRefreshing ? "Đang làm mới..." : "Làm mới"}
               </Button>
             </Box>
           </Grid>
         </Grid>
       </Paper>
 
-      {/* Content */}
-      <Paper elevation={3} sx={{ p: 3 }}>
+      {/* Summary Cards */}
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <BalanceIcon color="primary" />
+                <Box>
+                  <Typography variant="h6">
+                    ${account_info?.balance?.total_wallet_balance ? account_info.balance.total_wallet_balance.toFixed(8) : total_balance_usd.toFixed(2)}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Tổng số dư
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <TrendingUpIcon color={
+                  (account_info?.balance?.total_unrealized_pnl !== undefined ? account_info.balance.total_unrealized_pnl : total_pnl) >= 0 ? "success" : "error"
+                } />
+                <Box>
+                  <Typography 
+                    variant="h6" 
+                    color={
+                      (account_info?.balance?.total_unrealized_pnl !== undefined ? account_info.balance.total_unrealized_pnl : total_pnl) >= 0 ? "success.main" : "error.main"
+                    }
+                  >
+                    ${account_info?.balance?.total_unrealized_pnl !== undefined 
+                      ? account_info.balance.total_unrealized_pnl.toFixed(8) 
+                      : total_pnl.toFixed(2)
+                    }
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    PnL chưa thực hiện
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <TrendingUpIcon color="info" />
+                <Box>
+                  <Typography variant="h6">{positions_count}</Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    Lệnh đang mở
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Tabs */}
+      <Paper elevation={3}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={currentTab}
-            onChange={handleTabChange}
-            aria-label="account detail tabs"
-          >
-            <Tab 
-              label="Balance" 
-              value="balance" 
-              icon={<BalanceIcon />}
-              iconPosition="start"
-            />
-            <Tab 
-              label="Lệnh đang mở" 
-              value="orders" 
-              icon={<ScheduleIcon />}
-              iconPosition="start"
-            />
-            <Tab 
-              label="Trading Process" 
-              value="processes" 
-              icon={<TrendingUpIcon />}
-              iconPosition="start"
-            />
+          <Tabs value={currentTab} onChange={handleTabChange}>
+            <Tab label="Balance" value="balance" />
+            <Tab label="Lệnh đang mở" value="positions" />
           </Tabs>
         </Box>
 
         {/* Balance Tab */}
         <TabPanel value={currentTab} index="balance">
-          <Grid container spacing={3}>
-            {accountBalance.map((balance, index) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
-                <Card>
+          <Box sx={{ p: 3 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Chi tiết Balance
+            </Typography>
+            
+            {/* Summary Cards */}
+            {account_info?.balance && (
+              <Grid container spacing={2} sx={{ mb: 3 }}>
+                <Grid size={{ xs: 12, md: 3 }}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Typography variant="body2" color="textSecondary">
+                        Tổng số dư ví
+                      </Typography>
+                      <Typography variant="h6">
+                        ${account_info.balance.total_wallet_balance.toFixed(8)}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+                <Grid size={{ xs: 12, md: 3 }}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Typography variant="body2" color="textSecondary">
+                        Số dư khả dụng
+                      </Typography>
+                      <Typography variant="h6">
+                        ${account_info.balance.available_balance.toFixed(8)}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+                <Grid size={{ xs: 12, md: 3 }}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Typography variant="body2" color="textSecondary">
+                        PnL chưa thực hiện
+                      </Typography>
+                      <Typography 
+                        variant="h6"
+                        color={account_info.balance.total_unrealized_pnl >= 0 ? "success.main" : "error.main"}
+                      >
+                        ${account_info.balance.total_unrealized_pnl.toFixed(8)}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+                <Grid size={{ xs: 12, md: 3 }}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Typography variant="body2" color="textSecondary">
+                        Số tiền có thể rút
+                      </Typography>
+                      <Typography variant="h6">
+                        ${account_info.balance.max_withdraw_amount.toFixed(8)}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+            )}
+
+            {/* Assets Details */}
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Chi tiết từng Asset
+            </Typography>
+            
+            {account_info?.balance?.assets && account_info.balance.assets.length > 0 ? (
+              account_info.balance.assets.map((asset, index) => (
+                <Card key={index} sx={{ mb: 2 }}>
                   <CardContent>
-                    <Typography variant="h6" component="div" gutterBottom>
-                      {balance.asset}
-                    </Typography>
-                    <Box sx={{ mb: 1 }}>
-                      <Typography variant="body2" color="textSecondary">
-                        Có sẵn
-                      </Typography>
-                      <Typography variant="h6" color="success.main">
-                        {balance.free}
-                      </Typography>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                      <Typography variant="h6">{asset.asset}</Typography>
+                      <Chip 
+                        label={asset.margin_available ? "Margin khả dụng" : "Margin không khả dụng"}
+                        color={asset.margin_available ? "success" : "default"}
+                        size="small"
+                      />
                     </Box>
-                    <Box sx={{ mb: 1 }}>
-                      <Typography variant="body2" color="textSecondary">
-                        Đang khóa
-                      </Typography>
-                      <Typography variant="body1" color="warning.main">
-                        {balance.locked}
-                      </Typography>
-                    </Box>
-                    <Divider sx={{ my: 1 }} />
-                    <Box>
-                      <Typography variant="body2" color="textSecondary">
-                        Tổng cộng
-                      </Typography>
-                      <Typography variant="h6" color="primary.main">
-                        {balance.total}
-                      </Typography>
-                    </Box>
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 12, md: 4 }}>
+                        <Box>
+                          <Typography variant="body2" color="textSecondary">
+                            Số dư ví
+                          </Typography>
+                          <Typography variant="body1" fontWeight="medium">
+                            {asset.wallet_balance.toFixed(8)}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid size={{ xs: 12, md: 4 }}>
+                        <Box>
+                          <Typography variant="body2" color="textSecondary">
+                            Số dư khả dụng
+                          </Typography>
+                          <Typography variant="body1" fontWeight="medium">
+                            {asset.available_balance.toFixed(8)}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid size={{ xs: 12, md: 4 }}>
+                        <Box>
+                          <Typography variant="body2" color="textSecondary">
+                            Số dư margin
+                          </Typography>
+                          <Typography variant="body1" fontWeight="medium">
+                            {asset.margin_balance.toFixed(8)}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid size={{ xs: 12, md: 4 }}>
+                        <Box>
+                          <Typography variant="body2" color="textSecondary">
+                            PnL chưa thực hiện
+                          </Typography>
+                          <Typography 
+                            variant="body1" 
+                            fontWeight="medium"
+                            color={asset.unrealized_pnl >= 0 ? "success.main" : "error.main"}
+                          >
+                            {asset.unrealized_pnl.toFixed(8)}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid size={{ xs: 12, md: 4 }}>
+                        <Box>
+                          <Typography variant="body2" color="textSecondary">
+                            Cross wallet balance
+                          </Typography>
+                          <Typography variant="body1" fontWeight="medium">
+                            {asset.cross_wallet_balance.toFixed(8)}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid size={{ xs: 12, md: 4 }}>
+                        <Box>
+                          <Typography variant="body2" color="textSecondary">
+                            Cập nhật lần cuối
+                          </Typography>
+                          <Typography variant="body2" color="textSecondary">
+                            {new Date(asset.update_time).toLocaleString('vi-VN')}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    </Grid>
                   </CardContent>
                 </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </TabPanel>
-
-        {/* Open Orders Tab */}
-        <TabPanel value={currentTab} index="orders">
-          <Box sx={{ mb: 2, display: "flex", justifyContent: "flex-end" }}>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setOpenNewOrderDialog(true)}
-            >
-              Mở lệnh mới
-            </Button>
+              ))
+            ) : (
+              <Box sx={{ textAlign: "center", py: 4 }}>
+                <Typography variant="body1" color="textSecondary">
+                  Không có dữ liệu balance
+                </Typography>
+              </Box>
+            )}
           </Box>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Mã lệnh</TableCell>
-                  <TableCell>Symbol</TableCell>
-                  <TableCell>Loại</TableCell>
-                  <TableCell>Số lượng</TableCell>
-                  <TableCell>Giá</TableCell>
-                  <TableCell>Liquid</TableCell>
-                  <TableCell>Thời gian</TableCell>
-                  <TableCell align="right">Hành động</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {openOrders.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} align="center">
-                      <Typography variant="body2" color="textSecondary">
-                        Không có lệnh đang mở
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  openOrders.map((order, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{order.orderId}</TableCell>
-                      <TableCell>{order.symbol}</TableCell>
-                      <TableCell>
-                        <Chip 
-                          label={order.side}
-                          color={order.side === "BUY" ? "success" : "error"}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>{order.quantity}</TableCell>
-                      <TableCell>${order.price}</TableCell>
-                      <TableCell>${order.liquid}</TableCell>
-                      <TableCell>{order.time}</TableCell>
-                      <TableCell align="right">
-                        <Box sx={{ display: "flex", gap: 0.5 }}>
-                          <Tooltip title="Đóng toàn bộ">
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={() => {
-                                setSelectedOrder(order);
-                                setCloseOrderType("full");
-                                setOpenCloseOrderDialog(true);
-                              }}
-                            >
-                              <ClearAllIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Đóng 1 phần">
-                            <IconButton
-                              size="small"
-                              color="warning"
-                              onClick={() => {
-                                setSelectedOrder(order);
-                                setCloseOrderType("partial");
-                                setOpenCloseOrderDialog(true);
-                              }}
-                            >
-                              <RemoveCircleIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
         </TabPanel>
 
-        {/* Trading Processes Tab */}
-        <TabPanel value={currentTab} index="processes">
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Tên Process</TableCell>
-                  <TableCell>Bot Template</TableCell>
-                  <TableCell>Trạng thái</TableCell>
-                  <TableCell>Ngày tạo</TableCell>
-                  <TableCell>Hành động</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {isLoadingProcesses ? (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center">
-                      <Typography variant="body2" color="textSecondary">
-                        Đang tải...
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ) : processes.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center">
-                      <Typography variant="body2" color="textSecondary">
-                        Không có trading process nào
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  processes.map((process: TradingProcess) => (
-                    <TableRow key={process._id}>
-                      <TableCell>
-                        <Typography variant="body2" fontWeight="medium">
-                          {process.name}
-                        </Typography>
-                        {process.description && (
-                          <Typography variant="caption" color="textSecondary">
-                            {process.description}
-                          </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {process.bot_template_name || "N/A"}
-                      </TableCell>
-                      <TableCell>
-                        <Chip 
-                          label={getStatusDisplayText(process.status)}
-                          color={getStatusColor(process.status)}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        {new Date(process.created_at).toLocaleDateString("vi-VN")}
-                      </TableCell>
-                      <TableCell>
-                        <Tooltip title="Xem chi tiết">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleViewTradingProcess(process._id)}
-                          >
-                            <ViewIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
+        {/* Positions Tab */}
+        <TabPanel value={currentTab} index="positions">
+          <Box sx={{ p: 3 }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+              <Typography variant="h6">
+                Lệnh đang mở ({positions.length})
+              </Typography>
+              <Button
+                variant="outlined"
+                startIcon={<RefreshIcon />}
+                onClick={fetchPositions}
+                disabled={isLoadingPositions}
+                size="small"
+              >
+                {isLoadingPositions ? "Đang tải..." : "Làm mới"}
+              </Button>
+            </Box>
+            
+            {isLoadingPositions ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                <CircularProgress />
+              </Box>
+            ) : positions.length === 0 ? (
+              <Box sx={{ textAlign: "center", py: 4 }}>
+                <Typography variant="body1" color="textSecondary">
+                  Không có lệnh nào đang mở
+                </Typography>
+              </Box>
+            ) : (
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Mã lệnh</TableCell>
+                      <TableCell>Symbol</TableCell>
+                      <TableCell>Loại</TableCell>
+                      <TableCell>Số lượng</TableCell>
+                      <TableCell>Giá vào</TableCell>
+                      <TableCell>Giá hiện tại</TableCell>
+                      <TableCell>Liquid</TableCell>
+                      <TableCell>PnL</TableCell>
+                      <TableCell>Thời gian</TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {positions.map((position: PositionSummary, index: number) => (
+                      <TableRow key={`${position.order_id}-${index}`} hover>
+                        <TableCell>
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                            {position.order_id}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" fontWeight="medium">
+                            {position.symbol}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={`${position.side} ${position.position_side}`}
+                            color={position.side === "BUY" ? "success" : "error"}
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            {position.quantity}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            ${position.entry_price.toFixed(2)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            ${position.mark_price.toFixed(2)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            ${position.liquidation_price.toFixed(2)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Box>
+                            <Typography 
+                              variant="body2" 
+                              color={position.unrealized_pnl >= 0 ? "success.main" : "error.main"}
+                            >
+                              ${position.unrealized_pnl.toFixed(2)}
+                            </Typography>
+                            <Typography 
+                              variant="caption" 
+                              color={position.pnl_percentage >= 0 ? "success.main" : "error.main"}
+                            >
+                              ({position.pnl_percentage.toFixed(2)}%)
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" color="textSecondary">
+                            {new Date(position.timestamp).toLocaleString('vi-VN')}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </Box>
         </TabPanel>
       </Paper>
-
-      {/* New Order Dialog */}
-      <Dialog 
-        open={openNewOrderDialog} 
-        onClose={() => setOpenNewOrderDialog(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Mở lệnh mới</DialogTitle>
-        <DialogContent>
-          <Box sx={{ pt: 2, display: "flex", flexDirection: "column", gap: 2 }}>
-            <FormControl fullWidth>
-              <InputLabel>Symbol</InputLabel>
-              <Select label="Symbol">
-                <MenuItem value="BTCUSDT">BTCUSDT</MenuItem>
-                <MenuItem value="ETHUSDT">ETHUSDT</MenuItem>
-                <MenuItem value="BNBUSDT">BNBUSDT</MenuItem>
-              </Select>
-            </FormControl>
-            
-            <FormControl fullWidth>
-              <InputLabel>Loại lệnh</InputLabel>
-              <Select label="Loại lệnh">
-                <MenuItem value="BUY">BUY</MenuItem>
-                <MenuItem value="SELL">SELL</MenuItem>
-              </Select>
-            </FormControl>
-
-            <FormControl fullWidth>
-              <InputLabel>Kiểu lệnh</InputLabel>
-              <Select label="Kiểu lệnh">
-                <MenuItem value="MARKET">MARKET</MenuItem>
-                <MenuItem value="LIMIT">LIMIT</MenuItem>
-              </Select>
-            </FormControl>
-
-            <TextField
-              fullWidth
-              label="Số lượng"
-              type="number"
-              placeholder="0.01"
-            />
-
-            <TextField
-              fullWidth
-              label="Giá"
-              type="number"
-              placeholder="45000"
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenNewOrderDialog(false)}>
-            Hủy
-          </Button>
-          <Button 
-            variant="contained"
-            onClick={() => {
-              setOpenNewOrderDialog(false);
-              showNotification("Lệnh đã được tạo thành công", "success");
-            }}
-          >
-            Tạo lệnh
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Close Order Dialog */}
-      <Dialog 
-        open={openCloseOrderDialog} 
-        onClose={() => setOpenCloseOrderDialog(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>
-          {closeOrderType === "full" ? "Đóng toàn bộ lệnh" : "Đóng 1 phần lệnh"}
-        </DialogTitle>
-        <DialogContent>
-          {selectedOrder && (
-            <Box sx={{ pt: 2 }}>
-              <Typography variant="body2" gutterBottom>
-                <strong>Mã lệnh:</strong> {selectedOrder.orderId}
-              </Typography>
-              <Typography variant="body2" gutterBottom>
-                <strong>Symbol:</strong> {selectedOrder.symbol}
-              </Typography>
-              <Typography variant="body2" gutterBottom>
-                <strong>Số lượng hiện tại:</strong> {selectedOrder.quantity}
-              </Typography>
-              
-              {closeOrderType === "partial" && (
-                <TextField
-                  fullWidth
-                  label="Số lượng muốn đóng"
-                  type="number"
-                  value={partialQuantity}
-                  onChange={(e) => setPartialQuantity(e.target.value)}
-                  sx={{ mt: 2 }}
-                  placeholder="0.005"
-                />
-              )}
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenCloseOrderDialog(false)}>
-            Hủy
-          </Button>
-          <Button 
-            variant="contained"
-            color="error"
-            onClick={() => {
-              setOpenCloseOrderDialog(false);
-              const message = closeOrderType === "full" 
-                ? "Lệnh đã được đóng hoàn toàn" 
-                : `Đã đóng ${partialQuantity} từ lệnh ${selectedOrder?.orderId}`;
-              showNotification(message, "success");
-              setPartialQuantity("");
-              setSelectedOrder(null);
-            }}
-          >
-            {closeOrderType === "full" ? "Đóng toàn bộ" : "Đóng 1 phần"}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };
