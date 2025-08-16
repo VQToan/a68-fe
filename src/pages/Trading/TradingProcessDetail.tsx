@@ -303,18 +303,18 @@ const TradingProcessDetail = () => {
       </Paper>
 
       {/* Metrics Cards */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
+      <Grid container spacing={2} sx={{ mb: 3 }}>
         {/* ROI Card */}
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
           <Card>
-            <CardContent>
+            <CardContent sx={{ p: 2 }}>
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <Box>
                   <Typography variant="body2" color="textSecondary">
                     ROI
                   </Typography>
                   <Typography 
-                    variant="h5" 
+                    variant="h6" 
                     color={(performanceData?.performance.total_roi ?? 0) >= 0 ? "success.main" : "error.main"}
                     sx={{ fontWeight: "bold" }}
                   >
@@ -322,9 +322,9 @@ const TradingProcessDetail = () => {
                   </Typography>
                 </Box>
                 {(performanceData?.performance.total_roi ?? 0) >= 0 ? (
-                  <TrendingUpIcon color="success" fontSize="large" />
+                  <TrendingUpIcon color="success" fontSize="medium" />
                 ) : (
-                  <TrendingDownIcon color="error" fontSize="large" />
+                  <TrendingDownIcon color="error" fontSize="medium" />
                 )}
               </Box>
             </CardContent>
@@ -332,55 +332,55 @@ const TradingProcessDetail = () => {
         </Grid>
 
         {/* PNL Card */}
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
           <Card>
-            <CardContent>
+            <CardContent sx={{ p: 2 }}>
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <Box>
                   <Typography variant="body2" color="textSecondary">
                     PNL
                   </Typography>
                   <Typography 
-                    variant="h5" 
+                    variant="h6" 
                     color={(performanceData?.performance.total_pnl ?? 0) >= 0 ? "success.main" : "error.main"}
                     sx={{ fontWeight: "bold" }}
                   >
                     {formatCurrency(performanceData?.performance.total_pnl ?? 0)}
                   </Typography>
                 </Box>
-                <BalanceIcon color="primary" fontSize="large" />
+                <BalanceIcon color="primary" fontSize="medium" />
               </Box>
             </CardContent>
           </Card>
         </Grid>
 
         {/* Win Rate Card */}
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
           <Card>
-            <CardContent>
+            <CardContent sx={{ p: 2 }}>
               <Typography variant="body2" color="textSecondary">
                 Tỷ lệ thắng
               </Typography>
-              <Typography variant="h5" color="primary.main" sx={{ fontWeight: "bold" }}>
+              <Typography variant="h6" color="primary.main" sx={{ fontWeight: "bold" }}>
                 {(performanceData?.performance.win_rate ?? 0).toFixed(1)}%
               </Typography>
               <LinearProgress 
                 variant="determinate" 
                 value={performanceData?.performance.win_rate ?? 0} 
-                sx={{ mt: 1, height: 8, borderRadius: 4 }}
+                sx={{ mt: 1, height: 6, borderRadius: 3 }}
               />
             </CardContent>
           </Card>
         </Grid>
 
         {/* Total Trades Card */}
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
           <Card>
-            <CardContent>
+            <CardContent sx={{ p: 2 }}>
               <Typography variant="body2" color="textSecondary">
                 Tổng giao dịch
               </Typography>
-              <Typography variant="h5" color="primary.main" sx={{ fontWeight: "bold" }}>
+              <Typography variant="h6" color="primary.main" sx={{ fontWeight: "bold" }}>
                 {performanceData?.performance.total_trades ?? 0}
               </Typography>
               <Typography variant="caption" color="textSecondary">
@@ -391,13 +391,13 @@ const TradingProcessDetail = () => {
         </Grid>
 
         {/* Total Volume Card */}
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+        <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
           <Card>
-            <CardContent>
+            <CardContent sx={{ p: 2 }}>
               <Typography variant="body2" color="textSecondary">
                 Tổng Volume
               </Typography>
-              <Typography variant="h5" color="primary.main" sx={{ fontWeight: "bold" }}>
+              <Typography variant="h6" color="primary.main" sx={{ fontWeight: "bold" }}>
                 {(performanceData?.performance.total_volume ?? 0).toLocaleString('en-US')}
               </Typography>
               <Typography variant="caption" color="textSecondary">
