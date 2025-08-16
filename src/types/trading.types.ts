@@ -9,6 +9,17 @@ export interface TradingStatus {
   PAUSED: "paused";
 }
 
+// Notification types
+export interface NotificationSetupRequest {
+  process_id: string;
+  status: boolean;
+}
+
+export interface NotificationStatusResponse {
+  process_id: string;
+  status: boolean;
+}
+
 export type TradingStatusType = "created" | "queued" | "running" | "stopped" | "failed" | "paused";
 
 export interface TradingExchange {
@@ -178,6 +189,62 @@ export interface TradingProcess {
   stopped_at: string | null;
   trading_account_name?: string;
   bot_template_name?: string;
+}
+
+// Trading Details API types
+export interface TradingDetail {
+  _id?: string | null;
+  time: number;
+  price: number;
+  reason: string;
+  quantity: number;
+  side: string;
+  pnl: number;
+  balance: number;
+  position_result: string;
+  position_pnl: number;
+  position_avg_price: number;
+  user_id: string;
+  process_id: string;
+}
+
+export interface TradingDetailsResponse {
+  details: TradingDetail[];
+  total: number;
+  process_id: string;
+}
+
+// Trading Performance API types
+export interface TradingPerformanceMetrics {
+  total_trades: number;
+  total_orders: number;
+  total_volume: number;
+  win_rate: number;
+  winning_trades: number;
+  losing_trades: number;
+  long_win_rate: number;
+  short_win_rate: number;
+  total_pnl: number;
+  avg_pnl_per_trade: number;
+  avg_long_pnl: number;
+  avg_short_pnl: number;
+  total_roi: number;
+  avg_roi_per_trade: number;
+  avg_long_roi: number;
+  avg_short_roi: number;
+  profit_factor: number;
+  max_loss_occurrences: number;
+  long_trades: number;
+  short_trades: number;
+}
+
+export interface TradingPerformanceResponse {
+  process_id: string;
+  process_name?: string | null;
+  initial_balance: number;
+  current_balance: number;
+  performance: TradingPerformanceMetrics;
+  total_records: number;
 }
 
 export interface TradingProcessCreate {
