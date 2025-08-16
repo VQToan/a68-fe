@@ -51,9 +51,15 @@ export const remove = async (id: string): Promise<void> => {
   await apiClient.delete(`api/v1/trading-accounts/${id}`);
 };
 
-export const getActiveAccounts = async (): Promise<TradingAccount[]> => {
-  const response = await apiClient.get('api/v1/trading-accounts/active/list');
-  return response.data;
+export const getActiveAccounts = async (exchange?: TradingExchangeType): Promise<TradingAccount[]> => {
+  // Get all active trading accounts using the main endpoint
+  const params = new URLSearchParams();
+  params.append('page', '1');
+  params.append('page_size', '100'); // Get all accounts
+  if (exchange) params.append('exchange', exchange);
+
+  const response = await apiClient.get(`api/v1/trading-accounts?${params.toString()}`);
+  return response.data.items || [];
 };
 
 // New dashboard and trading endpoints

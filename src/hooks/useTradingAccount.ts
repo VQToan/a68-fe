@@ -43,8 +43,8 @@ export const useTradingAccount = () => {
     return dispatch(deleteTradingAccount(id));
   };
 
-  const getActiveAccounts = () => {
-    return dispatch(fetchActiveTradingAccounts());
+  const getActiveAccounts = (exchange?: TradingExchangeType) => {
+    return dispatch(fetchActiveTradingAccounts(exchange));
   };
 
   const clearErrorState = () => {

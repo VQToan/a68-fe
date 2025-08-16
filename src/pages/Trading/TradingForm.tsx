@@ -14,8 +14,11 @@ import {
   AccordionDetails,
   InputAdornment,
   CircularProgress,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import { useTradingAccount } from "@hooks/useTradingAccount";
 import { useBotTemplate } from "@hooks/useBotTemplate";
 import type {
@@ -124,12 +127,20 @@ const TradingForm = ({
   formId,
 }: TradingFormProps) => {
   // Get trading accounts and bot templates from the store
-  const { activeAccounts, getActiveAccounts } = useTradingAccount();
+  const { 
+    activeAccounts, 
+    getActiveAccounts, 
+    isLoading: isLoadingAccounts,
+    error: accountsError 
+  } = useTradingAccount();
   const {
     templates,
     getTemplates: getBotTemplates,
     isLoading: isLoadingTemplates,
   } = useBotTemplate();
+
+  // State for exchange filter
+  const [exchangeFilter, setExchangeFilter] = useState<string>("");
 
   // State for the selected bot template
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
@@ -181,8 +192,12 @@ const TradingForm = ({
   // Fetch bot templates and trading accounts on component mount
   useEffect(() => {
     getBotTemplates();
-    getActiveAccounts();
   }, []);
+
+  // Fetch trading accounts when exchange filter changes
+  useEffect(() => {
+    getActiveAccounts(exchangeFilter as any);
+  }, [exchangeFilter]); // Re-fetch when filter changes
 
   // Set initial parameters if in edit mode
   useEffect(() => {
@@ -230,7 +245,16 @@ const TradingForm = ({
     []
   );
 
-  // Validate form data
+  // Handle refresh trading accounts
+  const handleRefreshAccounts = useCallback(() => {
+    getActiveAccounts(exchangeFilter as any);
+  }, [getActiveAccounts, exchangeFilter]);
+
+  // Handle exchange filter change
+  const handleExchangeFilterChange = useCallback((exchange: string) => {
+    setExchangeFilter(exchange);
+    getActiveAccounts(exchange as any);
+  }, [getActiveAccounts]);
   const validateFormData = useCallback(
     (data: any): boolean => {
       const errors: Record<string, string> = {};
@@ -399,46 +423,99 @@ const TradingForm = ({
               )}
             </FormControl>
 
-            <FormControl
-              fullWidth
-              sx={{ mb: 2 }}
-              error={!!validationErrors.tradingAccount}
-            >
-              <InputLabel id="trading-account-select-label">
-                Tài khoản Trading
-              </InputLabel>
-              <Controller
-                name="trading_account_id"
-                control={control}
-                rules={{ required: "Tài khoản Trading là bắt buộc" }}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    labelId="trading-account-select-label"
-                    label="Tài khoản Trading"
-                    onChange={(e) => {
-                      field.onChange(e);
-                      setSelectedTradingAccountId(e.target.value as string);
-                    }}
-                    disabled={isSubmitting}
-                  >
-                    <MenuItem value="">
-                      <em>Chọn tài khoản trading</em>
-                    </MenuItem>
-                    {activeAccounts.map((account) => (
-                      <MenuItem key={account._id} value={account._id}>
-                        {account.account_name} ({account.exchange.toUpperCase()})
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              />
-              {validationErrors.tradingAccount && (
-                <Typography color="error" variant="caption">
-                  {validationErrors.tradingAccount}
-                </Typography>
-              )}
+            {/* Exchange Filter */}
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel>Lọc theo sàn giao dịch</InputLabel>
+              <Select
+                value={exchangeFilter}
+                label="Lọc theo sàn giao dịch"
+                onChange={(e) => handleExchangeFilterChange(e.target.value)}
+              >
+                <MenuItem value="">
+                  <em>Tất cả sàn giao dịch</em>
+                </MenuItem>
+                <MenuItem value="binance">Binance</MenuItem>
+                <MenuItem value="bybit">Bybit</MenuItem>
+                <MenuItem value="okx">OKX</MenuItem>
+                <MenuItem value="bitget">Bitget</MenuItem>
+              </Select>
             </FormControl>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <FormControl
+                fullWidth
+                error={!!validationErrors.tradingAccount}
+              >
+                <InputLabel id="trading-account-select-label">
+                  Tài khoản Trading
+                </InputLabel>
+                <Controller
+                  name="trading_account_id"
+                  control={control}
+                  rules={{ required: "Tài khoản Trading là bắt buộc" }}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      labelId="trading-account-select-label"
+                      label="Tài khoản Trading"
+                      onChange={(e) => {
+                        field.onChange(e);
+                        setSelectedTradingAccountId(e.target.value as string);
+                      }}
+                      disabled={isSubmitting || isLoadingAccounts}
+                    >
+                      <MenuItem value="">
+                        <em>Chọn tài khoản trading</em>
+                      </MenuItem>
+                      {isLoadingAccounts ? (
+                        <MenuItem value="" disabled>
+                          <CircularProgress size={20} sx={{ mr: 1 }} />
+                          Đang tải tài khoản...
+                        </MenuItem>
+                      ) : (
+                        activeAccounts.map((account) => (
+                          <MenuItem key={account._id} value={account._id}>
+                            {account.account_name} ({account.exchange.toUpperCase()})
+                            {account.status && account.status !== 'valid' && (
+                              <Typography 
+                                component="span" 
+                                sx={{ 
+                                  color: account.status === 'invalid' ? 'error.main' : 'warning.main',
+                                  fontSize: 'xs',
+                                  ml: 1 
+                                }}
+                              >
+                                [{account.status.toUpperCase()}]
+                              </Typography>
+                            )}
+                          </MenuItem>
+                        ))
+                      )}
+                    </Select>
+                  )}
+                />
+                {validationErrors.tradingAccount && (
+                  <Typography color="error" variant="caption">
+                    {validationErrors.tradingAccount}
+                  </Typography>
+                )}
+                {accountsError && (
+                  <Typography color="error" variant="caption" sx={{ mt: 1 }}>
+                    Lỗi tải tài khoản: {accountsError}
+                  </Typography>
+                )}
+              </FormControl>
+              
+              <Tooltip title="Làm mới danh sách tài khoản">
+                <IconButton 
+                  onClick={handleRefreshAccounts}
+                  disabled={isLoadingAccounts || isSubmitting}
+                  sx={{ mt: 1 }}
+                >
+                  <RefreshIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
 
             {/* Basic configuration */}
             <Accordion defaultExpanded>

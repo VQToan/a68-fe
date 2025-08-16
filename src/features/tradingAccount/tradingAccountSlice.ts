@@ -55,8 +55,8 @@ export const deleteTradingAccount = createAsyncThunk(
 
 export const fetchActiveTradingAccounts = createAsyncThunk(
   'tradingAccount/fetchActiveTradingAccounts',
-  async () => {
-    return await tradingAccountService.getActiveAccounts();
+  async (exchange?: string) => {
+    return await tradingAccountService.getActiveAccounts(exchange as any);
   }
 );
 
