@@ -389,6 +389,23 @@ const TradingProcessDetail = () => {
             </CardContent>
           </Card>
         </Grid>
+
+        {/* Total Volume Card */}
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="body2" color="textSecondary">
+                Tổng Volume
+              </Typography>
+              <Typography variant="h5" color="primary.main" sx={{ fontWeight: "bold" }}>
+                {(performanceData?.performance.total_volume ?? 0).toLocaleString('en-US')}
+              </Typography>
+              <Typography variant="caption" color="textSecondary">
+                USDT
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
       </Grid>
 
       {/* Trades List */}
