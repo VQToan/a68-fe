@@ -237,7 +237,7 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
                     <TableRow key={trade._id || `trade-${index}`} hover>
                       <TableCell>
                         <Typography variant="body2">
-                          {new Date(trade.time * 1000).toLocaleString("vi-VN")}
+                          {new Date(trade.time).toLocaleString("vi-VN")}
                         </Typography>
                       </TableCell>
                       <TableCell>
