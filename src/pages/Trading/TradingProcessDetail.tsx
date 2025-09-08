@@ -381,7 +381,7 @@ const TradingProcessDetail = () => {
                 Tổng giao dịch
               </Typography>
               <Typography variant="h6" color="primary.main" sx={{ fontWeight: "bold" }}>
-                {performanceData?.performance.total_trades ?? 0}
+                {performanceData?.performance.total_orders ?? 0}
               </Typography>
               <Typography variant="caption" color="textSecondary">
                 lệnh
