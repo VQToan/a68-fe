@@ -139,11 +139,7 @@ const TradingAccount = () => {
     // This is just UI filtering for now
   };
 
-  // Handle tab change
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
-    setCurrentTab(newValue);
-    setCurrentPage(1);
-  };
+
   const handleFilterTabChange = (newValue: string) => {
     setCurrentTab(newValue);
     setCurrentPage(1);
