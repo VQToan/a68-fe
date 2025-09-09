@@ -111,6 +111,15 @@ const Trading = () => {
     name: "",
   });
 
+  // State for confirm stop dialog
+  const [confirmStop, setConfirmStop] = useState<{
+    open: boolean;
+    id: string | null;
+  }>({
+    open: false,
+    id: null,
+  });
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
@@ -300,17 +309,28 @@ const Trading = () => {
     }
   }, [startProcess, showNotification, fetchTradingProcesses]);
 
-  // Handle stop trading process
-  const handleStopTradingProcess = useCallback(async (id: string) => {
+  // Open confirm stop dialog
+  const handleOpenStopConfirm = useCallback((id: string) => {
+    setConfirmStop({ open: true, id });
+  }, []);
+
+  const handleCloseStopConfirm = useCallback(() => {
+    setConfirmStop({ open: false, id: null });
+  }, []);
+
+  // Confirm stop trading process
+  const handleConfirmStopTradingProcess = useCallback(async () => {
+    if (!confirmStop.id) return;
     try {
-      await stopProcess(id);
+      await stopProcess(confirmStop.id);
       showNotification("Trading process đã được dừng lại", "success");
+      handleCloseStopConfirm();
       // Re-fetch the list with latest data
       fetchTradingProcesses();
     } catch (error) {
       console.error("Error stopping trading process:", error);
     }
-  }, [stopProcess, showNotification, fetchTradingProcesses]);
+  }, [confirmStop.id, stopProcess, showNotification, handleCloseStopConfirm, fetchTradingProcesses]);
 
   // Handle refreshing the trading process list
   const handleRefreshTradingProcesses = useCallback(() => {
@@ -439,7 +459,7 @@ const Trading = () => {
             onEdit={handleEditTradingProcess}
             onDelete={(id: string, name: string) => handleOpenDeleteConfirm(id, name)}
             onStart={handleStartTradingProcess}
-            onStop={handleStopTradingProcess}
+            onStop={handleOpenStopConfirm}
             onRefresh={handleRefreshTradingProcesses}
             pagination={pagination}
             onPageChange={handlePageChange}
@@ -481,6 +501,17 @@ const Trading = () => {
         confirmColor="error"
         onConfirm={handleDeleteTradingProcess}
         onCancel={handleCloseDeleteConfirm}
+      />
+
+      {/* Confirm Stop Dialog */}
+      <ConfirmDialog
+        open={confirmStop.open}
+        title="Xác nhận dừng giao dịch"
+        message="Bạn muốn dừng giao dịch?"
+        confirmLabel="Dừng"
+        confirmColor="warning"
+        onConfirm={handleConfirmStopTradingProcess}
+        onCancel={handleCloseStopConfirm}
       />
     </Box>
   );

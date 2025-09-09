@@ -138,6 +138,7 @@ const TradingList = ({
               <TableCell>Tên</TableCell>
               <TableCell>Mô tả</TableCell>
               <TableCell>Trạng thái</TableCell>
+              <TableCell>Số ngày chạy</TableCell>
               <TableCell>Tài khoản Trading</TableCell>
               <TableCell>Bot Template</TableCell>
               <TableCell>Ngày tạo</TableCell>
@@ -172,6 +173,19 @@ const TradingList = ({
                     color={getStatusColor(process.status)}
                     size="small"
                   />
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2">
+                    {(() => {
+                      if (!process.started_at) return "-";
+                      const start = new Date(process.started_at).getTime();
+                      const end = process.status === "running" || !process.stopped_at
+                        ? Date.now()
+                        : new Date(process.stopped_at).getTime();
+                      const diffDays = Math.max(0, Math.floor((end - start) / (1000 * 60 * 60 * 24)));
+                      return `${diffDays} ngày`;
+                    })()}
+                  </Typography>
                 </TableCell>
                 <TableCell>
                   <Typography variant="body2">

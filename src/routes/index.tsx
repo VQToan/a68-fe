@@ -77,7 +77,7 @@ export const routes: RouteObject[] = [
             element: <Trading />,
           },
           {
-            path: "trading-account",
+            path: "trading-accounts",
             element: <TradingAccount />,
           },
           {

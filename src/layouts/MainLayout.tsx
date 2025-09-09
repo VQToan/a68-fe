@@ -530,7 +530,7 @@ const MainLayout = () => {
                     backgroundColor: "rgba(255,255,255,0.1)",
                   },
                 }}
-                onClick={() => handleNavigation("/trading-account")}
+                onClick={() => handleNavigation("/trading-accounts")}
               >
                 <ListItemIcon
                   sx={{

@@ -29,6 +29,7 @@ import { useNotification } from "@context/NotificationContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { areEqual } from "@/utils/common";
 import TradingProcessSetupInfo from "./components/TradingProcessSetupInfo";
+import ConfirmDialog from "@components/ConfirmDialog";
 import TradingDetailsList from "./components/TradingDetailsList";
 import type { TradingPerformanceResponse } from "@/types/trading.types";
 import * as tradingProcessService from "@services/tradingProcess.service";
@@ -58,6 +59,8 @@ const TradingProcessDetail = () => {
   
   // State for setup info dialog
   const [openSetupInfoDialog, setOpenSetupInfoDialog] = useState<boolean>(false);
+  // State for confirm stop
+  const [confirmStopOpen, setConfirmStopOpen] = useState<boolean>(false);
 
   // Fetch performance data
   const fetchPerformanceData = useCallback(async () => {
@@ -133,8 +136,9 @@ const TradingProcessDetail = () => {
 
     try {
       if (currentProcess.status === "running") {
-        await stopProcess(currentProcess._id);
-        showNotification("Trading process đã được dừng", "success");
+        // Ask for confirmation before stopping
+        setConfirmStopOpen(true);
+        return;
       } else {
         await startProcess(currentProcess._id);
         showNotification("Trading process đã được khởi động", "success");
@@ -144,7 +148,20 @@ const TradingProcessDetail = () => {
     } catch (error) {
       console.error("Error toggling process:", error);
     }
-  }, [currentProcess, startProcess, stopProcess, fetchProcessDetails, fetchPerformanceData, showNotification]);
+  }, [currentProcess, startProcess, fetchProcessDetails, fetchPerformanceData, showNotification]);
+
+  const handleConfirmStop = useCallback(async () => {
+    if (!currentProcess) return;
+    try {
+      await stopProcess(currentProcess._id);
+      showNotification("Trading process đã được dừng", "success");
+      setConfirmStopOpen(false);
+      await fetchProcessDetails();
+      await fetchPerformanceData();
+    } catch (error) {
+      console.error("Error stopping process:", error);
+    }
+  }, [currentProcess, stopProcess, fetchProcessDetails, fetchPerformanceData, showNotification]);
 
   // Handle notifications toggle
   const handleNotificationsToggle = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -243,9 +260,22 @@ const TradingProcessDetail = () => {
               )}
             </Box>
             {currentProcess && (
-              <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                {currentProcess.name} • {currentProcess.bot_template_name || "N/A"}
-              </Typography>
+              <>
+                <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                  {currentProcess.name} • {currentProcess.bot_template_name || "N/A"}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" sx={{ mt: 0.5 }}>
+                  {(() => {
+                    if (!currentProcess.started_at) return "Số ngày chạy: -";
+                    const start = new Date(currentProcess.started_at).getTime();
+                    const end = currentProcess.status === "running" || !currentProcess.stopped_at
+                      ? Date.now()
+                      : new Date(currentProcess.stopped_at).getTime();
+                    const diffDays = Math.max(0, Math.floor((end - start) / (1000 * 60 * 60 * 24)));
+                    return `Số ngày chạy: ${diffDays} ngày`;
+                  })()}
+                </Typography>
+              </>
             )}
           </Grid>
           <Grid size={{ xs: "auto" }}>
@@ -419,6 +449,17 @@ const TradingProcessDetail = () => {
         open={openSetupInfoDialog}
         onClose={() => setOpenSetupInfoDialog(false)}
         setupData={currentProcess?.parameters}
+      />
+
+      {/* Confirm Stop Dialog */}
+      <ConfirmDialog
+        open={confirmStopOpen}
+        title="Xác nhận dừng giao dịch"
+        message="Bạn muốn dừng giao dịch?"
+        confirmLabel="Dừng"
+        confirmColor="warning"
+        onConfirm={handleConfirmStop}
+        onCancel={() => setConfirmStopOpen(false)}
       />
     </Box>
   );
