@@ -227,7 +227,7 @@ const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
         </DialogTitle>
         <DialogContent dividers>
           <TableContainer>
-            <Table>
+            <Table stickyHeader>
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: "bold", width: "40%" }}>

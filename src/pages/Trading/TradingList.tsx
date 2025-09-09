@@ -1,9 +1,7 @@
 import { memo } from "react";
 import {
-  Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   TablePagination,
@@ -22,6 +20,7 @@ import StopIcon from "@mui/icons-material/Stop";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import type { TradingProcess, TradingStatusType } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
+import StickyTable from "@components/StickyTable";
 
 interface TradingListProps {
   processes: TradingProcess[];
@@ -130,21 +129,25 @@ const TradingList = ({
   }
 
   return (
-    <Paper>
-      <TableContainer>
-        <Table>
+    <Paper sx={{ overflow: 'hidden', borderRadius: 2 }}>
+      <StickyTable
+        height="60vh"
+        minWidth={900}
+        head={
           <TableHead>
             <TableRow>
               <TableCell>Tên</TableCell>
-              <TableCell>Mô tả</TableCell>
+              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Mô tả</TableCell>
               <TableCell>Trạng thái</TableCell>
               <TableCell>Số ngày chạy</TableCell>
               <TableCell>Tài khoản Trading</TableCell>
-              <TableCell>Bot Template</TableCell>
-              <TableCell>Ngày tạo</TableCell>
+              <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>Bot Template</TableCell>
+              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Ngày tạo</TableCell>
               <TableCell align="right">Thao tác</TableCell>
             </TableRow>
           </TableHead>
+        }
+        body={
           <TableBody>
             {processes.map((process) => (
               <TableRow key={process._id} hover>
@@ -153,7 +156,7 @@ const TradingList = ({
                     {process.name}
                   </Typography>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                   <Typography 
                     variant="body2" 
                     color="text.secondary"
@@ -192,12 +195,12 @@ const TradingList = ({
                     {process.trading_account_name || "N/A"}
                   </Typography>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>
                   <Typography variant="body2">
                     {process.bot_template_name || "N/A"}
                   </Typography>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                   <Typography variant="body2" color="text.secondary">
                     {new Date(process.created_at).toLocaleDateString('vi-VN')}
                   </Typography>
@@ -269,8 +272,8 @@ const TradingList = ({
               </TableRow>
             ))}
           </TableBody>
-        </Table>
-      </TableContainer>
+        }
+      />
       
       <TablePagination
         component="div"
@@ -280,9 +283,9 @@ const TradingList = ({
         rowsPerPage={pagination.page_size}
         onRowsPerPageChange={handleRowsPerPageChange}
         rowsPerPageOptions={[5, 10, 25, 50]}
-        labelRowsPerPage="Số dòng mỗi trang:"
+        labelRowsPerPage="Số dòng:"
         labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} trong số ${count !== -1 ? count : `hơn ${to}`}`
+          `${from}–${to} / ${count !== -1 ? count : `hơn ${to}`}`
         }
       />
     </Paper>

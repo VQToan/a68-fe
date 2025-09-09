@@ -3,10 +3,8 @@ import {
   Box,
   Typography,
   Paper,
-  Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   Chip,
@@ -16,6 +14,7 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
+import StickyTable from "@components/StickyTable";
 import {
   Refresh as RefreshIcon,
   Info as InfoIcon,
@@ -157,8 +156,8 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <Paper sx={{ p: 3 }}>
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+    <Paper sx={{ p: { xs: 2, md: 3 }, overflow: 'hidden', borderRadius: 2 }}>
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1, mb: 2, flexWrap: 'wrap' }}>
         <Box>
           <Typography variant="h6">
             Danh sách Giao dịch ({total})
@@ -167,7 +166,7 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
             Hiển thị {pageSize} mục mỗi trang (tự động điều chỉnh theo màn hình)
           </Typography>
         </Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: 'wrap' }}>
           {onShowSetupInfo && (
             <Tooltip title="Xem thông tin setup">
               <IconButton
@@ -206,9 +205,10 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
         </Box>
       ) : (
         <>
-          {/* Trading Details Table */}
-          <TableContainer>
-            <Table>
+          <StickyTable
+            height="60vh"
+            minWidth={1100}
+            head={
               <TableHead>
                 <TableRow>
                   <TableCell>Thời gian</TableCell>
@@ -223,6 +223,8 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
                   <TableCell>Balance</TableCell>
                 </TableRow>
               </TableHead>
+            }
+            body={
               <TableBody>
                 {tradingDetails.length === 0 ? (
                   <TableRow>
@@ -303,8 +305,8 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
                   ))
                 )}
               </TableBody>
-            </Table>
-          </TableContainer>
+            }
+          />
 
           {/* Pagination */}
           {totalPages > 1 && (

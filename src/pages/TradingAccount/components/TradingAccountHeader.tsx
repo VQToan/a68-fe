@@ -73,10 +73,10 @@ const TradingAccountHeader = ({
   isRefreshing,
 }: TradingAccountHeaderProps) => {
   return (
-    <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+    <Paper elevation={3} sx={{ p: { xs: 2, md: 3 }, mb: 3, overflow: 'hidden', borderRadius: 2 }}>
       <Grid container spacing={2} alignItems="center" justifyContent="space-between">
-        <Grid size={{ xs: "auto" }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <Grid size={{ xs: 12, md: 'auto' }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: 'wrap' }}>
             <Typography variant="h5" component="h1">
               Chi tiết Tài khoản Trading
             </Typography>
@@ -94,8 +94,8 @@ const TradingAccountHeader = ({
             </Typography>
           )}
         </Grid>
-        <Grid size={{ xs: "auto" }}>
-          <Box sx={{ display: "flex", gap: 1 }}>
+        <Grid size={{ xs: 12, md: 'auto' }}>
+          <Box sx={{ display: "flex", gap: 1, flexWrap: 'wrap', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
             <Button
               variant="outlined"
               startIcon={<ArrowBackIcon />}

@@ -1,10 +1,8 @@
 import React, { useState, useCallback, memo } from "react";
 import {
   Box,
-  Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   TablePagination,
@@ -20,6 +18,7 @@ import {
   LinearProgress,
   Popover,
 } from "@mui/material";
+import StickyTable from "@components/StickyTable";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
@@ -221,8 +220,10 @@ const BacktestList = ({
       {isLoading && (
         <LinearProgress sx={{ position: "absolute", width: "100%", top: 0 }} />
       )}
-      <TableContainer sx={{ maxHeight: 440 }}>
-        <Table stickyHeader aria-label="backtest processes table">
+      <StickyTable
+        height={440}
+        minWidth={900}
+        head={
           <TableHead>
             <TableRow>
               <TableCell>Tên</TableCell>
@@ -233,6 +234,8 @@ const BacktestList = ({
               <TableCell>Thao tác</TableCell>
             </TableRow>
           </TableHead>
+        }
+        body={
           <TableBody>
             {processes.map((process) => (
               <TableRow hover key={process._id}>
@@ -301,8 +304,8 @@ const BacktestList = ({
               </TableRow>
             ))}
           </TableBody>
-        </Table>
-      </TableContainer>
+        }
+      />
       <TablePagination
         rowsPerPageOptions={[5, 10, 25, 50]}
         component="div"
@@ -311,9 +314,9 @@ const BacktestList = ({
         page={pagination.page - 1} // Convert from 1-based to 0-based for Material-UI
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        labelRowsPerPage="Dòng trên trang:"
+        labelRowsPerPage="Số dòng:"
         labelDisplayedRows={({ from, to, count }) =>
-          `${from}-${to} của ${count}`
+          `${from}-${to}/ ${count}`
         }
       />
 

@@ -1,9 +1,7 @@
 import { memo } from "react";
 import {
-  Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   TablePagination,
@@ -15,6 +13,7 @@ import {
   CircularProgress,
   Typography,
 } from "@mui/material";
+import StickyTable from "@components/StickyTable";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -151,21 +150,25 @@ const TradingAccountList = ({
   }
 
   return (
-    <Paper>
-      <TableContainer>
-        <Table>
+    <Paper sx={{ overflow: 'hidden', borderRadius: 2 }}>
+      <StickyTable
+        height="60vh"
+        minWidth={900}
+        head={
           <TableHead>
             <TableRow>
               <TableCell>Tên tài khoản</TableCell>
               <TableCell>Sàn giao dịch</TableCell>
-              <TableCell>API Key</TableCell>
+              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>API Key</TableCell>
               <TableCell>Trạng thái</TableCell>
               <TableCell>Số dư</TableCell>
-              <TableCell>Chat IDs</TableCell>
-              <TableCell>Ngày tạo</TableCell>
+              <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>Chat IDs</TableCell>
+              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Ngày tạo</TableCell>
               <TableCell align="right">Thao tác</TableCell>
             </TableRow>
           </TableHead>
+        }
+        body={
           <TableBody>
             {accounts.map((account) => (
               <TableRow key={account._id} hover>
@@ -181,7 +184,7 @@ const TradingAccountList = ({
                     size="small"
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                   <Typography 
                     variant="body2" 
                     color="text.secondary"
@@ -213,7 +216,7 @@ const TradingAccountList = ({
                     </Typography>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>
                   <Typography variant="body2" color="text.secondary">
                     {account.chat_ids.length > 0 
                       ? `${account.chat_ids.length} chat ID(s)`
@@ -221,7 +224,7 @@ const TradingAccountList = ({
                     }
                   </Typography>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                   <Typography variant="body2" color="text.secondary">
                     {new Date(account.created_at).toLocaleDateString('vi-VN')}
                   </Typography>
@@ -265,8 +268,8 @@ const TradingAccountList = ({
               </TableRow>
             ))}
           </TableBody>
-        </Table>
-      </TableContainer>
+        }
+      />
       
       <TablePagination
         component="div"
@@ -276,9 +279,9 @@ const TradingAccountList = ({
         rowsPerPage={pagination.page_size}
         onRowsPerPageChange={handleRowsPerPageChange}
         rowsPerPageOptions={[10, 20, 50, 100]}
-        labelRowsPerPage="Số dòng mỗi trang:"
+        labelRowsPerPage="Số dòng:"
         labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} trong số ${count !== -1 ? count : `hơn ${to}`}`
+          `${from}–${to}/ ${count !== -1 ? count : `hơn ${to}`}`
         }
       />
     </Paper>

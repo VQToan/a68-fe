@@ -16,7 +16,7 @@ interface AccountBalanceTabProps {
 
 const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
         Chi tiết Balance
       </Typography>

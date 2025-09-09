@@ -1,10 +1,8 @@
 import React, { memo } from "react";
 import {
   Box,
-  Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   Paper,
@@ -13,6 +11,7 @@ import {
   Tooltip,
   CircularProgress,
 } from "@mui/material";
+import StickyTable from "@components/StickyTable";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -53,86 +52,92 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
   }
 
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="bot templates table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Tên</TableCell>
-            <TableCell>Mô tả</TableCell>
-            <TableCell>Ngày tạo</TableCell>
-            <TableCell>Thao tác</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {templates.map((template) => (
-            <TableRow
-              key={template._id}
-              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              hover
-            >
-              <TableCell component="th" scope="row">
-                {template.name}
-              </TableCell>
-              <TableCell>
-                <Tooltip title={template.description} arrow>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      maxWidth: 200,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {template.description}
-                  </Typography>
-                </Tooltip>
-              </TableCell>
-              <TableCell>{formatDate(template.created_at)}</TableCell>
-              <TableCell>
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  {onView && (
-                    <Tooltip title="Xem chi tiết">
-                      <IconButton
-                        size="small"
-                        color="info"
-                        onClick={() => onView(template._id)}
-                      >
-                        <VisibilityIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-
-                  {onEdit && (
-                    <Tooltip title="Sửa">
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={() => onEdit(template._id)}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-
-                  {onDelete && (
-                    <Tooltip title="Xóa">
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => onDelete(template._id, template.name)}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </Box>
-              </TableCell>
+    <Paper sx={{ overflow: 'hidden' }}>
+      <StickyTable
+        height="60vh"
+        minWidth={800}
+        head={
+          <TableHead>
+            <TableRow>
+              <TableCell>Tên</TableCell>
+              <TableCell>Mô tả</TableCell>
+              <TableCell>Ngày tạo</TableCell>
+              <TableCell>Thao tác</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+        }
+        body={
+          <TableBody>
+            {templates.map((template) => (
+              <TableRow
+                key={template._id}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                hover
+              >
+                <TableCell component="th" scope="row">
+                  {template.name}
+                </TableCell>
+                <TableCell>
+                  <Tooltip title={template.description} arrow>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        maxWidth: 200,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {template.description}
+                    </Typography>
+                  </Tooltip>
+                </TableCell>
+                <TableCell>{formatDate(template.created_at)}</TableCell>
+                <TableCell>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    {onView && (
+                      <Tooltip title="Xem chi tiết">
+                        <IconButton
+                          size="small"
+                          color="info"
+                          onClick={() => onView(template._id)}
+                        >
+                          <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+
+                    {onEdit && (
+                      <Tooltip title="Sửa">
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() => onEdit(template._id)}
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+
+                    {onDelete && (
+                      <Tooltip title="Xóa">
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => onDelete(template._id, template.name)}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </Box>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        }
+      />
+    </Paper>
   );
 };
 

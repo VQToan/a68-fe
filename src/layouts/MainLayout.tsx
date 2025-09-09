@@ -48,6 +48,8 @@ const MainLayout = () => {
   const userMenuOpen = Boolean(anchorEl);
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
+  // Treat tablets as compact to avoid horizontal overflow
+  const isCompact = useMediaQuery(muiTheme.breakpoints.down("md"));
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -118,17 +120,19 @@ const MainLayout = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", minHeight: '100vh', overflowX: 'hidden' }}>
         {/* App Bar */}
         <AppBar
           position="fixed"
           sx={{
+            maxWidth: '100vw',
+            overflowX: 'hidden',
             zIndex: (theme) => theme.zIndex.drawer + 1,
             transition: theme.transitions.create(["width", "margin"], {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,
             }),
-            ...(open && {
+            ...(open && !isCompact && {
               marginLeft: drawerWidth,
               width: `calc(100% - ${drawerWidth}px)`,
               transition: theme.transitions.create(["width", "margin"], {
@@ -138,7 +142,7 @@ const MainLayout = () => {
             }),
           }}
         >
-          <Toolbar>
+          <Toolbar variant={isCompact ? 'dense' : 'regular'} sx={{ minHeight: { xs: 40, sm: 52, md: 64 }, px: { xs: 1, sm: 2 } }}>
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -156,18 +160,18 @@ const MainLayout = () => {
                 src={autoTradeLogo}
                 alt="AutoTrade68 Logo"
                 style={{
-                  height: "40px",
+                  height: isCompact ? "22px" : "32px",
                   marginRight: "16px",
                   borderRadius: "50%",
                 }}
               />
-              <Typography variant="h6" noWrap component="div">
+              <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block' }, fontSize: { sm: '0.95rem', md: '1.15rem' } }}>
                 AutoTrade68
               </Typography>
             </Box>
             <Box sx={{ flexGrow: 1 }} />
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography variant="body1" sx={{ mr: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", minWidth: 0 }}>
+              <Typography variant="body1" sx={{ mr: 2, display: { xs: 'none', md: 'block' }, fontSize: { md: '0.95rem' }, maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {userName}
               </Typography>
               <IconButton
@@ -178,7 +182,7 @@ const MainLayout = () => {
                 aria-expanded={userMenuOpen ? "true" : undefined}
                 sx={{ p: 0 }}
               >
-                <Avatar sx={{ bgcolor: "secondary.main" }}>
+                <Avatar sx={{ bgcolor: "secondary.main", width: { xs: 26, sm: 30, md: 36 }, height: { xs: 26, sm: 30, md: 36 } }}>
                   {getInitials(userName)}
                 </Avatar>
               </IconButton>
@@ -239,16 +243,17 @@ const MainLayout = () => {
 
         {/* Sidebar */}
         <Drawer
-          variant={isMobile ? "temporary" : "permanent"}
+          variant={isCompact ? "temporary" : "permanent"}
           open={open}
           onClose={handleDrawerClose}
+          ModalProps={{ keepMounted: false }}
           sx={{
-            width: drawerWidth,
+            width: isCompact ? undefined : drawerWidth,
             flexShrink: 0,
             [`& .MuiDrawer-paper`]: {
-              width: drawerWidth,
               boxSizing: "border-box",
-              ...(isMobile || !open
+              width: isCompact ? drawerWidth : open ? drawerWidth : undefined,
+              ...(!isCompact && !open
                 ? {
                     overflowX: "hidden",
                     transition: theme.transitions.create("width", {
@@ -604,10 +609,12 @@ const MainLayout = () => {
           component="main"
           sx={{
             flexGrow: 1,
-            p: 3,
+            p: { xs: 2, md: 3 },
             width: "100%",
             backgroundColor: "background.default",
-            marginLeft: isMobile
+            overflowX: 'hidden',
+            maxWidth: '100vw',
+            marginLeft: isCompact
               ? 0
               : open
               ? 0
@@ -618,7 +625,7 @@ const MainLayout = () => {
             }),
           }}
         >
-          <Toolbar /> {/* This is for spacing below AppBar */}
+          <Toolbar variant={isCompact ? 'dense' : 'regular'} /> {/* spacing below AppBar */}
           <Outlet />
         </Box>
       </Box>

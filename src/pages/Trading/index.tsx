@@ -9,8 +9,6 @@ import {
   InputAdornment,
   Grid,
   Divider,
-  Tabs,
-  Tab,
   IconButton,
   Tooltip,
 } from "@mui/material";
@@ -27,6 +25,7 @@ import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
 import type { TradingStatusType, TradingProcessCreate, TradingProcessUpdate } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
+import FilterTabs from "@components/FilterTabs";
 
 export type FormMode = "create" | "view" | "edit";
 
@@ -163,9 +162,8 @@ const Trading = () => {
   };
 
   // Handle tab change
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
+  const handleFilterTabChange = (newValue: string) => {
     setCurrentTab(newValue);
-    // Reset pagination when changing tabs
     setCurrentPage(1);
   };
 
@@ -378,20 +376,20 @@ const Trading = () => {
 
   return (
     <Box>
-      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+      <Paper elevation={3} sx={{ p: { xs: 2, md: 3 }, mb: 3, overflow: 'hidden', borderRadius: 2 }}>
         <Grid
           container
           spacing={2}
           alignItems="center"
           justifyContent="space-between"
         >
-          <Grid size={{ xs: "auto" }}>
+          <Grid size={{ xs: 12, md: 'auto' }}>
             <Typography variant="h5" component="h1" gutterBottom>
               Quản lý Trading
             </Typography>
           </Grid>
-          <Grid size={{ xs: "auto" }}>
-            <Box sx={{ display: "flex", gap: 2 }}>
+          <Grid size={{ xs: 12, md: 'auto' }}>
+            <Box sx={{ display: "flex", gap: 2, flexWrap: 'wrap', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
@@ -405,22 +403,20 @@ const Trading = () => {
 
         <Divider sx={{ my: 2 }} />
 
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={currentTab}
-            onChange={handleTabChange}
-            aria-label="trading tabs"
-            sx={{ mb: 2 }}
-          >
-            <Tab label="Tất cả" value="all" />
-            <Tab label="Đã tạo" value="created" />
-            <Tab label="Đang chờ" value="queued" />
-            <Tab label="Đang chạy" value="running" />
-            <Tab label="Đã dừng" value="stopped" />
-            <Tab label="Thất bại" value="failed" />
-            <Tab label="Tạm dừng" value="paused" />
-          </Tabs>
-        </Box>
+        <FilterTabs
+          ariaLabel="trading tabs"
+          value={currentTab}
+          onChange={handleFilterTabChange}
+          items={[
+            { label: 'Tất cả', value: 'all' },
+            { label: 'Đã tạo', value: 'created' },
+            { label: 'Đang chờ', value: 'queued' },
+            { label: 'Đang chạy', value: 'running' },
+            { label: 'Đã dừng', value: 'stopped' },
+            { label: 'Thất bại', value: 'failed' },
+            { label: 'Tạm dừng', value: 'paused' },
+          ]}
+        />
 
         <TextField
           fullWidth

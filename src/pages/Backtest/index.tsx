@@ -8,8 +8,6 @@ import {
   InputAdornment,
   Grid,
   Divider,
-  Tabs,
-  Tab,
   IconButton,
   Tooltip,
 } from "@mui/material";
@@ -30,6 +28,7 @@ import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
 import type { BacktestStatus, BacktestProcessCreate, BacktestProcessUpdate } from "@/types/backtest.type";
 import { areEqual } from "@/utils/common";
+import FilterTabs from "@components/FilterTabs";
 
 export type FormMode = "create" | "view" | "edit";
 
@@ -512,21 +511,19 @@ const Backtest = () => {
 
         <Divider sx={{ my: 2 }} />
 
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={currentTab}
-            onChange={handleTabChange}
-            aria-label="backtest tabs"
-            sx={{ mb: 2 }}
-          >
-            <Tab label="Tất cả" value="all" />
-            <Tab label="Đang chờ" value="created" />
-            <Tab label="Đang chạy" value="running" />
-            <Tab label="Hoàn thành" value="completed" />
-            <Tab label="Thất bại" value="failed" />
-            <Tab label="Đã dừng" value="stopped" />
-          </Tabs>
-        </Box>
+        <FilterTabs
+          ariaLabel="backtest tabs"
+          value={currentTab}
+          onChange={(v) => handleTabChange({} as any, v)}
+          items={[
+            { label: 'Tất cả', value: 'all' },
+            { label: 'Đang chờ', value: 'created' },
+            { label: 'Đang chạy', value: 'running' },
+            { label: 'Hoàn thành', value: 'completed' },
+            { label: 'Thất bại', value: 'failed' },
+            { label: 'Đã dừng', value: 'stopped' },
+          ]}
+        />
 
         <TextField
           fullWidth

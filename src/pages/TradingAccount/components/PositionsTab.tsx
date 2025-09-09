@@ -6,13 +6,13 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   CircularProgress,
   Chip,
   Fab,
 } from "@mui/material";
+import StickyTable from "@components/StickyTable";
 import {
   Refresh as RefreshIcon,
   Add as AddIcon,
@@ -136,8 +136,8 @@ const PositionsTab = ({
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, gap: 1, flexWrap: 'wrap' }}>
         <Typography variant="h6">
           Lệnh đang mở ({positions.length})
         </Typography>
@@ -171,8 +171,10 @@ const PositionsTab = ({
         </Box>
       ) : (
         <>
-          <TableContainer>
-            <Table>
+          <StickyTable
+            height="60vh"
+            minWidth={1000}
+            head={
               <TableHead>
                 <TableRow>
                   <TableCell>Mã lệnh</TableCell>
@@ -187,6 +189,8 @@ const PositionsTab = ({
                   <TableCell align="center">Hành động</TableCell>
                 </TableRow>
               </TableHead>
+            }
+            body={
               <TableBody>
                 {positions.map((position: PositionSummary, index: number) => (
                   <TableRow key={`${position.order_id}-${index}`} hover>
@@ -259,8 +263,8 @@ const PositionsTab = ({
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
-          </TableContainer>
+            }
+          />
 
           {/* Floating Action Button for New Position */}
           <Fab

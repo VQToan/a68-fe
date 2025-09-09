@@ -79,6 +79,10 @@ const theme = createTheme({
   components: {
     MuiCssBaseline: {
       styleOverrides: {
+        'html, body, #root': {
+          maxWidth: '100vw',
+          overflowX: 'hidden',
+        },
         body: {
           scrollbarColor: '#6b6b6b #0A0A0A',
           '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
