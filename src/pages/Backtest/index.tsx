@@ -374,7 +374,7 @@ const Backtest = () => {
   }, [processes, handleOpenRunBacktestDialog]);
 
   // Handle run backtest with date parameters
-  const handleRunBacktestWithDates = useCallback(async (startDate: string, endDate: string) => {
+  const handleRunBacktestWithDates = useCallback(async (startDate: number, endDate: number) => {
     if (!runBacktestDialog.id) return;
 
     try {

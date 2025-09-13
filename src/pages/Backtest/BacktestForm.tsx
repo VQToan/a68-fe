@@ -262,31 +262,7 @@ const BacktestForm = ({
       const formattedParams = { ...params };
 
       // Convert dates to UTC timestamps
-      if (formattedParams.START_DATE) {
-        const startDate = new Date(formattedParams.START_DATE);
-        formattedParams.START_DATE = Date.UTC(
-          startDate.getUTCFullYear(),
-          startDate.getUTCMonth(),
-          startDate.getUTCDate(),
-          startDate.getUTCHours(),
-          startDate.getUTCMinutes(),
-          startDate.getUTCSeconds(),
-          startDate.getUTCMilliseconds()
-        );
-      }
-
-      if (formattedParams.END_DATE) {
-        const endDate = new Date(formattedParams.END_DATE);
-        formattedParams.END_DATE = Date.UTC(
-          endDate.getUTCFullYear(),
-          endDate.getUTCMonth(),
-          endDate.getUTCDate(),
-          endDate.getUTCHours(),
-          endDate.getUTCMinutes(),
-          endDate.getUTCSeconds(),
-          endDate.getUTCMilliseconds()
-        );
-      }
+     
 
       // Ensure PAUSE_DAY is correctly formatted as a comma-separated string
       if (selectedPauseDays.length > 0) {

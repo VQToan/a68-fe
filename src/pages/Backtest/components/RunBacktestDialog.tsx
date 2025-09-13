@@ -15,7 +15,7 @@ import { areEqual } from "@/utils/common";
 interface RunBacktestDialogProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: (startDate: string, endDate: string) => void;
+  onConfirm: (startDate: number, endDate: number) => void;
   isLoading: boolean;
   backtestName: string;
 }
@@ -47,7 +47,7 @@ const RunBacktestDialog: React.FC<RunBacktestDialogProps> = ({
     }
 
     setValidationError(null);
-    onConfirm(startDate, endDate);
+    onConfirm(new Date(startDate).getTime(), new Date(endDate).getTime());
   }, [startDate, endDate, onConfirm]);
 
   return (
