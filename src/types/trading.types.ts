@@ -1,5 +1,6 @@
 // Trading types based on API documentation
 
+import type { BacktestParameter } from "./backtest.type";
 export interface TradingStatus {
   CREATED: "created";
   QUEUED: "queued";
@@ -181,7 +182,7 @@ export interface TradingProcess {
   user_id: string;
   bot_template_id: string;
   trading_account_id: string;
-  parameters: any; // BotParameters from backtest
+  parameters: Record<keyof BacktestParameter, any>;
   created_at: string;
   updated_at: string;
   status: TradingStatusType;
@@ -252,13 +253,13 @@ export interface TradingProcessCreate {
   description: string;
   bot_template_id: string;
   trading_account_id: string;
-  parameters?: any; // BotParameters
+  parameters?: Record<keyof BacktestParameter, any>;
 }
 
 export interface TradingProcessUpdate {
   name?: string;
   description?: string;
-  parameters?: any; // BotParameters
+  parameters?: Record<keyof BacktestParameter, any>;
   trading_account_id?: string;
 }
 

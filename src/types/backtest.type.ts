@@ -28,6 +28,7 @@ export interface BacktestParameter {
   R2R: string; // Risk to Reward ratio, default "1:2"
   MA_PERIOD: string;
   DCA_GRID: number;
+  GRID_MULTIPLIER: number;
   DCA_MULTIPLIER: number;
   RSI_ENTRY_SHORT: number;
   RSI_ENTRY_LONG: number;
