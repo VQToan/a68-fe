@@ -382,7 +382,7 @@ const Trading = () => {
 
   return (
     <Box>
-      <Paper elevation={3} sx={{ p: { xs: 2, md: 3 }, mb: 3, overflow: 'hidden', borderRadius: 2 }}>
+      <Paper elevation={3} sx={{ p: { xs: 1.5, sm: 2.5, md: 3 }, mb: 3, overflow: 'hidden', borderRadius: { xs: 1.5, md: 2 } }}>
         <Grid
           container
           spacing={2}

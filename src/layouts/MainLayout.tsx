@@ -609,7 +609,7 @@ const MainLayout = () => {
           component="main"
           sx={{
             flexGrow: 1,
-            p: { xs: 2, md: 3 },
+            p: { xs: 1.5, sm: 2, md: 3 },
             width: "100%",
             backgroundColor: "background.default",
             overflowX: 'hidden',
@@ -623,6 +623,55 @@ const MainLayout = () => {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,
             }),
+            [muiTheme.breakpoints.down('sm')]: {
+              padding: theme.spacing(1.5),
+              '& .MuiPaper-root': {
+                padding: `${theme.spacing(1.5)} !important`,
+                borderRadius: theme.spacing(1.5),
+              },
+              '& .MuiCard-root': {
+                padding: `${theme.spacing(1.5)} !important`,
+                borderRadius: theme.spacing(1.5),
+              },
+              '& .MuiTypography-h5': {
+                fontSize: '1.2rem',
+                lineHeight: 1.3,
+              },
+              '& .MuiTypography-h6': {
+                fontSize: '1rem',
+                lineHeight: 1.35,
+              },
+              '& .MuiTypography-body1': {
+                fontSize: '0.92rem',
+                lineHeight: 1.45,
+              },
+              '& .MuiTypography-body2': {
+                fontSize: '0.84rem',
+                lineHeight: 1.5,
+              },
+              '& .MuiButton-root': {
+                fontSize: '0.82rem',
+                padding: `${theme.spacing(0.75, 1.5)} !important`,
+              },
+            },
+            [muiTheme.breakpoints.between('sm', 'md')]: {
+              '& .MuiPaper-root, & .MuiCard-root': {
+                padding: `${theme.spacing(2.25)} !important`,
+                borderRadius: theme.spacing(1.75),
+              },
+              '& .MuiTypography-h5': {
+                fontSize: '1.35rem',
+              },
+              '& .MuiTypography-h6': {
+                fontSize: '1.12rem',
+              },
+              '& .MuiTypography-body1': {
+                fontSize: '0.96rem',
+              },
+              '& .MuiTypography-body2': {
+                fontSize: '0.88rem',
+              },
+            },
           }}
         >
           <Toolbar variant={isCompact ? 'dense' : 'regular'} /> {/* spacing below AppBar */}

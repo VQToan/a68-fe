@@ -156,7 +156,7 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <Paper sx={{ p: { xs: 2, md: 3 }, overflow: 'hidden', borderRadius: 2 }}>
+    <Paper sx={{ p: { xs: 1.5, sm: 2.5, md: 3 }, overflow: 'hidden', borderRadius: { xs: 1.5, md: 2 } }}>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1, mb: 2, flexWrap: 'wrap' }}>
         <Box>
           <Typography variant="h6">

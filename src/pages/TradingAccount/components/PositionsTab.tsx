@@ -135,7 +135,7 @@ const PositionsTab = ({
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 } }}>
+    <Box sx={{ p: { xs: 1.5, sm: 2.5, md: 3 } }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, gap: 1, flexWrap: 'wrap' }}>
         <Typography variant="h6">
           Lệnh đang mở ({positions.length})

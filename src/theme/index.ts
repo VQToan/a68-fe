@@ -68,6 +68,12 @@ const theme = createTheme({
     h6: {
       fontWeight: 600,
     },
+    body1: {
+      fontSize: '0.98rem',
+    },
+    body2: {
+      fontSize: '0.9rem',
+    },
     button: {
       fontWeight: 600,
       textTransform: 'none',
@@ -524,5 +530,96 @@ const theme = createTheme({
     }
   }
 });
+
+theme.typography.h5 = {
+  ...theme.typography.h5,
+  fontSize: '1.5rem',
+  [theme.breakpoints.down('md')]: {
+    fontSize: '1.35rem',
+  },
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '1.18rem',
+  },
+};
+
+theme.typography.h6 = {
+  ...theme.typography.h6,
+  fontSize: '1.2rem',
+  [theme.breakpoints.down('md')]: {
+    fontSize: '1.08rem',
+  },
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '0.98rem',
+  },
+};
+
+theme.typography.h4 = {
+  ...theme.typography.h4,
+  fontSize: '1.75rem',
+  [theme.breakpoints.down('md')]: {
+    fontSize: '1.55rem',
+  },
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '1.35rem',
+  },
+};
+
+theme.typography.h3 = {
+  ...theme.typography.h3,
+  fontSize: '2rem',
+  [theme.breakpoints.down('md')]: {
+    fontSize: '1.75rem',
+  },
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '1.55rem',
+  },
+};
+
+theme.typography.body1 = {
+  ...theme.typography.body1,
+  lineHeight: 1.55,
+  [theme.breakpoints.down('md')]: {
+    fontSize: '0.94rem',
+  },
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '0.9rem',
+  },
+};
+
+theme.typography.body2 = {
+  ...theme.typography.body2,
+  lineHeight: 1.5,
+  [theme.breakpoints.down('md')]: {
+    fontSize: '0.86rem',
+  },
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '0.82rem',
+  },
+};
+
+theme.typography.button = {
+  ...theme.typography.button,
+  fontSize: '0.95rem',
+  [theme.breakpoints.down('md')]: {
+    fontSize: '0.9rem',
+  },
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '0.84rem',
+  },
+};
+
+theme.components = {
+  ...theme.components,
+  MuiDialog: {
+    styleOverrides: {
+      paper: {
+        [theme.breakpoints.down('sm')]: {
+          margin: theme.spacing(1.5),
+          width: 'calc(100% - ' + theme.spacing(3) + ')',
+        },
+      },
+    },
+  },
+};
 
 export default theme;
