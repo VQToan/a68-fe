@@ -389,19 +389,29 @@ const Trading = () => {
           alignItems="center"
           justifyContent="space-between"
         >
-          <Grid size={{ xs: 12, md: 'auto' }}>
+          <Grid size={{ xs: 10, md: 'auto' }}>
             <Typography variant="h5" component="h1" gutterBottom>
               Quản lý Trading
             </Typography>
           </Grid>
-          <Grid size={{ xs: 12, md: 'auto' }}>
+          <Grid size={{ xs: 2, md: 'auto' }}>
             <Box sx={{ display: "flex", gap: 2, flexWrap: 'wrap', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => handleOpenDialog("create")}
+                aria-label="Tạo trading process mới"
+                sx={{
+                  px: { xs: 1.25, sm: 2 },
+                  minHeight: 40,
+                  '& .MuiButton-startIcon': {
+                    mr: { xs: 0, sm: 1 },
+                  },
+                }}
               >
-                Tạo trading process mới
+                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                  Tạo trading process mới
+                </Box>
               </Button>
             </Box>
           </Grid>

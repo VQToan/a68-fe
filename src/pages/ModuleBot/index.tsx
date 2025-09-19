@@ -255,19 +255,29 @@ const ModuleBot = () => {
           alignItems="center"
           justifyContent="space-between"
         >
-          <Grid size={{ xs: 12, md: 'auto' }}>
+          <Grid size={{ xs: 10, md: 'auto' }}>
             <Typography variant="h5" component="h1" gutterBottom>
               Quản lý Module Bot
             </Typography>
           </Grid>
-          <Grid size={{ xs: 12, md: 'auto' }}>
+          <Grid size={{ xs: 2, md: 'auto' }}>
             <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => handleOpenDialog("create")}
+                aria-label="Thêm module mới"
+                sx={{
+                  px: { xs: 1.25, sm: 2 },
+                  minHeight: 40,
+                  '& .MuiButton-startIcon': {
+                    mr: { xs: 0, sm: 1 },
+                  },
+                }}
               >
-                Thêm module mới
+                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                  Thêm module mới
+                </Box>
               </Button>
             </Box>
           </Grid>

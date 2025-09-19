@@ -326,7 +326,7 @@ const TradingAccount = () => {
           alignItems="center"
           justifyContent="space-between"
         >
-          <Grid size={{ xs: 12, md: 'auto' }}>
+          <Grid size={{ xs: 10, md: 'auto' }}>
             <Typography variant="h5" component="h1" gutterBottom>
               Quản lý Tài Khoản Trading
             </Typography>
@@ -337,8 +337,18 @@ const TradingAccount = () => {
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => handleOpenDialog("create")}
+                aria-label="Tạo tài khoản mới"
+                sx={{
+                  px: { xs: 1.25, sm: 2 },
+                  minHeight: 40,
+                  '& .MuiButton-startIcon': {
+                    mr: { xs: 0, sm: 1 },
+                  },
+                }}
               >
-                Tạo tài khoản mới
+                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                  Tạo tài khoản mới
+                </Box>
               </Button>
             </Box>
           </Grid>
