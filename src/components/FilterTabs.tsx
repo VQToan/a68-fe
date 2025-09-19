@@ -108,8 +108,8 @@ const FilterTabs = ({ value, items, onChange, ariaLabel, sx, showNavButtons = tr
         onChange={(_e, v) => onChange(v)}
         aria-label={ariaLabel || 'filter tabs'}
         variant="scrollable"
-        scrollButtons="auto"
-        allowScrollButtonsMobile={false}
+        {...(!showNavButtons && { scrollButtons: false, allowScrollButtonsMobile: false })}
+        {...(showNavButtons && { scrollButtons: true, allowScrollButtonsMobile: false })}
         sx={{ mb: 2, maxWidth: '100%' }}
       >
         {items.map((item) => (
