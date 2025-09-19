@@ -387,15 +387,15 @@ const Trading = () => {
           container
           spacing={2}
           alignItems="center"
-          justifyContent="space-between"
+          wrap="wrap"
         >
-          <Grid size={{ xs: 10, md: 'auto' }}>
+          <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ flexGrow: 1, minWidth: 0 }}>
             <Typography variant="h5" component="h1" gutterBottom>
               Quản lý Trading
             </Typography>
           </Grid>
-          <Grid size={{ xs: 2, md: 'auto' }}>
-            <Box sx={{ display: "flex", gap: 2, flexWrap: 'wrap', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+          <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ ml: { xs: 'auto', md: 0 } }}>
+            <Box sx={{ display: "flex", gap: 2, flexWrap: 'wrap', justifyContent: { xs: 'flex-end', md: 'flex-end' } }}>
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
@@ -404,6 +404,7 @@ const Trading = () => {
                 sx={{
                   px: { xs: 1.25, sm: 2 },
                   minHeight: 40,
+                  minWidth: { xs: 44, sm: 'auto' },
                   '& .MuiButton-startIcon': {
                     mr: { xs: 0, sm: 1 },
                   },
