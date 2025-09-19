@@ -29,7 +29,7 @@ interface TradingListProps {
   onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void;
   onStart: (id: string) => void;
-  onStop: (id: string) => void;
+  onStop: (process: TradingProcess) => void;
   onRefresh: () => void;
   pagination: {
     total: number;
@@ -237,7 +237,7 @@ const TradingList = ({
                         <IconButton
                           size="small"
                           color="warning"
-                          onClick={() => onStop(process._id)}
+                          onClick={() => onStop(process)}
                         >
                           <StopIcon />
                         </IconButton>

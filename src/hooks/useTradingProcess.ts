@@ -48,8 +48,8 @@ export const useTradingProcess = () => {
     return dispatch(startTradingProcess(id));
   };
 
-  const stopProcess = (id: string) => {
-    return dispatch(stopTradingProcess(id));
+  const stopProcess = (id: string, clearPositions?: boolean) => {
+    return dispatch(stopTradingProcess({ id, clearPositions }));
   };
 
   const getRunningProcesses = () => {

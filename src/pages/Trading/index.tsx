@@ -17,13 +17,14 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import AddIcon from "@mui/icons-material/Add";
 import TradingList from "./TradingList";
 import TradingForm from "./TradingForm";
+import StopTradingConfirmDialog from "./components/StopTradingConfirmDialog";
 import { useTradingProcess } from "@hooks/useTradingProcess";
 import { useTradingAccount } from "@hooks/useTradingAccount";
 import { useBotTemplate } from "@hooks/useBotTemplate";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
-import type { TradingStatusType, TradingProcessCreate, TradingProcessUpdate } from "@/types/trading.types";
+import type { TradingStatusType, TradingProcess, TradingProcessCreate, TradingProcessUpdate } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
 import FilterTabs from "@components/FilterTabs";
 
@@ -113,10 +114,10 @@ const Trading = () => {
   // State for confirm stop dialog
   const [confirmStop, setConfirmStop] = useState<{
     open: boolean;
-    id: string | null;
+    process: TradingProcess | null;
   }>({
     open: false,
-    id: null,
+    process: null,
   });
 
   // Pagination state
@@ -308,27 +309,32 @@ const Trading = () => {
   }, [startProcess, showNotification, fetchTradingProcesses]);
 
   // Open confirm stop dialog
-  const handleOpenStopConfirm = useCallback((id: string) => {
-    setConfirmStop({ open: true, id });
+  const handleOpenStopConfirm = useCallback((process: TradingProcess) => {
+    setConfirmStop({ open: true, process });
   }, []);
 
   const handleCloseStopConfirm = useCallback(() => {
-    setConfirmStop({ open: false, id: null });
+    setConfirmStop({ open: false, process: null });
   }, []);
 
   // Confirm stop trading process
-  const handleConfirmStopTradingProcess = useCallback(async () => {
-    if (!confirmStop.id) return;
+  const handleConfirmStopTradingProcess = useCallback(async (shouldClearPositions: boolean) => {
+    const processId = confirmStop.process?._id;
+    if (!processId) return;
+
     try {
-      await stopProcess(confirmStop.id);
-      showNotification("Trading process đã được dừng lại", "success");
+      await stopProcess(processId, shouldClearPositions ? true : undefined);
+      const message = shouldClearPositions
+        ? "Trading process đã được dừng và đóng tất cả lệnh"
+        : "Trading process đã được dừng lại";
+      showNotification(message, "success");
       handleCloseStopConfirm();
       // Re-fetch the list with latest data
       fetchTradingProcesses();
     } catch (error) {
       console.error("Error stopping trading process:", error);
     }
-  }, [confirmStop.id, stopProcess, showNotification, handleCloseStopConfirm, fetchTradingProcesses]);
+  }, [confirmStop.process, stopProcess, showNotification, handleCloseStopConfirm, fetchTradingProcesses]);
 
   // Handle refreshing the trading process list
   const handleRefreshTradingProcesses = useCallback(() => {
@@ -500,14 +506,13 @@ const Trading = () => {
       />
 
       {/* Confirm Stop Dialog */}
-      <ConfirmDialog
+      <StopTradingConfirmDialog
         open={confirmStop.open}
-        title="Xác nhận dừng giao dịch"
-        message="Bạn muốn dừng giao dịch?"
-        confirmLabel="Dừng"
-        confirmColor="warning"
-        onConfirm={handleConfirmStopTradingProcess}
-        onCancel={handleCloseStopConfirm}
+        processName={confirmStop.process?.name}
+        accountId={confirmStop.process?.trading_account_id}
+        symbol={confirmStop.process?.parameters?.SYMBOL as string | undefined}
+        onClose={handleCloseStopConfirm}
+        onStop={handleConfirmStopTradingProcess}
       />
     </Box>
   );

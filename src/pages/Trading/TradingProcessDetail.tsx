@@ -29,7 +29,7 @@ import { useNotification } from "@context/NotificationContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { areEqual } from "@/utils/common";
 import TradingProcessSetupInfo from "./components/TradingProcessSetupInfo";
-import ConfirmDialog from "@components/ConfirmDialog";
+import StopTradingConfirmDialog from "./components/StopTradingConfirmDialog";
 import TradingDetailsList from "./components/TradingDetailsList";
 import type { TradingPerformanceResponse } from "@/types/trading.types";
 import * as tradingProcessService from "@services/tradingProcess.service";
@@ -150,11 +150,14 @@ const TradingProcessDetail = () => {
     }
   }, [currentProcess, startProcess, fetchProcessDetails, fetchPerformanceData, showNotification]);
 
-  const handleConfirmStop = useCallback(async () => {
+  const handleConfirmStop = useCallback(async (shouldClearPositions: boolean) => {
     if (!currentProcess) return;
     try {
-      await stopProcess(currentProcess._id);
-      showNotification("Trading process đã được dừng", "success");
+      await stopProcess(currentProcess._id, shouldClearPositions ? true : undefined);
+      const message = shouldClearPositions
+        ? "Trading process đã được dừng và đóng tất cả lệnh"
+        : "Trading process đã được dừng";
+      showNotification(message, "success");
       setConfirmStopOpen(false);
       await fetchProcessDetails();
       await fetchPerformanceData();
@@ -452,14 +455,13 @@ const TradingProcessDetail = () => {
       />
 
       {/* Confirm Stop Dialog */}
-      <ConfirmDialog
+      <StopTradingConfirmDialog
         open={confirmStopOpen}
-        title="Xác nhận dừng giao dịch"
-        message="Bạn muốn dừng giao dịch?"
-        confirmLabel="Dừng"
-        confirmColor="warning"
-        onConfirm={handleConfirmStop}
-        onCancel={() => setConfirmStopOpen(false)}
+        processName={currentProcess?.name}
+        accountId={currentProcess?.trading_account_id}
+        symbol={currentProcess?.parameters?.SYMBOL as string | undefined}
+        onClose={() => setConfirmStopOpen(false)}
+        onStop={handleConfirmStop}
       />
     </Box>
   );

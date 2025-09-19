@@ -63,8 +63,8 @@ export const startTradingProcess = createAsyncThunk(
 
 export const stopTradingProcess = createAsyncThunk(
   'tradingProcess/stopTradingProcess',
-  async (id: string) => {
-    return await tradingProcessService.stop(id);
+  async ({ id, clearPositions }: { id: string; clearPositions?: boolean }) => {
+    return await tradingProcessService.stop(id, clearPositions);
   }
 );
 

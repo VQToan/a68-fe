@@ -51,8 +51,16 @@ export const start = async (id: string): Promise<TradingProcess> => {
   return response.data;
 };
 
-export const stop = async (id: string): Promise<TradingProcess> => {
-  const response = await apiClient.post(`api/v1/trading-processes/${id}/stop`);
+export const stop = async (id: string, clearPositions?: boolean): Promise<TradingProcess> => {
+  const params = new URLSearchParams();
+  if (clearPositions !== undefined) {
+    params.append('clear', clearPositions ? 'true' : 'false');
+  }
+
+  const queryString = params.toString();
+  const url = `api/v1/trading-processes/${id}/stop${queryString ? `?${queryString}` : ''}`;
+
+  const response = await apiClient.post(url);
   return response.data;
 };
 
