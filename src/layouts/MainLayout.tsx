@@ -609,7 +609,8 @@ const MainLayout = () => {
           component="main"
           sx={{
             flexGrow: 1,
-            p: { xs: 1.5, sm: 2, md: 3 },
+            px: { xs: 0, sm: 2, md: 3 },
+            py: { xs: 1.25, sm: 2, md: 3 },
             width: "100%",
             backgroundColor: "background.default",
             overflowX: 'hidden',
@@ -624,14 +625,19 @@ const MainLayout = () => {
               duration: theme.transitions.duration.leavingScreen,
             }),
             [muiTheme.breakpoints.down('sm')]: {
-              padding: theme.spacing(1.5),
               '& .MuiPaper-root': {
                 padding: `${theme.spacing(1.5)} !important`,
-                borderRadius: theme.spacing(1.5),
+                borderRadius: 0,
+                marginLeft: 0,
+                marginRight: 0,
+                width: '100%',
               },
               '& .MuiCard-root': {
                 padding: `${theme.spacing(1.5)} !important`,
                 borderRadius: theme.spacing(1.5),
+                marginLeft: 0,
+                marginRight: 0,
+                width: '100%',
               },
               '& .MuiTypography-h5': {
                 fontSize: '1.2rem',
