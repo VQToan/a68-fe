@@ -84,12 +84,13 @@ export const useBacktest = () => {
 
   // Run a backtest process with date parameters
   const handleRunProcess = useCallback(
-    async (id: string, startDate: number, endDate: number) => {
+    async (id: string, startDate: number, endDate: number, combieBalance: boolean) => {
       try {
         // convert date strings to timestamps utc
         const params = {
           start_date: startDate,
           end_date: endDate,
+          combie_balance: combieBalance,
         };
         await dispatch(runBacktestProcess({ id, params })).unwrap();
         // Fetch updated list after action completes

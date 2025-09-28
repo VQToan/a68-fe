@@ -141,6 +141,7 @@ export const runBacktestProcess = createAsyncThunk(
       params: {
         start_date: number;
         end_date: number;
+        combie_balance: boolean;
       };
     },
     { rejectWithValue }
