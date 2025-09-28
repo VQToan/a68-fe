@@ -30,6 +30,7 @@ export interface BacktestResultSummary {
   start_date: number;
   end_date: number;
   metrics: BacktestResultMetrics;
+  combie_balance?: boolean;
   created_at: string;
 }
 
@@ -41,6 +42,7 @@ export interface BacktestResultDetail {
   end_date: number;
   trades: BacktestResultTrade[];
   metrics: BacktestResultMetrics;
+  combie_balance?: boolean;
   created_at: string;
 }
 

@@ -191,6 +191,18 @@ const ResultList: React.FC<ResultListProps> = ({
                           color="info"
                           sx={{ ml: 1 }}
                         />
+                        {typeof resultItem.combie_balance === "boolean" && (
+                          <Chip
+                            size="small"
+                            label={`Combie balance: ${
+                              resultItem.combie_balance ? "Bật" : "Tắt"
+                            }`}
+                            color={
+                              resultItem.combie_balance ? "primary" : "default"
+                            }
+                            sx={{ ml: 1 }}
+                          />
+                        )}
                       </Box>
                     }
                   />
