@@ -3,6 +3,7 @@ import { Box, Tabs, Tab, IconButton, type SxProps, type Theme } from '@mui/mater
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { areEqual } from '@/utils/common';
+import { useTranslation } from 'react-i18next';
 
 export interface FilterTabItem {
   value: string;
@@ -21,6 +22,7 @@ interface FilterTabsProps {
 
 const FilterTabs = ({ value, items, onChange, ariaLabel, sx, showNavButtons = true, scrollAmount = 140 }: FilterTabsProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const { t } = useTranslation();
   const [showButtons, setShowButtons] = useState(false);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(false);
@@ -106,7 +108,7 @@ const FilterTabs = ({ value, items, onChange, ariaLabel, sx, showNavButtons = tr
       <Tabs
         value={value}
         onChange={(_e, v) => onChange(v)}
-        aria-label={ariaLabel || 'filter tabs'}
+        aria-label={ariaLabel || t('filterTabs.ariaLabel')}
         variant="scrollable"
         {...(!showNavButtons && { scrollButtons: false, allowScrollButtonsMobile: false })}
         {...(showNavButtons && { scrollButtons: true, allowScrollButtonsMobile: false })}

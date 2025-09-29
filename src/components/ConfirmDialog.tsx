@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { areEqual } from '@/utils/common';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -27,12 +28,16 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   open,
   title,
   message,
-  confirmLabel = 'Xác nhận',
-  cancelLabel = 'Hủy',
+  confirmLabel,
+  cancelLabel,
   confirmColor = 'error',
   onConfirm,
   onCancel
 }) => {
+  const { t } = useTranslation();
+  const resolvedConfirmLabel = confirmLabel ?? t('common.confirm');
+  const resolvedCancelLabel = cancelLabel ?? t('common.cancel');
+
   return (
     <Dialog
       open={open}
@@ -54,7 +59,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         alignItems: 'center'
       }}>
         <Typography variant="h6">{title}</Typography>
-        <IconButton onClick={onCancel} size="small" sx={{ p: 0.5 }}>
+        <IconButton onClick={onCancel} size="small" sx={{ p: 0.5 }} aria-label={t('common.close')}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -65,10 +70,10 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onCancel} variant="outlined">
-          {cancelLabel}
+          {resolvedCancelLabel}
         </Button>
         <Button onClick={onConfirm} variant="contained" color={confirmColor} autoFocus>
-          {confirmLabel}
+          {resolvedConfirmLabel}
         </Button>
       </DialogActions>
     </Dialog>

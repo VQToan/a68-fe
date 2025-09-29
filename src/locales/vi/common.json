@@ -1,0 +1,147 @@
+{
+  "app": {
+    "name": "AutoTrade68"
+  },
+  "language": {
+    "label": "Ngôn ngữ",
+    "en": "Tiếng Anh",
+    "vi": "Tiếng Việt"
+  },
+  "layout": {
+    "openDrawer": "Mở thanh điều hướng",
+    "logoAlt": "Logo AutoTrade68"
+  },
+  "navigation": {
+    "home": "Trang chủ",
+    "dashboard": "Bảng điều khiển",
+    "moduleBot": "Module Bot",
+    "botTemplate": "Mẫu Bot",
+    "backtest": "Backtest",
+    "trading": "Giao dịch Crypto",
+    "tradingAccounts": "Tài khoản Trading"
+  },
+  "navbar": {
+    "toggleNavigation": "Mở menu điều hướng",
+    "openSettings": "Mở cài đặt"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "signIn": "Đăng nhập",
+    "signInProgress": "Đang đăng nhập...",
+    "email": "Địa chỉ email",
+    "password": "Mật khẩu",
+    "noAccount": "Chưa có tài khoản? Đăng ký"
+  },
+  "filterTabs": {
+    "ariaLabel": "tab lọc"
+  },
+  "home": {
+    "hero": {
+      "subtitle": "Bot giao dịch Crypto tự động",
+      "description": "Giao dịch tiền điện tử thông minh 24/7 với các bot được thiết kế chuyên nghiệp. Tối ưu lợi nhuận và giảm thiểu rủi ro nhờ công nghệ tự động tiên tiến.",
+      "register": "Đăng ký ngay",
+      "viewBots": "Xem các bot",
+      "imageAlt": "Hình minh họa AutoTrade68"
+    },
+    "featuresTitle": "Tính năng nổi bật",
+    "features": {
+      "automaticTrading": {
+        "title": "Giao dịch tự động",
+        "description": "Bot giao dịch tiền điện tử 24/7 không cần giám sát liên tục."
+      },
+      "diverseStrategies": {
+        "title": "Chiến lược đa dạng",
+        "description": "Nhiều module bot với chiến lược trading khác nhau phù hợp mọi thị trường."
+      },
+      "security": {
+        "title": "An toàn và bảo mật",
+        "description": "Hệ thống an toàn tuyệt đối, không nắm giữ tiền của người dùng."
+      },
+      "flexible": {
+        "title": "Tùy chỉnh linh hoạt",
+        "description": "Dễ dàng điều chỉnh thông số bot theo chiến lược giao dịch của bạn."
+      }
+    },
+    "assetsTitle": "Hỗ trợ đa dạng tài sản",
+    "cta": {
+      "title": "Bắt đầu giao dịch thông minh ngay hôm nay",
+      "description": "Đăng ký tài khoản để trải nghiệm bot giao dịch tiền điện tử {{appName}}. Tối ưu hóa danh mục đầu tư với các công cụ tự động tiên tiến.",
+      "button": "Đăng ký tài khoản"
+    },
+    "footer": "© {{year}} {{appName}}. Tất cả các quyền được bảo lưu."
+  },
+  "moduleBot": {
+    "pageTitle": "Quản lý Module Bot",
+    "addNew": "Thêm module mới",
+    "addNewAria": "Thêm module bot mới",
+    "searchPlaceholder": "Tìm kiếm module...",
+    "dialog": {
+      "createTitle": "Thêm Module Bot",
+      "viewTitle": "Chi tiết Module Bot",
+      "editTitle": "Chỉnh sửa Module Bot"
+    },
+    "notifications": {
+      "createSuccess": "Module bot đã được tạo thành công",
+      "updateSuccess": "Module bot đã được cập nhật thành công",
+      "deleteSuccess": "Module bot đã được xóa thành công"
+    },
+    "types": {
+      "entry": "Entry",
+      "exit": "Exit",
+      "dca_cutloss": "DCA/Cutloss",
+      "entry_hedge": "Entry Hedge",
+      "after_hedge": "After Hedge",
+      "stop_loss": "Stop Loss"
+    },
+    "list": {
+      "empty": "Không tìm thấy module nào. Hãy thêm module mới.",
+      "headers": {
+        "name": "Tên",
+        "nameInSource": "Name in Source",
+        "type": "Loại",
+        "description": "Mô tả",
+        "createdAt": "Ngày tạo",
+        "actions": "Thao tác"
+      },
+      "viewTooltip": "Xem chi tiết",
+      "editTooltip": "Chỉnh sửa",
+      "deleteTooltip": "Xóa"
+    },
+    "confirmDeleteTitle": "Xác nhận xóa",
+    "confirmDeleteMessage": "Bạn có chắc chắn muốn xóa module \"{{name}}\"? Hành động này không thể hoàn tác.",
+    "form": {
+      "fields": {
+        "name": "Tên",
+        "nameInSource": "Name in Source",
+        "description": "Mô tả",
+        "type": "Loại Module Bot"
+      },
+      "validation": {
+        "nameRequired": "Tên không được để trống",
+        "nameInSourceRequired": "Name in Source không được để trống",
+        "nameInSourcePattern": "Name in Source chỉ được chứa chữ thường, số và dấu gạch dưới",
+        "descriptionRequired": "Mô tả không được để trống",
+        "typeRequired": "Loại Module Bot không được để trống"
+      },
+      "helper": {
+        "markdown": "Hỗ trợ định dạng Markdown",
+        "nameInSource": "Chỉ sử dụng chữ thường, số và dấu gạch dưới, ví dụ: greeting_bot"
+      }
+    }
+  },
+  "common": {
+    "user": "Người dùng",
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt",
+    "logout": "Đăng xuất",
+    "close": "Đóng",
+    "confirm": "Xác nhận",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "create": "Tạo mới",
+    "loading": "Đang tải..."
+  }
+}

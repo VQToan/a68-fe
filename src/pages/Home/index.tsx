@@ -21,17 +21,17 @@ import PriceChangeIcon from "@mui/icons-material/PriceChange";
 import autoTradeLogo from "../../assets/autotrade68_logo.jpg";
 import { memo, useMemo } from "react";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 const Home = () => {
   const navigate = useNavigate();
   const theme = useTheme();
+  const { t } = useTranslation();
 
   const features = useMemo(
     () => [
       {
-        title: "Giao dịch tự động",
-        description:
-          "Bot giao dịch tiền điện tử 24/7 không cần giám sát liên tục",
+        key: "automaticTrading",
         icon: (
           <AutoGraphIcon
             fontSize="large"
@@ -40,9 +40,7 @@ const Home = () => {
         ),
       },
       {
-        title: "Chiến lược đa dạng",
-        description:
-          "Nhiều module bot với chiến lược trading khác nhau phù hợp với mọi thị trường",
+        key: "diverseStrategies",
         icon: (
           <TrendingUpIcon
             fontSize="large"
@@ -51,9 +49,7 @@ const Home = () => {
         ),
       },
       {
-        title: "An toàn và bảo mật",
-        description:
-          "Hệ thống an toàn tuyệt đối, không nắm giữ tiền của người dùng",
+        key: "security",
         icon: (
           <SecurityIcon
             fontSize="large"
@@ -62,9 +58,7 @@ const Home = () => {
         ),
       },
       {
-        title: "Tùy chỉnh linh hoạt",
-        description:
-          "Dễ dàng tùy chỉnh các thông số bot theo chiến lược giao dịch của bạn",
+        key: "flexible",
         icon: (
           <SettingsSuggestIcon
             fontSize="large"
@@ -145,19 +139,17 @@ const Home = () => {
         <Grid container spacing={4} alignItems="center">
           <Grid size={{ xs: 12, md: 7 }}>
             <Typography variant="h3" fontWeight="bold" gutterBottom>
-              AutoTrade68
+              {t("app.name")}
             </Typography>
             <Typography
               variant="h4"
               gutterBottom
               sx={{ color: theme.palette.secondary.main }}
             >
-              Bot Giao Dịch Crypto Tự Động
+              {t("home.hero.subtitle")}
             </Typography>
             <Typography variant="body1" sx={{ mb: 4, fontSize: "1.1rem" }}>
-              Giao dịch tiền điện tử thông minh 24/7 với các bot được thiết kế
-              chuyên nghiệp. Tối ưu lợi nhuận và giảm thiểu rủi ro với công nghệ
-              giao dịch tự động tiên tiến.
+              {t("home.hero.description")}
             </Typography>
             <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
               <Button
@@ -171,7 +163,7 @@ const Home = () => {
                   fontSize: "1rem",
                 }}
               >
-                Đăng Ký Ngay
+                {t("home.hero.register")}
               </Button>
               <Button
                 variant="outlined"
@@ -189,7 +181,7 @@ const Home = () => {
                   },
                 }}
               >
-                Xem Các Bot
+                {t("home.hero.viewBots")}
               </Button>
             </Stack>
           </Grid>
@@ -197,7 +189,7 @@ const Home = () => {
             <Box
               component="img"
               src={autoTradeLogo}
-              alt="AutoTrade68"
+              alt={t("home.hero.imageAlt")}
               sx={{
                 width: { xs: "70%", md: "90%" },
                 maxWidth: 300,
@@ -231,7 +223,7 @@ const Home = () => {
           },
         }}
       >
-        Tính Năng Nổi Bật
+        {t("home.featuresTitle")}
       </Typography>
 
       <Grid container spacing={4} sx={{ mb: 8 }}>
@@ -258,10 +250,10 @@ const Home = () => {
                   gutterBottom
                   fontWeight="bold"
                 >
-                  {feature.title}
+                  {t(`home.features.${feature.key}.title`)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {feature.description}
+                  {t(`home.features.${feature.key}.description`)}
                 </Typography>
               </CardContent>
             </Card>
@@ -285,7 +277,7 @@ const Home = () => {
           gutterBottom
           sx={{ mb: 3, fontWeight: "bold" }}
         >
-          Hỗ Trợ Đa Dạng Tài Sản
+          {t("home.assetsTitle")}
         </Typography>
 
         <Grid container spacing={2} justifyContent="center">
@@ -344,12 +336,10 @@ const Home = () => {
           sx={{ fontSize: 60, mb: 2, color: "rgba(255,255,255,0.9)" }}
         />
         <Typography variant="h4" sx={{ mb: 2, fontWeight: "bold" }}>
-          Bắt đầu giao dịch thông minh ngay hôm nay
+          {t("home.cta.title")}
         </Typography>
         <Typography variant="body1" sx={{ mb: 4, maxWidth: 700, mx: "auto" }}>
-          Đăng ký tài khoản để trải nghiệm bot giao dịch tiền điện tử
-          AutoTrade68. Tối ưu hóa danh mục đầu tư của bạn với các công cụ giao
-          dịch tự động tiên tiến.
+          {t("home.cta.description", { appName: t("app.name") })}
         </Typography>
         <Button
           variant="contained"
@@ -363,7 +353,7 @@ const Home = () => {
           }}
           startIcon={<PriceChangeIcon />}
         >
-          Đăng Ký Tài Khoản
+          {t("home.cta.button")}
         </Button>
       </Paper>
 
@@ -377,8 +367,10 @@ const Home = () => {
         }}
       >
         <Typography variant="body2" color="text.secondary">
-          © {new Date().getFullYear()} AutoTrade68. Tất cả các quyền được bảo
-          lưu.
+          {t("home.footer", {
+            year: new Date().getFullYear(),
+            appName: t("app.name"),
+          })}
         </Typography>
       </Box>
     </Container>

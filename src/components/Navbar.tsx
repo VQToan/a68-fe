@@ -1,15 +1,22 @@
-import { memo, useCallback, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { AppBar, Box, Toolbar, IconButton, Typography, Menu, Container, Avatar, Button, Tooltip, MenuItem } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from '../hooks/useAuth';
 import { areEqual } from '@/utils/common';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const { isLoggedIn, user, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const userInitial = useMemo(() => {
+    const base = user?.full_name ?? user?.email ?? t('common.user');
+    return base.charAt(0).toUpperCase();
+  }, [t, user]);
 
   const handleOpenNavMenu =useCallback( (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -52,13 +59,13 @@ const Navbar = () => {
               textDecoration: 'none',
             }}
           >
-            REACT-APP
+            {t('app.name')}
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
-              aria-label="account of current user"
+              aria-label={t('navbar.toggleNavigation')}
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
@@ -85,19 +92,19 @@ const Navbar = () => {
               }}
             >
               <MenuItem onClick={handleCloseNavMenu} component={RouterLink} to="/">
-                <Typography textAlign="center">Home</Typography>
+                <Typography textAlign="center">{t('navigation.home')}</Typography>
               </MenuItem>
               {isLoggedIn ? (
                 <MenuItem onClick={handleCloseNavMenu} component={RouterLink} to="/dashboard">
-                  <Typography textAlign="center">Dashboard</Typography>
+                  <Typography textAlign="center">{t('navigation.dashboard')}</Typography>
                 </MenuItem>
               ) : (
                 <>
                   <MenuItem onClick={handleCloseNavMenu} component={RouterLink} to="/login">
-                    <Typography textAlign="center">Login</Typography>
+                    <Typography textAlign="center">{t('auth.login')}</Typography>
                   </MenuItem>
                   <MenuItem onClick={handleCloseNavMenu} component={RouterLink} to="/register">
-                    <Typography textAlign="center">Register</Typography>
+                    <Typography textAlign="center">{t('auth.register')}</Typography>
                   </MenuItem>
                 </>
               )}
@@ -120,7 +127,7 @@ const Navbar = () => {
               textDecoration: 'none',
             }}
           >
-            REACT-APP
+            {t('app.name')}
           </Typography>
           
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
@@ -130,7 +137,7 @@ const Navbar = () => {
               onClick={handleCloseNavMenu}
               sx={{ my: 2, color: 'white', display: 'block' }}
             >
-              Home
+              {t('navigation.home')}
             </Button>
             
             {isLoggedIn ? (
@@ -140,7 +147,7 @@ const Navbar = () => {
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                Dashboard
+                {t('navigation.dashboard')}
               </Button>
             ) : (
               <>
@@ -150,7 +157,7 @@ const Navbar = () => {
                   onClick={handleCloseNavMenu}
                   sx={{ my: 2, color: 'white', display: 'block' }}
                 >
-                  Login
+                  {t('auth.login')}
                 </Button>
                 <Button
                   component={RouterLink}
@@ -158,17 +165,20 @@ const Navbar = () => {
                   onClick={handleCloseNavMenu}
                   sx={{ my: 2, color: 'white', display: 'block' }}
                 >
-                  Register
+                  {t('auth.register')}
                 </Button>
               </>
             )}
           </Box>
 
-          {isLoggedIn && (
-            <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open settings">
+          {isLoggedIn ? (
+            <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <LanguageSwitcher />
+              <Tooltip title={t('navbar.openSettings')}>
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt={user?.full_name || 'User'} src="/static/images/avatar/2.jpg" />
+                  <Avatar alt={user?.full_name || t('common.user')} src="/static/images/avatar/2.jpg">
+                    {userInitial}
+                  </Avatar>
                 </IconButton>
               </Tooltip>
               <Menu
@@ -188,12 +198,16 @@ const Navbar = () => {
                 onClose={handleCloseUserMenu}
               >
                 <MenuItem onClick={handleCloseUserMenu} component={RouterLink} to="/profile">
-                  <Typography textAlign="center">Profile</Typography>
+                  <Typography textAlign="center">{t('common.profile')}</Typography>
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>
-                  <Typography textAlign="center">Logout</Typography>
+                  <Typography textAlign="center">{t('common.logout')}</Typography>
                 </MenuItem>
               </Menu>
+            </Box>
+          ) : (
+            <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', ml: 1 }}>
+              <LanguageSwitcher />
             </Box>
           )}
         </Toolbar>

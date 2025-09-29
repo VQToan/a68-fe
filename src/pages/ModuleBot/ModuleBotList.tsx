@@ -18,6 +18,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import type { IModuleBot } from "@services/moduleBots.service";
 import { areEqual, formatDate } from "@utils/common";
+import { useTranslation } from 'react-i18next';
 
 interface ModuleBotListProps {
   modules: IModuleBot[];
@@ -40,6 +41,8 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
   onDelete,
   onView
 }) => {
+  const { t } = useTranslation();
+
   if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" p={3}>
@@ -52,7 +55,7 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
     return (
       <Box p={3} textAlign="center">
         <Typography variant="body1" color="textSecondary">
-          Không tìm thấy module nào. Hãy thêm module mới.
+          {t('moduleBot.list.empty')}
         </Typography>
       </Box>
     );
@@ -65,13 +68,13 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
         minWidth={900}
         head={
           <TableHead>
-            <TableRow>
-              <TableCell><strong>Tên</strong></TableCell>
-              <TableCell><strong>Name in Source</strong></TableCell>
-              <TableCell><strong>Loại</strong></TableCell>
-              <TableCell><strong>Mô tả</strong></TableCell>
-              <TableCell><strong>Ngày tạo</strong></TableCell>
-              <TableCell><strong>Thao tác</strong></TableCell>
+          <TableRow>
+              <TableCell><strong>{t('moduleBot.list.headers.name')}</strong></TableCell>
+              <TableCell><strong>{t('moduleBot.list.headers.nameInSource')}</strong></TableCell>
+              <TableCell><strong>{t('moduleBot.list.headers.type')}</strong></TableCell>
+              <TableCell><strong>{t('moduleBot.list.headers.description')}</strong></TableCell>
+              <TableCell><strong>{t('moduleBot.list.headers.createdAt')}</strong></TableCell>
+              <TableCell><strong>{t('moduleBot.list.headers.actions')}</strong></TableCell>
             </TableRow>
           </TableHead>
         }
@@ -90,7 +93,9 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
                 </TableCell>
                 <TableCell>
                   <Chip 
-                    label={module.type || "entry"} 
+                    label={t(`moduleBot.types.${module.type ?? 'entry'}`, {
+                      defaultValue: module.type ?? 'entry',
+                    })}
                     size="small" 
                     color="secondary" 
                     variant="outlined" 
@@ -107,7 +112,7 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
                 <TableCell>
                   <Box>
                     {onView && (
-                      <Tooltip title="Xem chi tiết">
+                      <Tooltip title={t('moduleBot.list.viewTooltip')}>
                         <IconButton 
                           size="small" 
                           color="primary"
@@ -119,7 +124,7 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
                     )}
                     
                     {onEdit && (
-                      <Tooltip title="Sửa">
+                      <Tooltip title={t('moduleBot.list.editTooltip')}>
                         <IconButton 
                           size="small" 
                           color="primary"
@@ -131,7 +136,7 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
                     )}
                     
                     {onDelete && (
-                      <Tooltip title="Xóa">
+                      <Tooltip title={t('moduleBot.list.deleteTooltip')}>
                         <IconButton 
                           size="small" 
                           color="error"

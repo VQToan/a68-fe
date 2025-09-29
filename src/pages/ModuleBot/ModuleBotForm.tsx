@@ -15,6 +15,7 @@ import { useForm, Controller } from "react-hook-form";
 import ReactMarkdown from "react-markdown";
 import type { IModuleBot, ModuleBotType } from "@services/moduleBots.service";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 // Define the form mode types
 export type FormMode = "create" | "view" | "edit";
@@ -42,6 +43,7 @@ const ModuleBotForm: React.FC<ModuleBotFormProps> = ({
   mode = "create",
   formId = "module-bot-form",
 }) => {
+  const { t } = useTranslation();
   // Initialize React Hook Form
   const {
     control,
@@ -82,7 +84,7 @@ const ModuleBotForm: React.FC<ModuleBotFormProps> = ({
       return (
         <Box sx={{ height: "100%" }}>
           <Typography variant="subtitle1" fontWeight="medium" gutterBottom>
-            Mô tả:
+            {`${t("moduleBot.form.fields.description")}:`}
           </Typography>
           <Paper
             variant="outlined"
@@ -105,18 +107,18 @@ const ModuleBotForm: React.FC<ModuleBotFormProps> = ({
         name="description"
         control={control}
         rules={{
-          required: "Mô tả không được để trống",
+          required: t("moduleBot.form.validation.descriptionRequired"),
         }}
         render={({ field }) => (
           <TextField
             {...field}
             fullWidth
-            label="Mô tả"
+            label={t("moduleBot.form.fields.description")}
             required={mode !== "view"}
             error={!!errors.description}
             helperText={
               errors.description?.message ||
-              (mode !== "view" ? "Hỗ trợ định dạng Markdown" : "")
+              (mode !== "view" ? t("moduleBot.form.helper.markdown") : "")
             }
             margin="none"
             multiline
@@ -146,13 +148,13 @@ const ModuleBotForm: React.FC<ModuleBotFormProps> = ({
             name="name"
             control={control}
             rules={{
-              required: "Tên không được để trống",
+              required: t("moduleBot.form.validation.nameRequired"),
             }}
             render={({ field }) => (
               <TextField
                 {...field}
                 fullWidth
-                label="Tên"
+                label={t("moduleBot.form.fields.name")}
                 required={mode !== "view"}
                 error={!!errors.name}
                 helperText={errors.name?.message}
@@ -169,24 +171,23 @@ const ModuleBotForm: React.FC<ModuleBotFormProps> = ({
             name="name_in_source"
             control={control}
             rules={{
-              required: "Name in source không được để trống",
+              required: t("moduleBot.form.validation.nameInSourceRequired"),
               pattern: {
                 value: /^[a-z0-9_]+$/,
-                message:
-                  "Name in source chỉ được chứa chữ thường, số và dấu gạch dưới",
+                message: t("moduleBot.form.validation.nameInSourcePattern"),
               },
             }}
             render={({ field }) => (
               <TextField
                 {...field}
                 fullWidth
-                label="Name in Source"
+                label={t("moduleBot.form.fields.nameInSource")}
                 required={mode !== "view"}
                 error={!!errors.name_in_source}
                 helperText={
                   errors.name_in_source?.message ||
                   (mode !== "view"
-                    ? "Chỉ sử dụng chữ thường, số và dấu gạch dưới, ví dụ: greeting_bot"
+                    ? t("moduleBot.form.helper.nameInSource")
                     : "")
                 }
                 margin="none"
@@ -202,7 +203,7 @@ const ModuleBotForm: React.FC<ModuleBotFormProps> = ({
             name="type"
             control={control}
             rules={{
-              required: "Loại Module Bot không được để trống",
+              required: t("moduleBot.form.validation.typeRequired"),
             }}
             render={({ field }) => (
               <FormControl
@@ -212,21 +213,21 @@ const ModuleBotForm: React.FC<ModuleBotFormProps> = ({
                 disabled={mode === "view"}
               >
                 <InputLabel id="module-bot-type-label">
-                  Loại Module Bot
+                  {t("moduleBot.form.fields.type")}
                 </InputLabel>
                 <Select
                   {...field}
                   labelId="module-bot-type-label"
-                  label="Loại Module Bot"
+                  label={t("moduleBot.form.fields.type")}
                   required={mode !== "view"}
                   readOnly={mode === "view"}
                 >
-                  <MenuItem value="entry">Entry</MenuItem>
-                  <MenuItem value="exit">Exit</MenuItem>
-                  <MenuItem value="dca_cutloss">DCA/Cutloss</MenuItem>
-                  <MenuItem value="entry_hedge">Entry Hedge</MenuItem>
-                  <MenuItem value="after_hedge">After Hedge</MenuItem>
-                  <MenuItem value="stop_loss">Stop Loss</MenuItem>
+                  <MenuItem value="entry">{t("moduleBot.types.entry")}</MenuItem>
+                  <MenuItem value="exit">{t("moduleBot.types.exit")}</MenuItem>
+                  <MenuItem value="dca_cutloss">{t("moduleBot.types.dca_cutloss")}</MenuItem>
+                  <MenuItem value="entry_hedge">{t("moduleBot.types.entry_hedge")}</MenuItem>
+                  <MenuItem value="after_hedge">{t("moduleBot.types.after_hedge")}</MenuItem>
+                  <MenuItem value="stop_loss">{t("moduleBot.types.stop_loss")}</MenuItem>
                 </Select>
                 {errors.type && (
                   <FormHelperText>{errors.type.message}</FormHelperText>

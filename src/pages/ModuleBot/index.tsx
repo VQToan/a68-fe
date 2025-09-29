@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo } from "react";
+import { useState, useEffect, useCallback, memo, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -21,6 +21,7 @@ import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
 import type { IModuleBot } from "@services/moduleBots.service";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 const ModuleBot = () => {
   // Use the moduleSlice through the useModule hook
@@ -40,13 +41,13 @@ const ModuleBot = () => {
 
   // Use the notification context
   const { showNotification } = useNotification();
+  const { t } = useTranslation();
 
   // Local state for UI
   const [searchTerm, setSearchTerm] = useState<string>("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
-  const [dialogTitle, setDialogTitle] = useState("Thêm Module Bot Mới");
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -92,23 +93,9 @@ const ModuleBot = () => {
   const handleOpenDialog = useCallback(
     (mode: FormMode = "create") => {
       setDialogMode(mode);
-
-      // Set dialog title based on mode
-      switch (mode) {
-        case "create":
-          setDialogTitle("Thêm Module Bot Mới");
-          break;
-        case "view":
-          setDialogTitle("Chi Tiết Module Bot");
-          break;
-        case "edit":
-          setDialogTitle("Chỉnh Sửa Module Bot");
-          break;
-      }
-
       setOpenDialog(true);
     },
-    [setDialogMode, setDialogTitle]
+    [setDialogMode, setOpenDialog]
   );
 
   const handleCloseDialog = useCallback(() => {
@@ -124,25 +111,24 @@ const ModuleBot = () => {
         if (dialogMode === "create") {
           // Create new module
           await createModule(formData);
-          showNotification("Module bot đã được tạo thành công", "success");
+          showNotification(t("moduleBot.notifications.createSuccess"), "success");
         } else if (dialogMode === "edit" && currentModule) {
           // Update existing module
           await updateModule(currentModule._id, formData);
-          showNotification("Module bot đã được cập nhật thành công", "success");
+          showNotification(t("moduleBot.notifications.updateSuccess"), "success");
         }
         handleCloseDialog();
       } catch (error) {
         console.error("Error submitting module bot:", error);
       }
     },
-    [dialogMode, currentModule, createModule, updateModule, showNotification]
+    [createModule, currentModule, dialogMode, handleCloseDialog, showNotification, t, updateModule]
   );
 
   // Handle edit mode toggle from view mode
   const handleSwitchToEditMode = useCallback(() => {
     setDialogMode("edit");
-    setDialogTitle("Chỉnh Sửa Module Bot");
-  }, [setDialogMode, setDialogTitle]);
+  }, [setDialogMode]);
 
   // Handle view module details
   const handleViewModule = useCallback(
@@ -197,17 +183,12 @@ const ModuleBot = () => {
 
     try {
       await deleteModule(confirmDelete.id);
-      showNotification("Module bot đã được xóa thành công", "success");
+      showNotification(t("moduleBot.notifications.deleteSuccess"), "success");
       handleCloseDeleteConfirm();
     } catch (error) {
       console.error("Error deleting module bot:", error);
     }
-  }, [
-    confirmDelete.id,
-    deleteModule,
-    handleCloseDeleteConfirm,
-    showNotification,
-  ]);
+  }, [confirmDelete.id, deleteModule, handleCloseDeleteConfirm, showNotification, t]);
 
   // Create form footer based on dialog mode
   const getModalFooter = useCallback(() => {
@@ -219,10 +200,10 @@ const ModuleBot = () => {
             variant="outlined"
             color="primary"
           >
-            Chỉnh sửa
+            {t("common.edit")}
           </Button>
           <Button onClick={handleCloseDialog} variant="contained">
-            Đóng
+            {t("common.close")}
           </Button>
         </>
       );
@@ -231,7 +212,7 @@ const ModuleBot = () => {
     return (
       <>
         <Button onClick={handleCloseDialog} variant="outlined">
-          Hủy
+          {t("common.cancel")}
         </Button>
         <Button 
           onClick={() => {
@@ -240,11 +221,22 @@ const ModuleBot = () => {
           }} 
           variant="contained"
         >
-          Lưu
+          {t("common.save")}
         </Button>
       </>
     );
-  }, [dialogMode, handleCloseDialog, handleSwitchToEditMode]);
+  }, [dialogMode, handleCloseDialog, handleSwitchToEditMode, t]);
+
+  const dialogTitleKey = useMemo(() => {
+    switch (dialogMode) {
+      case "view":
+        return "moduleBot.dialog.viewTitle";
+      case "edit":
+        return "moduleBot.dialog.editTitle";
+      default:
+        return "moduleBot.dialog.createTitle";
+    }
+  }, [dialogMode]);
 
   return (
     <Box>
@@ -257,7 +249,7 @@ const ModuleBot = () => {
         >
           <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ flexGrow: 1, minWidth: 0 }}>
             <Typography variant="h5" component="h1" gutterBottom>
-              Quản lý Module Bot
+              {t("moduleBot.pageTitle")}
             </Typography>
           </Grid>
           <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ ml: { xs: 'auto', md: 0 } }}>
@@ -266,7 +258,7 @@ const ModuleBot = () => {
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => handleOpenDialog("create")}
-                aria-label="Thêm module mới"
+                aria-label={t("moduleBot.addNewAria")}
                 sx={{
                   px: { xs: 1.25, sm: 2 },
                   minHeight: 40,
@@ -277,7 +269,7 @@ const ModuleBot = () => {
                 }}
               >
                 <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                  Thêm module mới
+                  {t("moduleBot.addNew")}
                 </Box>
               </Button>
             </Box>
@@ -289,7 +281,7 @@ const ModuleBot = () => {
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Tìm kiếm module..."
+          placeholder={t("moduleBot.searchPlaceholder")}
           value={searchTerm}
           onChange={handleSearch}
           sx={{ mb: 3 }}
@@ -315,7 +307,7 @@ const ModuleBot = () => {
       <Modal
         open={openDialog}
         onClose={handleCloseDialog}
-        title={dialogTitle}
+        title={t(dialogTitleKey)}
         maxWidth="md"
         footer={getModalFooter()}
       >
@@ -330,9 +322,9 @@ const ModuleBot = () => {
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
         open={confirmDelete.open}
-        title="Xác nhận xóa"
-        message={`Bạn có chắc chắn muốn xóa module "${confirmDelete.name}"? Hành động này không thể hoàn tác.`}
-        confirmLabel="Xóa"
+        title={t("moduleBot.confirmDeleteTitle")}
+        message={t("moduleBot.confirmDeleteMessage", { name: confirmDelete.name })}
+        confirmLabel={t("common.delete")}
         confirmColor="error"
         onConfirm={handleDeleteModule}
         onCancel={handleCloseDeleteConfirm}

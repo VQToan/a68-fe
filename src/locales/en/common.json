@@ -1,0 +1,147 @@
+{
+  "app": {
+    "name": "AutoTrade68"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "vi": "Vietnamese"
+  },
+  "layout": {
+    "openDrawer": "Open navigation drawer",
+    "logoAlt": "AutoTrade68 logo"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "moduleBot": "Module Bot",
+    "botTemplate": "Bot Template",
+    "backtest": "Backtest",
+    "trading": "Crypto Trading",
+    "tradingAccounts": "Trading Accounts"
+  },
+  "navbar": {
+    "toggleNavigation": "Open main navigation",
+    "openSettings": "Open settings"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "signIn": "Sign in",
+    "signInProgress": "Signing in...",
+    "email": "Email address",
+    "password": "Password",
+    "noAccount": "Don't have an account? Sign Up"
+  },
+  "filterTabs": {
+    "ariaLabel": "filter tabs"
+  },
+  "home": {
+    "hero": {
+      "subtitle": "Automated crypto trading bot",
+      "description": "Trade cryptocurrencies intelligently 24/7 with professionally crafted bots. Maximize profit and reduce risk with advanced automation.",
+      "register": "Get started now",
+      "viewBots": "Explore bots",
+      "imageAlt": "AutoTrade68 promotional graphic"
+    },
+    "featuresTitle": "Key features",
+    "features": {
+      "automaticTrading": {
+        "title": "Automated trading",
+        "description": "Run crypto trading bots around the clock without constant monitoring."
+      },
+      "diverseStrategies": {
+        "title": "Diverse strategies",
+        "description": "Multiple bot modules with strategies tailored to different market conditions."
+      },
+      "security": {
+        "title": "Secure and reliable",
+        "description": "Enterprise-grade security that never takes custody of user funds."
+      },
+      "flexible": {
+        "title": "Flexible customization",
+        "description": "Easily tune bot parameters to match your trading approach."
+      }
+    },
+    "assetsTitle": "Broad asset support",
+    "cta": {
+      "title": "Start trading smarter today",
+      "description": "Create an account to experience the {{appName}} crypto trading bots. Optimize your portfolio with advanced automation tools.",
+      "button": "Create account"
+    },
+    "footer": "© {{year}} {{appName}}. All rights reserved."
+  },
+  "moduleBot": {
+    "pageTitle": "Module bot management",
+    "addNew": "Add new module",
+    "addNewAria": "Add a new module bot",
+    "searchPlaceholder": "Search modules...",
+    "dialog": {
+      "createTitle": "Create module bot",
+      "viewTitle": "Module bot details",
+      "editTitle": "Edit module bot"
+    },
+    "notifications": {
+      "createSuccess": "Module bot created successfully",
+      "updateSuccess": "Module bot updated successfully",
+      "deleteSuccess": "Module bot deleted successfully"
+    },
+    "types": {
+      "entry": "Entry",
+      "exit": "Exit",
+      "dca_cutloss": "DCA/Cutloss",
+      "entry_hedge": "Entry hedge",
+      "after_hedge": "After hedge",
+      "stop_loss": "Stop loss"
+    },
+    "list": {
+      "empty": "No modules found. Add a new module to get started.",
+      "headers": {
+        "name": "Name",
+        "nameInSource": "Name in source",
+        "type": "Type",
+        "description": "Description",
+        "createdAt": "Created at",
+        "actions": "Actions"
+      },
+      "viewTooltip": "View details",
+      "editTooltip": "Edit",
+      "deleteTooltip": "Delete"
+    },
+    "confirmDeleteTitle": "Confirm deletion",
+    "confirmDeleteMessage": "Are you sure you want to delete the \"{{name}}\" module? This action cannot be undone.",
+    "form": {
+      "fields": {
+        "name": "Name",
+        "nameInSource": "Name in source",
+        "description": "Description",
+        "type": "Module bot type"
+      },
+      "validation": {
+        "nameRequired": "Name is required",
+        "nameInSourceRequired": "Name in source is required",
+        "nameInSourcePattern": "Only lowercase letters, numbers, and underscores are allowed",
+        "descriptionRequired": "Description is required",
+        "typeRequired": "Module bot type is required"
+      },
+      "helper": {
+        "markdown": "Supports Markdown formatting",
+        "nameInSource": "Use lowercase letters, numbers, and underscores only, e.g. greeting_bot"
+      }
+    }
+  },
+  "common": {
+    "user": "User",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "close": "Close",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "loading": "Loading..."
+  }
+}

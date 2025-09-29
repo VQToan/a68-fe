@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { areEqual } from '@/utils/common';
+import { useTranslation } from 'react-i18next';
 
 interface ModalProps extends Omit<DialogProps, 'title'> {
   open: boolean;
@@ -45,6 +46,7 @@ const Modal = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const fullScreen = fullScreenProp || isMobile;
+  const { t } = useTranslation();
   
   const contentRef = useRef<HTMLElement>(null);
   
@@ -97,7 +99,7 @@ const Modal = ({
           <IconButton 
             onClick={onClose} 
             size="small" 
-            aria-label="close"
+            aria-label={t('common.close')}
             sx={{ 
               p: 0.5,
               '&:hover': {

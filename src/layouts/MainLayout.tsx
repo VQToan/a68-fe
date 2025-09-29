@@ -39,6 +39,8 @@ import { useNavigate } from "react-router-dom";
 import theme from "../theme";
 import autoTradeLogo from "../assets/autotrade68_logo.jpg";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@components/LanguageSwitcher";
 
 const drawerWidth = 240;
 
@@ -52,6 +54,7 @@ const MainLayout = () => {
   const isCompact = useMediaQuery(muiTheme.breakpoints.down("md"));
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleDrawerOpen = useCallback(() => {
     setOpen(true);
@@ -105,9 +108,9 @@ const MainLayout = () => {
     } else if (user?.email) {
       return user.email;
     } else {
-      return "User";
+      return t("common.user");
     }
-  }, [user]);
+  }, [t, user]);
 
   // Get first letter for Avatar
   const getInitials = useCallback(
@@ -145,7 +148,7 @@ const MainLayout = () => {
           <Toolbar variant={isCompact ? 'dense' : 'regular'} sx={{ minHeight: { xs: 40, sm: 52, md: 64 }, px: { xs: 1, sm: 2 } }}>
             <IconButton
               color="inherit"
-              aria-label="open drawer"
+              aria-label={t("layout.openDrawer")}
               onClick={handleDrawerOpen}
               edge="start"
               sx={{
@@ -158,7 +161,7 @@ const MainLayout = () => {
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <img
                 src={autoTradeLogo}
-                alt="AutoTrade68 Logo"
+                alt={t("layout.logoAlt")}
                 style={{
                   height: isCompact ? "22px" : "32px",
                   marginRight: "16px",
@@ -166,11 +169,12 @@ const MainLayout = () => {
                 }}
               />
               <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block' }, fontSize: { sm: '0.95rem', md: '1.15rem' } }}>
-                AutoTrade68
+                {t("app.name")}
               </Typography>
             </Box>
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: "flex", alignItems: "center", minWidth: 0 }}>
+              <LanguageSwitcher />
               <Typography variant="body1" sx={{ mr: 2, display: { xs: 'none', md: 'block' }, fontSize: { md: '0.95rem' }, maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {userName}
               </Typography>
@@ -221,20 +225,20 @@ const MainLayout = () => {
                   <ListItemIcon>
                     <PersonIcon fontSize="small" />
                   </ListItemIcon>
-                  Profile
+                  {t("common.profile")}
                 </MenuItem>
                 <MenuItem onClick={handleSettings}>
                   <ListItemIcon>
                     <SettingsIcon fontSize="small" />
                   </ListItemIcon>
-                  Settings
+                  {t("common.settings")}
                 </MenuItem>
                 <Divider />
                 <MenuItem onClick={handleLogout}>
                   <ListItemIcon>
                     <LogoutIcon fontSize="small" />
                   </ListItemIcon>
-                  Logout
+                  {t("common.logout")}
                 </MenuItem>
               </Menu>
             </Box>
@@ -326,7 +330,8 @@ const MainLayout = () => {
                     }} 
                   />
                 </ListItemIcon>
-                <ListItemText primary="Home" sx={{ opacity: open ? 1 : 0 }} />
+                <ListItemText primary={t("navigation.home")}
+                  sx={{ opacity: open ? 1 : 0 }} />
               </ListItemButton>
             </ListItem>
 
@@ -363,7 +368,7 @@ const MainLayout = () => {
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Dashboard"
+                  primary={t("navigation.dashboard")}
                   sx={{ opacity: open ? 1 : 0 }}
                 />
               </ListItemButton>
@@ -402,7 +407,7 @@ const MainLayout = () => {
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Module Bot"
+                  primary={t("navigation.moduleBot")}
                   sx={{ opacity: open ? 1 : 0 }}
                 />
               </ListItemButton>
@@ -441,7 +446,7 @@ const MainLayout = () => {
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Bot Template"
+                  primary={t("navigation.botTemplate")}
                   sx={{ opacity: open ? 1 : 0 }}
                 />
               </ListItemButton>
@@ -480,7 +485,7 @@ const MainLayout = () => {
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Backtest"
+                  primary={t("navigation.backtest")}
                   sx={{ opacity: open ? 1 : 0 }}
                 />
               </ListItemButton>
@@ -519,7 +524,7 @@ const MainLayout = () => {
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Crypto Trading"
+                  primary={t("navigation.trading")}
                   sx={{ opacity: open ? 1 : 0 }}
                 />
               </ListItemButton>
@@ -558,7 +563,7 @@ const MainLayout = () => {
                   />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Tài khoản Trading"
+                  primary={t("navigation.tradingAccounts")}
                   sx={{ opacity: open ? 1 : 0 }}
                 />
               </ListItemButton>
@@ -598,7 +603,7 @@ const MainLayout = () => {
                     }} 
                   />
                 </ListItemIcon>
-                <ListItemText primary="Logout" sx={{ opacity: open ? 1 : 0 }} />
+                <ListItemText primary={t("common.logout")} sx={{ opacity: open ? 1 : 0 }} />
               </ListItemButton>
             </ListItem>
           </List>
