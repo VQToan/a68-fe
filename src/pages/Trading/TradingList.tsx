@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import {
   TableBody,
   TableCell,
@@ -21,6 +21,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import type { TradingProcess, TradingStatusType } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
 import StickyTable from "@components/StickyTable";
+import { useTranslation } from "react-i18next";
 
 interface TradingListProps {
   processes: TradingProcess[];
@@ -61,25 +62,6 @@ const getStatusColor = (status: TradingStatusType): "default" | "primary" | "sec
   }
 };
 
-const getStatusLabel = (status: TradingStatusType): string => {
-  switch (status) {
-    case "created":
-      return "Đã tạo";
-    case "queued":
-      return "Đang chờ";
-    case "running":
-      return "Đang chạy";
-    case "stopped":
-      return "Đã dừng";
-    case "failed":
-      return "Thất bại";
-    case "paused":
-      return "Tạm dừng";
-    default:
-      return status;
-  }
-};
-
 const TradingList = ({
   processes,
   isLoading,
@@ -92,6 +74,19 @@ const TradingList = ({
   onPageChange,
   onRowsPerPageChange,
 }: TradingListProps) => {
+  const { t } = useTranslation();
+  const statusLabels = useMemo(
+    () => ({
+      created: t("trading.list.status.created"),
+      queued: t("trading.list.status.queued"),
+      running: t("trading.list.status.running"),
+      stopped: t("trading.list.status.stopped"),
+      failed: t("trading.list.status.failed"),
+      paused: t("trading.list.status.paused"),
+    }),
+    [t]
+  );
+
   const handlePageChange = (_event: unknown, newPage: number) => {
     onPageChange(newPage + 1); // MUI uses 0-based indexing, our API uses 1-based
   };
@@ -122,7 +117,7 @@ const TradingList = ({
         minHeight="200px"
       >
         <Typography variant="body1" color="text.secondary">
-          Không có trading process nào
+          {t("trading.list.empty")}
         </Typography>
       </Box>
     );
@@ -136,14 +131,14 @@ const TradingList = ({
         head={
           <TableHead>
             <TableRow>
-              <TableCell>Tên</TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Mô tả</TableCell>
-              <TableCell>Trạng thái</TableCell>
-              <TableCell>Số ngày chạy</TableCell>
-              <TableCell>Tài khoản Trading</TableCell>
-              <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>Bot Template</TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Ngày tạo</TableCell>
-              <TableCell align="right">Thao tác</TableCell>
+              <TableCell>{t("trading.list.headers.name")}</TableCell>
+              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>{t("trading.list.headers.description")}</TableCell>
+              <TableCell>{t("trading.list.headers.status")}</TableCell>
+              <TableCell>{t("trading.list.headers.daysRunning")}</TableCell>
+              <TableCell>{t("trading.list.headers.account")}</TableCell>
+              <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>{t("trading.list.headers.template")}</TableCell>
+              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>{t("trading.list.headers.createdAt")}</TableCell>
+              <TableCell align="right">{t("trading.list.headers.actions")}</TableCell>
             </TableRow>
           </TableHead>
         }
@@ -172,7 +167,7 @@ const TradingList = ({
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={getStatusLabel(process.status)}
+                    label={statusLabels[process.status] ?? process.status}
                     color={getStatusColor(process.status)}
                     size="small"
                   />
@@ -186,29 +181,29 @@ const TradingList = ({
                         ? Date.now()
                         : new Date(process.stopped_at).getTime();
                       const diffDays = Math.max(0, Math.floor((end - start) / (1000 * 60 * 60 * 24)));
-                      return `${diffDays} ngày`;
+                      return t("trading.list.runningDays", { count: diffDays });
                     })()}
                   </Typography>
                 </TableCell>
                 <TableCell>
                   <Typography variant="body2">
-                    {process.trading_account_name || "N/A"}
+                    {process.trading_account_name || t("common.notAvailable")}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>
                   <Typography variant="body2">
-                    {process.bot_template_name || "N/A"}
+                    {process.bot_template_name || t("common.notAvailable")}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                   <Typography variant="body2" color="text.secondary">
-                    {new Date(process.created_at).toLocaleDateString('vi-VN')}
+                    {new Date(process.created_at).toLocaleDateString()}
                   </Typography>
                 </TableCell>
                 <TableCell align="right">
                   <Box sx={{ display: "flex", gap: 0.5 }}>
                     {/* View details button */}
-                    <Tooltip title="Xem chi tiết">
+                    <Tooltip title={t("trading.list.tooltips.view")}>
                       <IconButton
                         size="small"
                         color="info"
@@ -220,7 +215,7 @@ const TradingList = ({
 
                     {/* Start button - only show if not running */}
                     {process.status !== "running" && (
-                      <Tooltip title="Bắt đầu trading">
+                      <Tooltip title={t("trading.list.tooltips.start")}>
                         <IconButton
                           size="small"
                           color="success"
@@ -233,7 +228,7 @@ const TradingList = ({
 
                     {/* Stop button - only show if running */}
                     {process.status === "running" && (
-                      <Tooltip title="Dừng trading">
+                      <Tooltip title={t("trading.list.tooltips.stop")}>
                         <IconButton
                           size="small"
                           color="warning"
@@ -245,7 +240,7 @@ const TradingList = ({
                     )}
 
                     {/* Edit button */}
-                    <Tooltip title="Chỉnh sửa">
+                    <Tooltip title={t("common.edit")}>
                       <IconButton
                         size="small"
                         color="primary"
@@ -257,7 +252,7 @@ const TradingList = ({
 
                     {/* Delete button - only show if not running */}
                     {process.status !== "running" && (
-                      <Tooltip title="Xóa">
+                      <Tooltip title={t("common.delete")}>
                         <IconButton
                           size="small"
                           color="error"
@@ -283,9 +278,9 @@ const TradingList = ({
         rowsPerPage={pagination.page_size}
         onRowsPerPageChange={handleRowsPerPageChange}
         rowsPerPageOptions={[5, 10, 25, 50]}
-        labelRowsPerPage="Số dòng:"
+        labelRowsPerPage={t("trading.list.pagination.rowsPerPage")}
         labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to} / ${count !== -1 ? count : `hơn ${to}`}`
+          t("trading.list.pagination.displayedRows", { from, to, count })
         }
       />
     </Paper>

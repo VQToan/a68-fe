@@ -130,6 +130,161 @@
       }
     }
   },
+  "botTemplate": {
+    "pageTitle": "Quản lý Bot Template",
+    "create": {
+      "button": "Tạo template",
+      "aria": "Tạo bot template mới"
+    },
+    "searchPlaceholder": "Tìm kiếm template...",
+    "dialog": {
+      "createTitle": "Tạo Bot Template",
+      "viewTitle": "Chi tiết Bot Template",
+      "editTitle": "Chỉnh sửa Bot Template"
+    },
+    "notifications": {
+      "createSuccess": "Bot template đã được tạo thành công",
+      "updateSuccess": "Bot template đã được cập nhật thành công",
+      "deleteSuccess": "Bot template đã được xóa thành công"
+    },
+    "confirmDelete": {
+      "title": "Xóa bot template",
+      "message": "Bạn có chắc chắn muốn xóa bot template \"{{name}}\"?"
+    },
+    "list": {
+      "empty": "Không có bot template nào.",
+      "headers": {
+        "name": "Tên",
+        "description": "Mô tả",
+        "createdAt": "Ngày tạo",
+        "actions": "Thao tác"
+      },
+      "tooltips": {
+        "view": "Xem chi tiết",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa"
+      }
+    },
+    "form": {
+      "sections": {
+        "basic": "Thông tin cơ bản",
+        "modules": "Cấu hình Module"
+      },
+      "fields": {
+        "name": "Tên template",
+        "description": "Mô tả",
+        "entry": "Module Entry",
+        "exit": "Module Exit",
+        "dca": "Module DCA/Cutloss",
+        "entryHedge": "Module Entry Hedge",
+        "afterHedge": "Module After Hedge",
+        "stopLoss": "Module Stop Loss"
+      },
+      "placeholders": {
+        "name": "Nhập tên template",
+        "description": "Nhập mô tả chi tiết"
+      },
+      "validation": {
+        "nameRequired": "Tên template là bắt buộc",
+        "descriptionRequired": "Mô tả là bắt buộc",
+        "entryRequired": "Module Entry là bắt buộc",
+        "exitRequired": "Module Exit là bắt buộc",
+        "dcaRequired": "Module DCA/Cutloss là bắt buộc",
+        "entryHedgeRequired": "Module Entry Hedge là bắt buộc",
+        "afterHedgeRequired": "Module After Hedge là bắt buộc",
+        "stopLossRequired": "Module Stop Loss là bắt buộc"
+      },
+      "moduleLabels": {
+        "entry": "Module Entry",
+        "exit": "Module Exit",
+        "dca": "Module DCA/Cutloss",
+        "entryHedge": "Module Entry Hedge",
+        "afterHedge": "Module After Hedge",
+        "stopLoss": "Module Stop Loss"
+      },
+      "helper": {
+        "select": "Chọn module"
+      }
+    },
+    "detail": {
+      "notFound": "Không tìm thấy thông tin template.",
+      "name": "Tên",
+      "description": "Mô tả",
+      "modules": "Cấu hình Module",
+      "createdAt": "Ngày tạo",
+      "updatedAt": "Cập nhật lần cuối",
+      "missing": "Không có",
+      "moduleMissing": "Không tìm thấy module"
+    }
+  },
+  "trading": {
+    "pageTitle": "Quản lý Trading Process",
+    "create": {
+      "button": "Tạo trading process",
+      "aria": "Tạo trading process mới"
+    },
+    "searchPlaceholder": "Tìm kiếm trading process...",
+    "refreshTooltip": "Làm mới danh sách",
+    "tabs": {
+      "ariaLabel": "tab trạng thái trading",
+      "all": "Tất cả",
+      "created": "Đã tạo",
+      "queued": "Đang chờ",
+      "running": "Đang chạy",
+      "stopped": "Đã dừng",
+      "failed": "Thất bại",
+      "paused": "Tạm dừng"
+    },
+    "dialog": {
+      "createTitle": "Tạo Trading Process",
+      "viewTitle": "Chi tiết Trading Process",
+      "editTitle": "Chỉnh sửa Trading Process"
+    },
+    "notifications": {
+      "createSuccess": "Trading process đã được tạo thành công",
+      "updateSuccess": "Trading process đã được cập nhật thành công",
+      "deleteSuccess": "Trading process đã được xóa thành công",
+      "startSuccess": "Trading process đã được khởi động",
+      "stopSuccess": "Trading process đã được dừng",
+      "stopWithCloseSuccess": "Trading process đã được dừng và đóng tất cả lệnh",
+      "refreshSuccess": "Danh sách trading process đã được cập nhật"
+    },
+    "confirmDelete": {
+      "title": "Xóa trading process",
+      "message": "Bạn có chắc chắn muốn xóa trading process \"{{name}}\"? Hành động này không thể hoàn tác."
+    },
+    "list": {
+      "empty": "Không có trading process nào",
+      "status": {
+        "created": "Đã tạo",
+        "queued": "Đang chờ",
+        "running": "Đang chạy",
+        "stopped": "Đã dừng",
+        "failed": "Thất bại",
+        "paused": "Tạm dừng"
+      },
+      "headers": {
+        "name": "Tên",
+        "description": "Mô tả",
+        "status": "Trạng thái",
+        "daysRunning": "Số ngày chạy",
+        "account": "Tài khoản trading",
+        "template": "Bot template",
+        "createdAt": "Ngày tạo",
+        "actions": "Thao tác"
+      },
+      "tooltips": {
+        "view": "Xem chi tiết",
+        "start": "Bắt đầu trading",
+        "stop": "Dừng trading"
+      },
+      "runningDays": "{{count}} ngày",
+      "pagination": {
+        "rowsPerPage": "Số dòng:",
+        "displayedRows": "{{from}}–{{to}}/{{count}}"
+      }
+    }
+  },
   "backtest": {
     "management": {
       "pageTitle": "Quản lý Backtest",

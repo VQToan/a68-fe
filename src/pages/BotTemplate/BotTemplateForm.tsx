@@ -19,6 +19,7 @@ import {
 } from "../../types/botTemplate.types";
 import type { IModuleBot } from "@services/moduleBots.service";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 export type FormMode = "create" | "edit";
 
@@ -37,14 +38,13 @@ interface ModuleOption {
   type: string;
 }
 
-// Mapping for Vietnamese module labels
-const moduleLabels: Record<ModuleType, string> = {
-  [ModuleType.ENTRY]: "Module Entry",
-  [ModuleType.EXIT]: "Module Exit",
-  [ModuleType.DCA_CUTLOSS]: "Module DCA/Cutloss",
-  [ModuleType.ENTRY_HEDGE]: "Module Entry Hedge",
-  [ModuleType.AFTER_HEDGE]: "Module After Hedge",
-  [ModuleType.STOP_LOSS]: "Module Stop Loss",
+const moduleLabelKeyMap: Record<ModuleType, string> = {
+  [ModuleType.ENTRY]: "botTemplate.form.fields.entry",
+  [ModuleType.EXIT]: "botTemplate.form.fields.exit",
+  [ModuleType.DCA_CUTLOSS]: "botTemplate.form.fields.dca",
+  [ModuleType.ENTRY_HEDGE]: "botTemplate.form.fields.entryHedge",
+  [ModuleType.AFTER_HEDGE]: "botTemplate.form.fields.afterHedge",
+  [ModuleType.STOP_LOSS]: "botTemplate.form.fields.stopLoss",
 };
 
 const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
@@ -55,6 +55,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
 }) => {
   // Get modules from the store for the module selections
   const { modules, getModules, isLoading: isLoadingModules } = useModule();
+  const { t } = useTranslation();
 
   // Group modules by type
   const [moduleOptions, setModuleOptions] = useState<
@@ -160,12 +161,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="name"
               control={control}
-              rules={{ required: "Tên là bắt buộc" }}
+              rules={{ required: t("botTemplate.form.validation.nameRequired") }}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Tên template"
-                  placeholder="Nhập tên template"
+                  label={t("botTemplate.form.fields.name")}
+                  placeholder={t("botTemplate.form.placeholders.name")}
                   fullWidth
                   error={!!errors.name}
                   helperText={errors.name?.message}
@@ -183,12 +184,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="description"
               control={control}
-              rules={{ required: "Mô tả là bắt buộc" }}
+              rules={{ required: t("botTemplate.form.validation.descriptionRequired") }}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Mô tả"
-                  placeholder="Nhập mô tả chi tiết về template"
+                  label={t("botTemplate.form.fields.description")}
+                  placeholder={t("botTemplate.form.placeholders.description")}
                   fullWidth
                   multiline
                   rows={3}
@@ -205,7 +206,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
       {/* Module configuration section */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-          Cấu hình Module
+          {t("botTemplate.form.sections.modules")}
         </Typography>
 
         <Grid container spacing={3}>
@@ -214,7 +215,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="entry_module"
               control={control}
-              rules={{ required: "Module Entry là bắt buộc" }}
+              rules={{ required: t("botTemplate.form.validation.entryRequired") }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
@@ -222,12 +223,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                   error={!!errors.entry_module}
                 >
                   <InputLabel id="entry-module-label">
-                    {moduleLabels[ModuleType.ENTRY]}
+                    {t(moduleLabelKeyMap[ModuleType.ENTRY])}
                   </InputLabel>
                   <Select
                     {...field}
                     labelId="entry-module-label"
-                    label={moduleLabels[ModuleType.ENTRY]}
+                    label={t(moduleLabelKeyMap[ModuleType.ENTRY])}
                     sx={{
                       height: 56,
                       "& .MuiSelect-select": {
@@ -256,7 +257,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="exit_module"
               control={control}
-              rules={{ required: "Module Exit là bắt buộc" }}
+              rules={{ required: t("botTemplate.form.validation.exitRequired") }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
@@ -264,12 +265,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                   error={!!errors.exit_module}
                 >
                   <InputLabel id="exit-module-label">
-                    {moduleLabels[ModuleType.EXIT]}
+                    {t(moduleLabelKeyMap[ModuleType.EXIT])}
                   </InputLabel>
                   <Select
                     {...field}
                     labelId="exit-module-label"
-                    label={moduleLabels[ModuleType.EXIT]}
+                    label={t(moduleLabelKeyMap[ModuleType.EXIT])}
                     sx={{
                       height: 56,
                       "& .MuiSelect-select": {
@@ -299,7 +300,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="dca_cutloss_module"
               control={control}
-              rules={{ required: "Module DCA/Cutloss là bắt buộc" }}
+              rules={{ required: t("botTemplate.form.validation.dcaRequired") }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
@@ -307,12 +308,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                   error={!!errors.dca_cutloss_module}
                 >
                   <InputLabel id="dca-cutloss-module-label">
-                    {moduleLabels[ModuleType.DCA_CUTLOSS]}
+                    {t(moduleLabelKeyMap[ModuleType.DCA_CUTLOSS])}
                   </InputLabel>
                   <Select
                     {...field}
                     labelId="dca-cutloss-module-label"
-                    label={moduleLabels[ModuleType.DCA_CUTLOSS]}
+                    label={t(moduleLabelKeyMap[ModuleType.DCA_CUTLOSS])}
                     sx={{
                       height: 56,
                       "& .MuiSelect-select": {
@@ -341,7 +342,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="stop_loss_module"
               control={control}
-              rules={{ required: "Module Stop Loss là bắt buộc" }}
+              rules={{ required: t("botTemplate.form.validation.stopLossRequired") }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
@@ -349,12 +350,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                   error={!!errors.stop_loss_module}
                 >
                   <InputLabel id="stop-loss-module-label">
-                    {moduleLabels[ModuleType.STOP_LOSS]}
+                    {t(moduleLabelKeyMap[ModuleType.STOP_LOSS])}
                   </InputLabel>
                   <Select
                     {...field}
                     labelId="stop-loss-module-label"
-                    label={moduleLabels[ModuleType.STOP_LOSS]}
+                    label={t(moduleLabelKeyMap[ModuleType.STOP_LOSS])}
                     sx={{
                       height: 56,
                       "& .MuiSelect-select": {
@@ -384,7 +385,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="entry_hedge_module"
               control={control}
-              rules={{ required: "Module Entry Hedge là bắt buộc" }}
+              rules={{ required: t("botTemplate.form.validation.entryHedgeRequired") }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
@@ -392,12 +393,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                   error={!!errors.entry_hedge_module}
                 >
                   <InputLabel id="entry-hedge-module-label">
-                    {moduleLabels[ModuleType.ENTRY_HEDGE]}
+                    {t(moduleLabelKeyMap[ModuleType.ENTRY_HEDGE])}
                   </InputLabel>
                   <Select
                     {...field}
                     labelId="entry-hedge-module-label"
-                    label={moduleLabels[ModuleType.ENTRY_HEDGE]}
+                    label={t(moduleLabelKeyMap[ModuleType.ENTRY_HEDGE])}
                     sx={{
                       height: 56,
                       "& .MuiSelect-select": {
@@ -426,7 +427,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="after_hedge_module"
               control={control}
-              rules={{ required: "Module After Hedge là bắt buộc" }}
+              rules={{ required: t("botTemplate.form.validation.afterHedgeRequired") }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
@@ -434,12 +435,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                   error={!!errors.after_hedge_module}
                 >
                   <InputLabel id="after-hedge-module-label">
-                    {moduleLabels[ModuleType.AFTER_HEDGE]}
+                    {t(moduleLabelKeyMap[ModuleType.AFTER_HEDGE])}
                   </InputLabel>
                   <Select
                     {...field}
                     labelId="after-hedge-module-label"
-                    label={moduleLabels[ModuleType.AFTER_HEDGE]}
+                    label={t(moduleLabelKeyMap[ModuleType.AFTER_HEDGE])}
                     sx={{
                       height: 56,
                       "& .MuiSelect-select": {

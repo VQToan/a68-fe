@@ -32,7 +32,7 @@ const RunBacktestDialog: React.FC<RunBacktestDialogProps> = ({
 }) => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const [combineBalance, setCombineBalance] = useState<boolean>(false);
+  const [combineBalance, setCombineBalance] = useState<boolean>(true);
   const [validationError, setValidationError] = useState<string | null>(null);
   const { t } = useTranslation();
 
@@ -95,6 +95,7 @@ const RunBacktestDialog: React.FC<RunBacktestDialogProps> = ({
                   color="primary"
                 />
               }
+              sx={{ gap: 1 }}
               label={t("backtest.runDialog.combineBalance")}
             />
           </Box>

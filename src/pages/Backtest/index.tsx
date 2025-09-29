@@ -26,7 +26,11 @@ import { useModule } from "@hooks/useModule";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
-import type { BacktestStatus, BacktestProcessCreate, BacktestProcessUpdate } from "@/types/backtest.type";
+import type {
+  BacktestStatus,
+  BacktestProcessCreate,
+  BacktestProcessUpdate,
+} from "@/types/backtest.type";
 import { areEqual } from "@/utils/common";
 import FilterTabs from "@components/FilterTabs";
 import { useTranslation } from "react-i18next";
@@ -35,8 +39,8 @@ export type FormMode = "create" | "view" | "edit";
 
 // Component state enum để quản lý hiển thị
 enum BacktestView {
-  LIST = 'list',
-  RESULT = 'result'
+  LIST = "list",
+  RESULT = "result",
 }
 
 // Tab interface
@@ -103,10 +107,14 @@ const Backtest = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
   const { t } = useTranslation();
-  
+
   // Thêm state để quản lý hiển thị component
-  const [currentView, setCurrentView] = useState<BacktestView>(BacktestView.LIST);
-  const [selectedBacktestId, setSelectedBacktestId] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<BacktestView>(
+    BacktestView.LIST
+  );
+  const [selectedBacktestId, setSelectedBacktestId] = useState<string | null>(
+    null
+  );
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -140,7 +148,7 @@ const Backtest = () => {
       model: string;
     };
   }>({
-    open: false
+    open: false,
   });
 
   const [optimizationResultsDialog, setOptimizationResultsDialog] = useState<{
@@ -166,7 +174,11 @@ const Backtest = () => {
 
   // Fetch backtests with pagination parameters
   const fetchBacktests = useCallback(() => {
-    getProcesses(tabStatusMap[currentTab], (currentPage - 1) * rowsPerPage, rowsPerPage);
+    getProcesses(
+      tabStatusMap[currentTab],
+      (currentPage - 1) * rowsPerPage,
+      rowsPerPage
+    );
   }, [currentTab, currentPage, rowsPerPage, getProcesses]);
 
   // Re-fetch when pagination changes
@@ -235,11 +247,20 @@ const Backtest = () => {
         if (dialogMode === "create") {
           // Create new backtest
           await createProcess(formData as BacktestProcessCreate);
-          showNotification(t("backtest.management.notifications.createSuccess"), "success");
+          showNotification(
+            t("backtest.management.notifications.createSuccess"),
+            "success"
+          );
         } else if (dialogMode === "edit" && currentProcess) {
           // Update existing backtest
-          await updateProcess(currentProcess._id, formData as BacktestProcessUpdate);
-          showNotification(t("backtest.management.notifications.updateSuccess"), "success");
+          await updateProcess(
+            currentProcess._id,
+            formData as BacktestProcessUpdate
+          );
+          showNotification(
+            t("backtest.management.notifications.updateSuccess"),
+            "success"
+          );
         }
         handleCloseDialog();
         // Re-fetch the list with latest data
@@ -248,7 +269,16 @@ const Backtest = () => {
         console.error("Error submitting backtest:", error);
       }
     },
-    [createProcess, currentProcess, dialogMode, fetchBacktests, handleCloseDialog, showNotification, t, updateProcess]
+    [
+      createProcess,
+      currentProcess,
+      dialogMode,
+      fetchBacktests,
+      handleCloseDialog,
+      showNotification,
+      t,
+      updateProcess,
+    ]
   );
 
   // Handle edit mode toggle from view mode
@@ -305,41 +335,63 @@ const Backtest = () => {
 
     try {
       await deleteProcess(confirmDelete.id);
-      showNotification(t("backtest.management.notifications.deleteSuccess"), "success");
+      showNotification(
+        t("backtest.management.notifications.deleteSuccess"),
+        "success"
+      );
       handleCloseDeleteConfirm();
       // Re-fetch the list with latest data
       fetchBacktests();
     } catch (error) {
       console.error("Error deleting backtest:", error);
     }
-  }, [confirmDelete.id, deleteProcess, fetchBacktests, handleCloseDeleteConfirm, showNotification, t]);
+  }, [
+    confirmDelete.id,
+    deleteProcess,
+    fetchBacktests,
+    handleCloseDeleteConfirm,
+    showNotification,
+    t,
+  ]);
 
   // Handle stop backtest
-  const handleStopBacktest = useCallback(async (id: string) => {
-    try {
-      await stopProcess(id);
-      showNotification(t("backtest.management.notifications.stopSuccess"), "success");
-      // Re-fetch the list with latest data
-      fetchBacktests();
-    } catch (error) {
-      console.error("Error stopping backtest:", error);
-    }
-  }, [fetchBacktests, showNotification, stopProcess, t]);
+  const handleStopBacktest = useCallback(
+    async (id: string) => {
+      try {
+        await stopProcess(id);
+        showNotification(
+          t("backtest.management.notifications.stopSuccess"),
+          "success"
+        );
+        // Re-fetch the list with latest data
+        fetchBacktests();
+      } catch (error) {
+        console.error("Error stopping backtest:", error);
+      }
+    },
+    [fetchBacktests, showNotification, stopProcess, t]
+  );
 
   // Handle refreshing the backtest list
   const handleRefreshBacktests = useCallback(() => {
     fetchBacktests();
-    showNotification(t("backtest.management.notifications.refreshSuccess"), "success");
+    showNotification(
+      t("backtest.management.notifications.refreshSuccess"),
+      "success"
+    );
   }, [fetchBacktests, showNotification, t]);
 
   // Handle opening run backtest dialog
-  const handleOpenRunBacktestDialog = useCallback((id: string, name: string) => {
-    setRunBacktestDialog({
-      open: true,
-      id,
-      name,
-    });
-  }, [setRunBacktestDialog]);
+  const handleOpenRunBacktestDialog = useCallback(
+    (id: string, name: string) => {
+      setRunBacktestDialog({
+        open: true,
+        id,
+        name,
+      });
+    },
+    [setRunBacktestDialog]
+  );
 
   // Handle closing run backtest dialog
   const handleCloseRunBacktestDialog = useCallback(() => {
@@ -351,28 +403,49 @@ const Backtest = () => {
   }, [setRunBacktestDialog]);
 
   // Handle run backtest (now opens the dialog)
-  const handleRunBacktest = useCallback(async (id: string) => {
-    // Find the backtest process to get its name
-    const process = processes.find(p => p._id === id);
-    if (process) {
-      handleOpenRunBacktestDialog(id, process.name);
-    }
-  }, [processes, handleOpenRunBacktestDialog]);
+  const handleRunBacktest = useCallback(
+    async (id: string) => {
+      // Find the backtest process to get its name
+      const process = processes.find((p) => p._id === id);
+      if (process) {
+        handleOpenRunBacktestDialog(id, process.name);
+      }
+    },
+    [processes, handleOpenRunBacktestDialog]
+  );
 
   // Handle run backtest with date parameters
-  const handleRunBacktestWithDates = useCallback(async (startDate: number, endDate: number, combineBalance: boolean) => {
-    if (!runBacktestDialog.id) return;
+  const handleRunBacktestWithDates = useCallback(
+    async (startDate: number, endDate: number, combineBalance: boolean) => {
+      if (!runBacktestDialog.id) return;
 
-    try {
-      await runProcess(runBacktestDialog.id, startDate, endDate, combineBalance);
-      showNotification(t("backtest.management.notifications.runSuccess"), "success");
-      handleCloseRunBacktestDialog();
-      // Re-fetch the list with latest data
-      fetchBacktests();
-    } catch (error) {
-      console.error("Error running backtest:", error);
-    }
-  }, [fetchBacktests, handleCloseRunBacktestDialog, runBacktestDialog.id, runProcess, showNotification, t]);
+      try {
+        await runProcess(
+          runBacktestDialog.id,
+          startDate,
+          endDate,
+          combineBalance
+        );
+        showNotification(
+          t("backtest.management.notifications.runSuccess"),
+          "success"
+        );
+        handleCloseRunBacktestDialog();
+        // Re-fetch the list with latest data
+        fetchBacktests();
+      } catch (error) {
+        console.error("Error running backtest:", error);
+      }
+    },
+    [
+      fetchBacktests,
+      handleCloseRunBacktestDialog,
+      runBacktestDialog.id,
+      runProcess,
+      showNotification,
+      t,
+    ]
+  );
 
   // Handle opening optimization dialog
   const handleOpenOptimizationDialog = useCallback(() => {
@@ -389,26 +462,29 @@ const Backtest = () => {
   }, []);
 
   // Handle optimization success
-  const handleOptimizationSuccess = useCallback((params: {
-    botTemplateId: string;
-    backtestProcessIds: string[];
-    llmProvider: string;
-    model: string;
-  }) => {
-    // Store parameters for use in the results dialog
-    setOptimizationState(prev => ({
-      ...prev,
-      parametersData: params
-    }));
-    
-    // Open the results dialog
-    setOptimizationResultsDialog({
-      open: true,
-    });
-    
-    // Re-fetch the list with latest data
-    fetchBacktests();
-  }, [fetchBacktests]);
+  const handleOptimizationSuccess = useCallback(
+    (params: {
+      botTemplateId: string;
+      backtestProcessIds: string[];
+      llmProvider: string;
+      model: string;
+    }) => {
+      // Store parameters for use in the results dialog
+      setOptimizationState((prev) => ({
+        ...prev,
+        parametersData: params,
+      }));
+
+      // Open the results dialog
+      setOptimizationResultsDialog({
+        open: true,
+      });
+
+      // Re-fetch the list with latest data
+      fetchBacktests();
+    },
+    [fetchBacktests]
+  );
 
   // Handle closing optimization results dialog
   const handleCloseOptimizationResultsDialog = useCallback(() => {
@@ -443,8 +519,13 @@ const Backtest = () => {
         </Button>
         <Button
           onClick={() => {
-            const form = document.getElementById("backtest-form") as HTMLFormElement;
-            if (form) form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+            const form = document.getElementById(
+              "backtest-form"
+            ) as HTMLFormElement;
+            if (form)
+              form.dispatchEvent(
+                new Event("submit", { cancelable: true, bubbles: true })
+              );
           }}
           variant="contained"
           disabled={isLoading}
@@ -485,57 +566,85 @@ const Backtest = () => {
 
   return (
     <Box>
-      <Paper elevation={3} sx={{ p: { xs: 1.5, sm: 2.5, md: 3 }, mb: 3, overflow: 'hidden', borderRadius: { xs: 1.5, md: 2 } }}>
-      <Grid
-        container
-        spacing={2}
-        alignItems="center"
-        wrap="wrap"
+      <Paper
+        elevation={3}
+        sx={{
+          p: { xs: 1.5, sm: 2.5, md: 3 },
+          mb: 3,
+          overflow: "hidden",
+          borderRadius: { xs: 1.5, md: 2 },
+        }}
       >
-        <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ flexGrow: 1, minWidth: 0 }}>
-          <Typography variant="h5" component="h1" gutterBottom>
-            {t("backtest.management.pageTitle")}
-          </Typography>
-        </Grid>
-        <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ ml: { xs: 'auto', md: 0 } }}>
-          <Box sx={{ display: "flex", gap: 1.5, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-            <Button
-              variant="outlined"
-              color="secondary"
-              startIcon={<OptimizeIcon />}
-              onClick={handleOpenOptimizationDialog}
-              aria-label={t("backtest.management.optimize.ariaLabel")}
+        <Grid
+          container
+          spacing={2}
+          alignItems="center"
+          wrap="wrap"
+          justifyContent="space-between"
+        >
+          <Grid
+            size={{ xs: "auto", md: "auto" }}
+            sx={{ flexGrow: 1, minWidth: 0 }}
+          >
+            <Typography variant="h5" component="h1" gutterBottom>
+              {t("backtest.management.pageTitle")}
+            </Typography>
+          </Grid>
+          <Grid
+            size={{ xs: "auto", md: "auto" }}
+            sx={{ ml: { xs: "auto", md: 0 } }}
+          >
+            <Box
               sx={{
-                px: { xs: 1.25, sm: 2 },
-                minHeight: 40,
-                minWidth: { xs: 44, sm: 'auto' },
-                '& .MuiButton-startIcon': {
-                  mr: { xs: 0, sm: 1 },
-                },
+                display: "flex",
+                gap: 1.5,
+                flexWrap: "wrap",
+                justifyContent: "flex-end",
               }}
             >
-              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                {t("backtest.management.optimize.button")}
-              </Box>
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => handleOpenDialog("create")}
-              aria-label={t("backtest.management.create.ariaLabel")}
-              sx={{
-                px: { xs: 1.25, sm: 2 },
-                minHeight: 40,
-                minWidth: { xs: 44, sm: 'auto' },
-                '& .MuiButton-startIcon': {
-                  mr: { xs: 0, sm: 1 },
-                },
-              }}
-            >
-              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                {t("backtest.management.create.button")}
-              </Box>
-            </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                startIcon={<OptimizeIcon />}
+                onClick={handleOpenOptimizationDialog}
+                aria-label={t("backtest.management.optimize.ariaLabel")}
+                sx={{
+                  px: { xs: 1.25, sm: 2 },
+                  minHeight: 40,
+                  minWidth: { xs: 44, sm: "auto" },
+                  "& .MuiButton-startIcon": {
+                    mr: { xs: 0, sm: 1 },
+                  },
+                }}
+              >
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
+                  {t("backtest.management.optimize.button")}
+                </Box>
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => handleOpenDialog("create")}
+                aria-label={t("backtest.management.create.ariaLabel")}
+                sx={{
+                  px: { xs: 1.25, sm: 2 },
+                  minHeight: 40,
+                  minWidth: { xs: 44, sm: "auto" },
+                  "& .MuiButton-startIcon": {
+                    mr: { xs: 0, sm: 1 },
+                  },
+                }}
+              >
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
+                  {t("backtest.management.create.button")}
+                </Box>
+              </Button>
             </Box>
           </Grid>
         </Grid>
@@ -565,7 +674,7 @@ const Backtest = () => {
             endAdornment: (
               <InputAdornment position="end">
                 <Tooltip title={t("backtest.management.refreshTooltip")}>
-                  <IconButton 
+                  <IconButton
                     onClick={handleRefreshBacktests}
                     disabled={isLoading}
                     size="small"
@@ -604,13 +713,17 @@ const Backtest = () => {
         footer={getModalFooter()}
       >
         <BacktestForm
-          initialData={currentProcess ? {
-            _id: currentProcess._id,
-            name: currentProcess.name,
-            description: currentProcess.description,
-            parameters: currentProcess.parameters,
-            bot_template_id: currentProcess.bot_template_id
-          } : undefined}
+          initialData={
+            currentProcess
+              ? {
+                  _id: currentProcess._id,
+                  name: currentProcess.name,
+                  description: currentProcess.description,
+                  parameters: currentProcess.parameters,
+                  bot_template_id: currentProcess.bot_template_id,
+                }
+              : undefined
+          }
           onSubmit={handleSubmitBacktest}
           isSubmitting={isLoading}
           isEditMode={dialogMode === "edit"}
@@ -622,7 +735,9 @@ const Backtest = () => {
       <ConfirmDialog
         open={confirmDelete.open}
         title={t("backtest.management.confirmDelete.title")}
-        message={t("backtest.management.confirmDelete.message", { name: confirmDelete.name })}
+        message={t("backtest.management.confirmDelete.message", {
+          name: confirmDelete.name,
+        })}
         confirmLabel={t("common.delete")}
         confirmColor="error"
         onConfirm={handleDeleteBacktest}

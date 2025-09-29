@@ -17,6 +17,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import type { BotTemplate } from "../../types/botTemplate.types";
 import { areEqual, formatDate } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 interface BotTemplateListProps {
   templates: BotTemplate[];
@@ -33,6 +34,7 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
   onDelete,
   onView,
 }) => {
+  const { t } = useTranslation();
   if (isLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
@@ -45,7 +47,7 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
     return (
       <Paper sx={{ p: 3, textAlign: "center" }}>
         <Typography variant="body1" color="text.secondary">
-          Không có bot template nào được tìm thấy.
+          {t("botTemplate.list.empty")}
         </Typography>
       </Paper>
     );
@@ -59,10 +61,10 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
         head={
           <TableHead>
             <TableRow>
-              <TableCell>Tên</TableCell>
-              <TableCell>Mô tả</TableCell>
-              <TableCell>Ngày tạo</TableCell>
-              <TableCell>Thao tác</TableCell>
+              <TableCell>{t("botTemplate.list.headers.name")}</TableCell>
+              <TableCell>{t("botTemplate.list.headers.description")}</TableCell>
+              <TableCell>{t("botTemplate.list.headers.createdAt")}</TableCell>
+              <TableCell>{t("botTemplate.list.headers.actions")}</TableCell>
             </TableRow>
           </TableHead>
         }
@@ -96,7 +98,7 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
                 <TableCell>
                   <Box sx={{ display: "flex", gap: 1 }}>
                     {onView && (
-                      <Tooltip title="Xem chi tiết">
+                      <Tooltip title={t("botTemplate.list.tooltips.view")}>
                         <IconButton
                           size="small"
                           color="info"
@@ -108,7 +110,7 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
                     )}
 
                     {onEdit && (
-                      <Tooltip title="Sửa">
+                      <Tooltip title={t("botTemplate.list.tooltips.edit")}>
                         <IconButton
                           size="small"
                           color="primary"
@@ -120,7 +122,7 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
                     )}
 
                     {onDelete && (
-                      <Tooltip title="Xóa">
+                      <Tooltip title={t("botTemplate.list.tooltips.delete")}>
                         <IconButton
                           size="small"
                           color="error"

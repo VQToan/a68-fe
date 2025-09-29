@@ -130,6 +130,162 @@
       }
     }
   },
+  "botTemplate": {
+    "pageTitle": "Bot template management",
+    "create": {
+      "button": "Create template",
+      "aria": "Create new bot template"
+    },
+    "searchPlaceholder": "Search templates...",
+    "dialog": {
+      "createTitle": "Create bot template",
+      "viewTitle": "Bot template details",
+      "editTitle": "Edit bot template"
+    },
+    "notifications": {
+      "createSuccess": "Bot template created successfully",
+      "updateSuccess": "Bot template updated successfully",
+      "deleteSuccess": "Bot template deleted successfully"
+    },
+    "confirmDelete": {
+      "title": "Delete bot template",
+      "message": "Are you sure you want to delete the bot template \"{{name}}\"?"
+    },
+    "list": {
+      "empty": "No bot templates found.",
+      "headers": {
+        "name": "Name",
+        "description": "Description",
+        "createdAt": "Created at",
+        "actions": "Actions"
+      },
+      "tooltips": {
+        "view": "View details",
+        "edit": "Edit",
+        "delete": "Delete"
+      }
+    },
+    "form": {
+      "sections": {
+        "basic": "Basic information",
+        "modules": "Module configuration"
+      },
+      "fields": {
+        "name": "Template name",
+        "description": "Description",
+        "entry": "Entry module",
+        "exit": "Exit module",
+        "dca": "DCA/Cutloss module",
+        "entryHedge": "Entry hedge module",
+        "afterHedge": "After hedge module",
+        "stopLoss": "Stop loss module"
+      },
+      "placeholders": {
+        "name": "Enter template name",
+        "description": "Enter a detailed description"
+      },
+      "validation": {
+        "nameRequired": "Template name is required",
+        "descriptionRequired": "Description is required",
+        "entryRequired": "Entry module is required",
+        "exitRequired": "Exit module is required",
+        "dcaRequired": "DCA/Cutloss module is required",
+        "entryHedgeRequired": "Entry hedge module is required",
+        "afterHedgeRequired": "After hedge module is required",
+        "stopLossRequired": "Stop loss module is required"
+      },
+      "moduleLabels": {
+        "entry": "Entry module",
+        "exit": "Exit module",
+        "dca": "DCA/Cutloss module",
+        "entryHedge": "Entry hedge module",
+        "afterHedge": "After hedge module",
+        "stopLoss": "Stop loss module"
+      },
+      "helper": {
+        "select": "Select a module"
+      }
+    },
+    "detail": {
+      "notFound": "Bot template information not found.",
+      "name": "Name",
+      "description": "Description",
+      "modules": "Module configuration",
+      "createdAt": "Created at",
+      "updatedAt": "Last updated",
+      "missing": "None",
+      "moduleMissing": "Module not found"
+    }
+  },
+  "trading": {
+    "pageTitle": "Trading process management",
+    "create": {
+      "button": "Create trading process",
+      "aria": "Create new trading process"
+    },
+    "searchPlaceholder": "Search trading processes...",
+    "refreshTooltip": "Refresh list",
+    "tabs": {
+      "ariaLabel": "trading status tabs",
+      "all": "All",
+      "created": "Created",
+      "queued": "Queued",
+      "running": "Running",
+      "stopped": "Stopped",
+      "failed": "Failed",
+      "paused": "Paused"
+    },
+    "dialog": {
+      "createTitle": "Create trading process",
+      "viewTitle": "Trading process details",
+      "editTitle": "Edit trading process"
+    },
+    "notifications": {
+      "createSuccess": "Trading process created successfully",
+      "updateSuccess": "Trading process updated successfully",
+      "deleteSuccess": "Trading process deleted successfully",
+      "startSuccess": "Trading process started",
+      "stopSuccess": "Trading process stopped",
+      "stopWithCloseSuccess": "Trading process stopped and all orders were closed",
+      "refreshSuccess": "Trading processes refreshed"
+    },
+    "confirmDelete": {
+      "title": "Delete trading process",
+      "message": "Are you sure you want to delete the trading process \"{{name}}\"? This action cannot be undone."
+    },
+    "list": {
+      "empty": "No trading processes found",
+      "status": {
+        "created": "Created",
+        "queued": "Queued",
+        "running": "Running",
+        "stopped": "Stopped",
+        "failed": "Failed",
+        "paused": "Paused"
+      },
+      "headers": {
+        "name": "Name",
+        "description": "Description",
+        "status": "Status",
+        "daysRunning": "Days running",
+        "account": "Trading account",
+        "template": "Bot template",
+        "createdAt": "Created at",
+        "actions": "Actions"
+      },
+      "tooltips": {
+        "view": "View details",
+        "start": "Start trading",
+        "stop": "Stop trading"
+      },
+      "runningDays_one": "{{count}} day",
+      "runningDays_other": "{{count}} days",
+      "pagination": {
+        "rowsPerPage": "Rows per page:",
+        "displayedRows": "{{from}}–{{to}} of {{count}}"
+      }
+    }
+  },
   "backtest": {
     "management": {
       "pageTitle": "Backtest management",

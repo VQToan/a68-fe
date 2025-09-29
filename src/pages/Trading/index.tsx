@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo } from "react";
+import { useState, useEffect, useCallback, memo, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -27,6 +27,7 @@ import Modal from "@components/Modal";
 import type { TradingStatusType, TradingProcess, TradingProcessCreate, TradingProcessUpdate } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
 import FilterTabs from "@components/FilterTabs";
+import { useTranslation } from "react-i18next";
 
 export type FormMode = "create" | "view" | "edit";
 
@@ -98,7 +99,7 @@ const Trading = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
-  const [dialogTitle, setDialogTitle] = useState("Tạo Trading Process Mới");
+  const { t } = useTranslation();
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -177,6 +178,19 @@ const Trading = () => {
       )
     : processes;
 
+  const tabItems = useMemo(
+    () => [
+      { label: t("trading.tabs.all"), value: "all" },
+      { label: t("trading.tabs.created"), value: "created" },
+      { label: t("trading.tabs.queued"), value: "queued" },
+      { label: t("trading.tabs.running"), value: "running" },
+      { label: t("trading.tabs.stopped"), value: "stopped" },
+      { label: t("trading.tabs.failed"), value: "failed" },
+      { label: t("trading.tabs.paused"), value: "paused" },
+    ],
+    [t]
+  );
+
   // Pagination handlers
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
@@ -190,22 +204,11 @@ const Trading = () => {
   // Handle dialog open/close
   const handleOpenDialog = useCallback((mode: FormMode = "create") => {
     setDialogMode(mode);
-
-    // Set dialog title based on mode
-    switch (mode) {
-      case "create":
-        setDialogTitle("Tạo Trading Process Mới");
-        break;
-      case "view":
-        setDialogTitle("Chi Tiết Trading Process");
-        break;
-      case "edit":
-        setDialogTitle("Chỉnh Sửa Trading Process");
-        break;
+    if (mode === "create") {
+      clearCurrentProcess();
     }
-
     setOpenDialog(true);
-  }, []);
+  }, [clearCurrentProcess]);
 
   const handleCloseDialog = useCallback(() => {
     setOpenDialog(false);
@@ -218,13 +221,11 @@ const Trading = () => {
     async (formData: TradingProcessCreate | TradingProcessUpdate) => {
       try {
         if (dialogMode === "create") {
-          // Create new trading process
           await createProcess(formData as TradingProcessCreate);
-          showNotification("Trading process đã được tạo thành công", "success");
+          showNotification(t("trading.notifications.createSuccess"), "success");
         } else if (dialogMode === "edit" && currentProcess) {
-          // Update existing trading process
           await updateProcess(currentProcess._id, formData as TradingProcessUpdate);
-          showNotification("Trading process đã được cập nhật thành công", "success");
+          showNotification(t("trading.notifications.updateSuccess"), "success");
         }
         handleCloseDialog();
         // Re-fetch the list with latest data
@@ -233,13 +234,12 @@ const Trading = () => {
         console.error("Error submitting trading process:", error);
       }
     },
-    [dialogMode, currentProcess, createProcess, updateProcess, showNotification, handleCloseDialog, fetchTradingProcesses]
+    [dialogMode, currentProcess, createProcess, updateProcess, showNotification, handleCloseDialog, fetchTradingProcesses, t]
   );
 
   // Handle edit mode toggle from view mode
   const handleSwitchToEditMode = useCallback(() => {
     setDialogMode("edit");
-    setDialogTitle("Chỉnh Sửa Trading Process");
   }, []);
 
   // Handle edit trading process directly
@@ -287,26 +287,26 @@ const Trading = () => {
 
     try {
       await deleteProcess(confirmDelete.id);
-      showNotification("Trading process đã được xóa thành công", "success");
+      showNotification(t("trading.notifications.deleteSuccess"), "success");
       handleCloseDeleteConfirm();
       // Re-fetch the list with latest data
       fetchTradingProcesses();
     } catch (error) {
       console.error("Error deleting trading process:", error);
     }
-  }, [confirmDelete.id, deleteProcess, showNotification, handleCloseDeleteConfirm, fetchTradingProcesses]);
+  }, [confirmDelete.id, deleteProcess, showNotification, handleCloseDeleteConfirm, fetchTradingProcesses, t]);
 
   // Handle start trading process
   const handleStartTradingProcess = useCallback(async (id: string) => {
     try {
       await startProcess(id);
-      showNotification("Trading process đã được bắt đầu", "success");
+      showNotification(t("trading.notifications.startSuccess"), "success");
       // Re-fetch the list with latest data
       fetchTradingProcesses();
     } catch (error) {
       console.error("Error starting trading process:", error);
     }
-  }, [startProcess, showNotification, fetchTradingProcesses]);
+  }, [startProcess, showNotification, fetchTradingProcesses, t]);
 
   // Open confirm stop dialog
   const handleOpenStopConfirm = useCallback((process: TradingProcess) => {
@@ -325,8 +325,8 @@ const Trading = () => {
     try {
       await stopProcess(processId, shouldClearPositions ? true : undefined);
       const message = shouldClearPositions
-        ? "Trading process đã được dừng và đóng tất cả lệnh"
-        : "Trading process đã được dừng lại";
+        ? t("trading.notifications.stopWithCloseSuccess")
+        : t("trading.notifications.stopSuccess");
       showNotification(message, "success");
       handleCloseStopConfirm();
       // Re-fetch the list with latest data
@@ -334,15 +334,26 @@ const Trading = () => {
     } catch (error) {
       console.error("Error stopping trading process:", error);
     }
-  }, [confirmStop.process, stopProcess, showNotification, handleCloseStopConfirm, fetchTradingProcesses]);
+  }, [confirmStop.process, stopProcess, showNotification, handleCloseStopConfirm, fetchTradingProcesses, t]);
 
   // Handle refreshing the trading process list
   const handleRefreshTradingProcesses = useCallback(() => {
     fetchTradingProcesses();
-    showNotification("Danh sách trading process đã được cập nhật", "success");
-  }, [fetchTradingProcesses, showNotification]);
+    showNotification(t("trading.notifications.refreshSuccess"), "success");
+  }, [fetchTradingProcesses, showNotification, t]);
 
   // Create form footer based on dialog mode
+  const dialogTitleKey = useMemo(() => {
+    switch (dialogMode) {
+      case "view":
+        return "trading.dialog.viewTitle";
+      case "edit":
+        return "trading.dialog.editTitle";
+      default:
+        return "trading.dialog.createTitle";
+    }
+  }, [dialogMode]);
+
   const getModalFooter = useCallback(() => {
     if (dialogMode === "view") {
       return (
@@ -352,10 +363,10 @@ const Trading = () => {
             variant="outlined"
             color="primary"
           >
-            Chỉnh sửa
+            {t("common.edit")}
           </Button>
           <Button onClick={handleCloseDialog} variant="contained">
-            Đóng
+            {t("common.close")}
           </Button>
         </>
       );
@@ -364,7 +375,7 @@ const Trading = () => {
     return (
       <>
         <Button onClick={handleCloseDialog} variant="outlined">
-          Hủy
+          {t("common.cancel")}
         </Button>
         <Button
           onClick={() => {
@@ -374,11 +385,11 @@ const Trading = () => {
           variant="contained"
           disabled={isLoading}
         >
-          {dialogMode === "edit" ? "Cập nhật" : "Tạo"}
+          {dialogMode === "edit" ? t("common.update") : t("common.create")}
         </Button>
       </>
     );
-  }, [dialogMode, handleCloseDialog, handleSwitchToEditMode, isLoading]);
+  }, [dialogMode, handleCloseDialog, handleSwitchToEditMode, isLoading, t]);
 
   return (
     <Box>
@@ -388,10 +399,11 @@ const Trading = () => {
           spacing={2}
           alignItems="center"
           wrap="wrap"
+          justifyContent="space-between"
         >
           <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ flexGrow: 1, minWidth: 0 }}>
             <Typography variant="h5" component="h1" gutterBottom>
-              Quản lý Trading
+              {t("trading.pageTitle")}
             </Typography>
           </Grid>
           <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ ml: { xs: 'auto', md: 0 } }}>
@@ -400,7 +412,7 @@ const Trading = () => {
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => handleOpenDialog("create")}
-                aria-label="Tạo trading process mới"
+                aria-label={t("trading.create.aria")}
                 sx={{
                   px: { xs: 1.25, sm: 2 },
                   minHeight: 40,
@@ -411,7 +423,7 @@ const Trading = () => {
                 }}
               >
                 <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                  Tạo trading process mới
+                  {t("trading.create.button")}
                 </Box>
               </Button>
             </Box>
@@ -421,24 +433,16 @@ const Trading = () => {
         <Divider sx={{ my: 2 }} />
 
         <FilterTabs
-          ariaLabel="trading tabs"
+          ariaLabel={t("trading.tabs.ariaLabel")}
           value={currentTab}
           onChange={handleFilterTabChange}
-          items={[
-            { label: 'Tất cả', value: 'all' },
-            { label: 'Đã tạo', value: 'created' },
-            { label: 'Đang chờ', value: 'queued' },
-            { label: 'Đang chạy', value: 'running' },
-            { label: 'Đã dừng', value: 'stopped' },
-            { label: 'Thất bại', value: 'failed' },
-            { label: 'Tạm dừng', value: 'paused' },
-          ]}
+          items={tabItems}
         />
 
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Tìm kiếm trading process..."
+          placeholder={t("trading.searchPlaceholder")}
           value={searchTerm}
           onChange={handleSearch}
           sx={{ mb: 3 }}
@@ -450,7 +454,7 @@ const Trading = () => {
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <Tooltip title="Làm mới danh sách">
+                <Tooltip title={t("trading.refreshTooltip")}>
                   <IconButton 
                     onClick={handleRefreshTradingProcesses}
                     disabled={isLoading}
@@ -485,7 +489,7 @@ const Trading = () => {
       <Modal
         open={openDialog}
         onClose={handleCloseDialog}
-        title={dialogTitle}
+        title={t(dialogTitleKey)}
         maxWidth="sm"
         footer={getModalFooter()}
       >
@@ -508,9 +512,9 @@ const Trading = () => {
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
         open={confirmDelete.open}
-        title="Xác nhận xóa"
-        message={`Bạn có chắc chắn muốn xóa trading process "${confirmDelete.name}"? Hành động này không thể hoàn tác.`}
-        confirmLabel="Xóa"
+        title={t("trading.confirmDelete.title")}
+        message={t("trading.confirmDelete.message", { name: confirmDelete.name })}
+        confirmLabel={t("common.delete")}
         confirmColor="error"
         onConfirm={handleDeleteTradingProcess}
         onCancel={handleCloseDeleteConfirm}

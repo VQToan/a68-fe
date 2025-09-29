@@ -325,6 +325,7 @@ const TradingAccount = () => {
           spacing={2}
           alignItems="center"
           wrap="wrap"
+          justifyContent="space-between"
         >
           <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ flexGrow: 1, minWidth: 0 }}>
             <Typography variant="h5" component="h1" gutterBottom>

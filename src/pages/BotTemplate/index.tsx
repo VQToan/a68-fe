@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo } from "react";
+import { useState, useEffect, useCallback, memo, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -27,6 +27,7 @@ import type {
   BotTemplateUpdate,
 } from "../../types/botTemplate.types";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 // Form mode type definition
 export type FormMode = "create" | "view" | "edit";
@@ -62,7 +63,7 @@ const BotTemplate = () => {
   const debouncedSearchTerm = useDebounce<string>(searchTerm, 500);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
-  const [dialogTitle, setDialogTitle] = useState("Tạo Bot Template Mới");
+  const { t } = useTranslation();
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -107,24 +108,12 @@ const BotTemplate = () => {
   const handleOpenDialog = useCallback(
     (mode: FormMode = "create") => {
       setDialogMode(mode);
-
-      // Set dialog title based on mode
-      switch (mode) {
-        case "create":
-          setDialogTitle("Tạo Bot Template Mới");
-          clearCurrentTemplate();
-          break;
-        case "view":
-          setDialogTitle("Chi Tiết Bot Template");
-          break;
-        case "edit":
-          setDialogTitle("Chỉnh Sửa Bot Template");
-          break;
+      if (mode === "create") {
+        clearCurrentTemplate();
       }
-
       setOpenDialog(true);
     },
-    [setDialogMode, setDialogTitle, clearCurrentTemplate]
+    [clearCurrentTemplate]
   );
 
   const handleCloseDialog = useCallback(() => {
@@ -142,19 +131,11 @@ const BotTemplate = () => {
     async (formData: BotTemplateCreate | BotTemplateUpdate) => {
       try {
         if (dialogMode === "create") {
-          // Create new bot template
           await createTemplate(formData as BotTemplateCreate);
-          showNotification("Bot template đã được tạo thành công", "success");
+          showNotification(t("botTemplate.notifications.createSuccess"), "success");
         } else if (dialogMode === "edit" && currentTemplate?._id) {
-          // Update existing bot template
-          await updateTemplate(
-            currentTemplate._id,
-            formData as BotTemplateUpdate
-          );
-          showNotification(
-            "Bot template đã được cập nhật thành công",
-            "success"
-          );
+          await updateTemplate(currentTemplate._id, formData as BotTemplateUpdate);
+          showNotification(t("botTemplate.notifications.updateSuccess"), "success");
         }
         handleCloseDialog();
         getTemplates(debouncedSearchTerm); // Refresh the list
@@ -169,14 +150,15 @@ const BotTemplate = () => {
       updateTemplate,
       getTemplates,
       debouncedSearchTerm,
+      handleCloseDialog,
+      t,
     ]
   );
 
   // Handle edit mode toggle from view mode
   const handleSwitchToEditMode = useCallback(() => {
     setDialogMode("edit");
-    setDialogTitle("Chỉnh Sửa Bot Template");
-  }, [setDialogMode, setDialogTitle]);
+  }, []);
 
   // Handle view bot template details
   const handleViewTemplate = useCallback(
@@ -231,7 +213,7 @@ const BotTemplate = () => {
 
     try {
       await deleteTemplate(confirmDelete.id);
-      showNotification("Bot template đã được xóa thành công", "success");
+      showNotification(t("botTemplate.notifications.deleteSuccess"), "success");
       handleCloseDeleteConfirm();
     } catch (error) {
       console.error("Error deleting bot template:", error);
@@ -241,9 +223,21 @@ const BotTemplate = () => {
     deleteTemplate,
     showNotification,
     handleCloseDeleteConfirm,
+    t,
   ]);
 
   // Create form footer based on dialog mode
+  const dialogTitleKey = useMemo(() => {
+    switch (dialogMode) {
+      case "view":
+        return "botTemplate.dialog.viewTitle";
+      case "edit":
+        return "botTemplate.dialog.editTitle";
+      default:
+        return "botTemplate.dialog.createTitle";
+    }
+  }, [dialogMode]);
+
   const getModalFooter = useCallback(() => {
     if (dialogMode === "view") {
       return (
@@ -253,19 +247,19 @@ const BotTemplate = () => {
             variant="outlined"
             color="primary"
           >
-            Chỉnh sửa
+            {t("common.edit")}
           </Button>
           <Button onClick={handleCloseDialog} variant="contained">
-            Đóng
+            {t("common.close")}
           </Button>
         </>
       );
     }
-    
+
     return (
       <>
         <Button onClick={handleCloseDialog} variant="outlined">
-          Hủy
+          {t("common.cancel")}
         </Button>
         <Button 
           onClick={() => {
@@ -275,11 +269,11 @@ const BotTemplate = () => {
           variant="contained"
           disabled={isLoading}
         >
-          Lưu
+          {t("common.save")}
         </Button>
       </>
     );
-  }, [dialogMode, handleCloseDialog, handleSwitchToEditMode, isLoading]);
+  }, [dialogMode, handleCloseDialog, handleSwitchToEditMode, isLoading, t]);
 
   return (
     <Box>
@@ -289,10 +283,11 @@ const BotTemplate = () => {
           spacing={2}
           alignItems="center"
           wrap="wrap"
+          justifyContent="space-between"
         >
           <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ flexGrow: 1, minWidth: 0 }}>
             <Typography variant="h5" component="h1" gutterBottom>
-              Quản lý Bot Template
+              {t("botTemplate.pageTitle")}
             </Typography>
           </Grid>
           <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ ml: { xs: 'auto', md: 0 } }}>
@@ -301,7 +296,7 @@ const BotTemplate = () => {
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => handleOpenDialog("create")}
-                aria-label="Tạo template mới"
+                aria-label={t("botTemplate.create.aria")}
                 sx={{
                   px: { xs: 1.25, sm: 2 },
                   minHeight: 40,
@@ -312,7 +307,7 @@ const BotTemplate = () => {
                 }}
               >
                 <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                  Tạo template mới
+                  {t("botTemplate.create.button")}
                 </Box>
               </Button>
             </Box>
@@ -324,7 +319,7 @@ const BotTemplate = () => {
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Tìm kiếm template..."
+          placeholder={t("botTemplate.searchPlaceholder")}
           value={searchTerm}
           onChange={handleSearch}
           sx={{ mb: 3 }}
@@ -350,7 +345,7 @@ const BotTemplate = () => {
       <Modal
         open={openDialog}
         onClose={handleCloseDialog}
-        title={dialogTitle}
+        title={t(dialogTitleKey)}
         maxWidth="md"
         fullScreen={isMobile}
         footer={getModalFooter()}
@@ -374,8 +369,8 @@ const BotTemplate = () => {
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
         open={confirmDelete.open}
-        title="Xác nhận xóa"
-        message={`Bạn có chắc chắn muốn xóa bot template "${confirmDelete.name}"?`}
+        title={t("botTemplate.confirmDelete.title")}
+        message={t("botTemplate.confirmDelete.message", { name: confirmDelete.name })}
         onConfirm={handleDeleteTemplate}
         onCancel={handleCloseDeleteConfirm}
       />
