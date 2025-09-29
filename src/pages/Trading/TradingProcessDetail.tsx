@@ -23,6 +23,7 @@ import {
   AccountBalance as BalanceIcon,
   Notifications as NotificationsIcon,
   NotificationsOff as NotificationsOffIcon,
+  AccountBalanceWallet as AccountBalanceWalletIcon,
 } from "@mui/icons-material";
 import { useTradingProcess } from "@hooks/useTradingProcess";
 import { useNotification } from "@context/NotificationContext";
@@ -54,6 +55,8 @@ const TradingProcessDetail = () => {
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(false);
   const [isLoadingNotifications, setIsLoadingNotifications] = useState<boolean>(false);
+  const [combineBalanceEnabled, setCombineBalanceEnabled] = useState<boolean>(false);
+  const [isLoadingCombineBalance, setIsLoadingCombineBalance] = useState<boolean>(false);
   const [performanceData, setPerformanceData] = useState<TradingPerformanceResponse | null>(null);
   const [isLoadingPerformance, setIsLoadingPerformance] = useState<boolean>(false);
   
@@ -94,14 +97,30 @@ const TradingProcessDetail = () => {
     }
   }, [id, showNotification]);
 
+  const fetchCombineBalanceStatus = useCallback(async () => {
+    if (!id) return;
+
+    setIsLoadingCombineBalance(true);
+    try {
+      const response = await tradingProcessService.getCombineBalanceStatus(id);
+      setCombineBalanceEnabled(Boolean(response.status));
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch combine balance status';
+      showNotification(errorMessage, 'error');
+    } finally {
+      setIsLoadingCombineBalance(false);
+    }
+  }, [id, showNotification]);
+
   // Fetch process details on mount
   useEffect(() => {
     if (id) {
       fetchProcessDetails();
       fetchPerformanceData();
       fetchNotificationStatus();
+      fetchCombineBalanceStatus();
     }
-  }, [id]);
+  }, [id, fetchCombineBalanceStatus]);
 
   // Handle errors
   useEffect(() => {
@@ -125,10 +144,21 @@ const TradingProcessDetail = () => {
   // Handle refresh
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
-    await Promise.all([fetchProcessDetails(), fetchPerformanceData(), fetchNotificationStatus()]);
+    await Promise.all([
+      fetchProcessDetails(),
+      fetchPerformanceData(),
+      fetchNotificationStatus(),
+      fetchCombineBalanceStatus(),
+    ]);
     setIsRefreshing(false);
     showNotification("Dữ liệu đã được cập nhật", "success");
-  }, [fetchProcessDetails, fetchPerformanceData, fetchNotificationStatus, showNotification]);
+  }, [
+    fetchProcessDetails,
+    fetchPerformanceData,
+    fetchNotificationStatus,
+    fetchCombineBalanceStatus,
+    showNotification,
+  ]);
 
   // Handle start/stop process
   const handleToggleProcess = useCallback(async () => {
@@ -190,6 +220,27 @@ const TradingProcessDetail = () => {
       showNotification(errorMessage, 'error');
       // Reset switch to previous state if update failed
       // The switch will stay at previous state since we don't update state on error
+    }
+  }, [id, showNotification]);
+
+  const handleCombineBalanceToggle = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!id) return;
+
+    const newStatus = event.target.checked;
+    try {
+      await tradingProcessService.setCombineBalance(id, {
+        status: newStatus,
+      });
+      setCombineBalanceEnabled(newStatus);
+      showNotification(
+        newStatus
+          ? "Chế độ combine balance đã được bật"
+          : "Chế độ combine balance đã được tắt",
+        "success"
+      );
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update combine balance status';
+      showNotification(errorMessage, 'error');
     }
   }, [id, showNotification]);
 
@@ -294,7 +345,22 @@ const TradingProcessDetail = () => {
                     checkedIcon={<NotificationsIcon />}
                   />
                 }
+                sx={{ gap: 1 }}
                 label="Thông báo"
+              />
+
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={combineBalanceEnabled}
+                    onChange={handleCombineBalanceToggle}
+                    disabled={isLoadingCombineBalance}
+                    icon={<AccountBalanceWalletIcon />}
+                    checkedIcon={<AccountBalanceWalletIcon />}
+                  />
+                }
+                sx={{ gap: 1 }}
+                label="Combine balance"
               />
               
               {/* Start/Stop Button */}

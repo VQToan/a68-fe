@@ -21,6 +21,16 @@ export interface NotificationStatusResponse {
   status: boolean;
 }
 
+export interface CombineBalanceStatusResponse {
+  process_id: string;
+  status: boolean;
+  message?: string;
+}
+
+export interface CombineBalanceRequest {
+  status: boolean;
+}
+
 export type TradingStatusType = "created" | "queued" | "running" | "stopped" | "failed" | "paused";
 
 export interface TradingExchange {

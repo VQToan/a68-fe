@@ -8,7 +8,9 @@ import type {
   TradingDetailsResponse,
   TradingPerformanceResponse,
   NotificationSetupRequest,
-  NotificationStatusResponse
+  NotificationStatusResponse,
+  CombineBalanceStatusResponse,
+  CombineBalanceRequest
 } from '@/types/trading.types';
 
 // Trading Process API calls
@@ -96,5 +98,20 @@ export const getNotificationStatus = async (processId: string): Promise<Notifica
 
 export const updateNotificationStatus = async (data: NotificationSetupRequest): Promise<NotificationStatusResponse> => {
   const response = await apiClient.post(`api/v1/notifications/noti-setup`, data);
+  return response.data;
+};
+
+// Combine balance API calls
+
+export const getCombineBalanceStatus = async (processId: string): Promise<CombineBalanceStatusResponse> => {
+  const response = await apiClient.get(`api/v1/trading-processes/${processId}/combine-balance-status`);
+  return response.data;
+};
+
+export const setCombineBalance = async (
+  processId: string,
+  data: CombineBalanceRequest
+): Promise<CombineBalanceStatusResponse> => {
+  const response = await apiClient.post(`api/v1/trading-processes/${processId}/set-combine-balance?status=${data.status}`);
   return response.data;
 };
