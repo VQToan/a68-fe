@@ -416,6 +416,65 @@
         "totalVolume": "Total volume",
         "volumeUnit": "USDT"
       }
+    },
+    "stopDialog": {
+      "title": "Confirm stop trading",
+      "description": "Are you sure you want to stop this trading process?",
+      "symbol": "Symbol: {{symbol}}",
+      "sections": {
+        "runningPositions": "Running positions"
+      },
+      "positionLabel": "{{symbol}} · {{side}}",
+      "positionDetails": "Volume: {{quantity}} · Entry: {{entry}} · PnL: {{pnl}}",
+      "positionSide": "Position side: {{side}}",
+      "emptyPositions": "No running positions for this account.",
+      "noAccount": "Unable to determine the trading account to show running positions.",
+      "errors": {
+        "loadPositions": "Failed to load running positions"
+      },
+      "actions": {
+        "stop": "Stop",
+        "stopAndClose": "Stop and close all positions"
+      }
+    },
+    "setupInfo": {
+      "title": "Trading process setup",
+      "sections": {
+        "basic": "Basic configuration",
+        "trading": "Trading parameters",
+        "risk": "Risk management",
+        "indicators": "Technical indicators",
+        "dca": "DCA settings"
+      }
+    },
+    "details": {
+      "title": "Trade history ({{total}})",
+      "subtitle": "Showing {{count}} items per page (auto adjusted to screen)",
+      "actions": {
+        "refresh": "Refresh"
+      },
+      "tooltips": {
+        "setup": "View setup information"
+      },
+      "empty": "No trades recorded",
+      "errors": {
+        "fetch": "Failed to fetch trading details"
+      },
+      "tableHeaders": {
+        "time": "Time",
+        "price": "Price",
+        "reason": "Reason",
+        "quantity": "Quantity",
+        "type": "Type",
+        "pnl": "PnL",
+        "result": "Result",
+        "positionPnl": "Position PnL",
+        "avgPrice": "Average position price",
+        "balance": "Balance"
+      },
+      "pagination": {
+        "summary": "Page {{current}} / {{total}} • Showing {{visible}} of {{totalItems}} items"
+      }
     }
   },
   "backtest": {

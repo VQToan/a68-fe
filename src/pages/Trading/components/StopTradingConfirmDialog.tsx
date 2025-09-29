@@ -17,6 +17,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import type { PositionSummary } from '@/types/trading.types';
 import * as tradingAccountService from '@services/tradingAccount.service';
 import { areEqual } from '@/utils/common';
+import { useTranslation } from 'react-i18next';
 
 interface StopTradingConfirmDialogProps {
   open: boolean;
@@ -29,9 +30,9 @@ interface StopTradingConfirmDialogProps {
 
 const formatNumber = (value?: number | null, maximumFractionDigits: number = 4) => {
   if (value === undefined || value === null || Number.isNaN(value)) return '-';
-  return value.toLocaleString('en-US', {
+  return new Intl.NumberFormat(undefined, {
     maximumFractionDigits,
-  });
+  }).format(value);
 };
 
 const StopTradingConfirmDialog: React.FC<StopTradingConfirmDialogProps> = ({
@@ -46,6 +47,7 @@ const StopTradingConfirmDialog: React.FC<StopTradingConfirmDialogProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!open) {
@@ -69,7 +71,8 @@ const StopTradingConfirmDialog: React.FC<StopTradingConfirmDialogProps> = ({
         const data = await tradingAccountService.getPositions(accountId, symbol ?? undefined);
         setPositions(Array.isArray(data) ? data : []);
       } catch (fetchError) {
-        const message = fetchError instanceof Error ? fetchError.message : 'Không thể tải danh sách lệnh đang chạy';
+        const fallbackMessage = t('trading.stopDialog.errors.loadPositions');
+        const message = fetchError instanceof Error ? fetchError.message : fallbackMessage;
         setError(message);
         setPositions([]);
       } finally {
@@ -78,7 +81,7 @@ const StopTradingConfirmDialog: React.FC<StopTradingConfirmDialogProps> = ({
     };
 
     void fetchPositions();
-  }, [open, accountId, symbol]);
+  }, [open, accountId, symbol, t]);
 
   const handleStop = useCallback(async (clearPositions: boolean) => {
     if (isSubmitting) return;
@@ -114,7 +117,7 @@ const StopTradingConfirmDialog: React.FC<StopTradingConfirmDialogProps> = ({
         }}
       >
         <Box>
-          <Typography variant="h6">Xác nhận dừng giao dịch</Typography>
+          <Typography variant="h6">{t('trading.stopDialog.title')}</Typography>
           {processName && (
             <Typography variant="caption" color="text.secondary">
               {processName}
@@ -130,11 +133,11 @@ const StopTradingConfirmDialog: React.FC<StopTradingConfirmDialogProps> = ({
         <Stack spacing={2}>
           <Box>
             <Typography variant="body1" fontWeight={500} gutterBottom>
-              Bạn có chắc chắn muốn dừng trading process này?
+              {t('trading.stopDialog.description')}
             </Typography>
             {symbol && (
               <Typography variant="body2" color="text.secondary">
-                Symbol: {symbol}
+                {t('trading.stopDialog.symbol', { symbol })}
               </Typography>
             )}
           </Box>
@@ -142,7 +145,7 @@ const StopTradingConfirmDialog: React.FC<StopTradingConfirmDialogProps> = ({
           {accountId ? (
             <Box>
               <Typography variant="subtitle2" gutterBottom>
-                Các lệnh đang chạy
+                {t('trading.stopDialog.sections.runningPositions')}
               </Typography>
 
               {error && (
@@ -169,14 +172,23 @@ const StopTradingConfirmDialog: React.FC<StopTradingConfirmDialogProps> = ({
                     <React.Fragment key={`${position.order_id}-${index}`}>
                       <Box px={2} py={1.5}>
                         <Typography variant="body2" fontWeight={600}>
-                          {position.symbol} · {position.side}
+                          {t('trading.stopDialog.positionLabel', {
+                            symbol: position.symbol,
+                            side: position.side,
+                          })}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Khối lượng: {formatNumber(position.quantity)} · Entry: {formatNumber(position.entry_price)} · PnL: {formatNumber(position.unrealized_pnl, 2)}
+                          {t('trading.stopDialog.positionDetails', {
+                            quantity: formatNumber(position.quantity),
+                            entry: formatNumber(position.entry_price),
+                            pnl: formatNumber(position.unrealized_pnl, 2),
+                          })}
                         </Typography>
                         {position.position_side && (
                           <Typography variant="caption" color="text.secondary" display="block">
-                            Position side: {position.position_side}
+                            {t('trading.stopDialog.positionSide', {
+                              side: position.position_side,
+                            })}
                           </Typography>
                         )}
                       </Box>
@@ -186,13 +198,13 @@ const StopTradingConfirmDialog: React.FC<StopTradingConfirmDialogProps> = ({
                 </Box>
               ) : (
                 <Typography variant="body2" color="text.secondary">
-                  Không có lệnh nào đang chạy cho tài khoản này.
+                  {t('trading.stopDialog.emptyPositions')}
                 </Typography>
               )}
             </Box>
           ) : (
             <Typography variant="body2" color="text.secondary">
-              Không xác định được tài khoản trading để hiển thị các lệnh đang chạy.
+              {t('trading.stopDialog.noAccount')}
             </Typography>
           )}
         </Stack>
@@ -200,7 +212,7 @@ const StopTradingConfirmDialog: React.FC<StopTradingConfirmDialogProps> = ({
 
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onClose} variant="outlined" disabled={isSubmitting}>
-          Hủy
+          {t('common.cancel')}
         </Button>
         <Button
           onClick={() => handleStop(false)}
@@ -208,7 +220,7 @@ const StopTradingConfirmDialog: React.FC<StopTradingConfirmDialogProps> = ({
           color="warning"
           disabled={isSubmitting}
         >
-          Dừng
+          {t('trading.stopDialog.actions.stop')}
         </Button>
         <Button
           onClick={() => handleStop(true)}
@@ -216,7 +228,7 @@ const StopTradingConfirmDialog: React.FC<StopTradingConfirmDialogProps> = ({
           color="error"
           disabled={isSubmitting}
         >
-          Dừng và đóng tất cả lệnh
+          {t('trading.stopDialog.actions.stopAndClose')}
         </Button>
       </DialogActions>
     </Dialog>

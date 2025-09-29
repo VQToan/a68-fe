@@ -23,6 +23,7 @@ import { useNotification } from "@context/NotificationContext";
 import type { TradingDetail, TradingDetailsResponse } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
 import * as tradingProcessService from "@services/tradingProcess.service";
+import { useTranslation } from "react-i18next";
 
 interface TradingDetailsListProps {
   processId: string;
@@ -88,6 +89,7 @@ const usePageSizeByHeight = () => {
 
 const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListProps) => {
   const { showNotification } = useNotification();
+  const { t } = useTranslation();
   
   // Tính toán page size dựa vào chiều cao màn hình
   const dynamicPageSize = usePageSizeByHeight();
@@ -127,13 +129,14 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
       setTotal(response.total);
       setCurrentPage(page);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch trading details';
+      const fallbackMessage = t('trading.details.errors.fetch');
+      const errorMessage = error instanceof Error ? error.message : fallbackMessage;
       setError(errorMessage);
       showNotification(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }
-  }, [processId, pageSize, showNotification]);
+  }, [processId, pageSize, showNotification, t]);
 
   // Handle page change
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
@@ -160,15 +163,15 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1, mb: 2, flexWrap: 'wrap' }}>
         <Box>
           <Typography variant="h6">
-            Danh sách Giao dịch ({total})
+            {t("trading.details.title", { total })}
           </Typography>
           <Typography variant="caption" color="textSecondary">
-            Hiển thị {pageSize} mục mỗi trang (tự động điều chỉnh theo màn hình)
+            {t("trading.details.subtitle", { count: pageSize })}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: 'wrap' }}>
           {onShowSetupInfo && (
-            <Tooltip title="Xem thông tin setup">
+            <Tooltip title={t("trading.details.tooltips.setup")}>
               <IconButton
                 size="small"
                 onClick={onShowSetupInfo}
@@ -184,7 +187,7 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
             onClick={handleRefresh}
             disabled={isLoading}
           >
-            {isLoading ? "Đang tải..." : "Làm mới"}
+            {isLoading ? t("common.loading") : t("trading.details.actions.refresh")}
           </Button>
         </Box>
       </Box>
@@ -211,16 +214,16 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
             head={
               <TableHead>
                 <TableRow>
-                  <TableCell>Thời gian</TableCell>
-                  <TableCell>Giá</TableCell>
-                  <TableCell>Lý do</TableCell>
-                  <TableCell>Số lượng</TableCell>
-                  <TableCell>Loại</TableCell>
-                  <TableCell>PNL</TableCell>
-                  <TableCell>Kết quả</TableCell>
-                  <TableCell>Position PNL</TableCell>
-                  <TableCell>Giá TB Position</TableCell>
-                  <TableCell>Balance</TableCell>
+                  <TableCell>{t("trading.details.tableHeaders.time")}</TableCell>
+                  <TableCell>{t("trading.details.tableHeaders.price")}</TableCell>
+                  <TableCell>{t("trading.details.tableHeaders.reason")}</TableCell>
+                  <TableCell>{t("trading.details.tableHeaders.quantity")}</TableCell>
+                  <TableCell>{t("trading.details.tableHeaders.type")}</TableCell>
+                  <TableCell>{t("trading.details.tableHeaders.pnl")}</TableCell>
+                  <TableCell>{t("trading.details.tableHeaders.result")}</TableCell>
+                  <TableCell>{t("trading.details.tableHeaders.positionPnl")}</TableCell>
+                  <TableCell>{t("trading.details.tableHeaders.avgPrice")}</TableCell>
+                  <TableCell>{t("trading.details.tableHeaders.balance")}</TableCell>
                 </TableRow>
               </TableHead>
             }
@@ -230,7 +233,7 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
                   <TableRow>
                     <TableCell colSpan={10} align="center">
                       <Typography variant="body2" color="textSecondary">
-                        Chưa có giao dịch nào
+                        {t("trading.details.empty")}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -239,7 +242,7 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
                     <TableRow key={trade._id || `trade-${index}`} hover>
                       <TableCell>
                         <Typography variant="body2">
-                          {new Date(trade.time).toLocaleString("vi-VN")}
+                          {new Date(trade.time).toLocaleString()}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -312,8 +315,12 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
           {totalPages > 1 && (
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, mt: 3 }}>
               <Typography variant="caption" color="textSecondary">
-                Trang {currentPage} / {totalPages} • 
-                Hiển thị {Math.min(pageSize, total - (currentPage - 1) * pageSize)} / {total} mục
+                {t("trading.details.pagination.summary", {
+                  current: currentPage,
+                  total: totalPages,
+                  visible: Math.min(pageSize, Math.max(total - (currentPage - 1) * pageSize, 0)),
+                  totalItems: total,
+                })}
               </Typography>
               <Pagination
                 count={totalPages}

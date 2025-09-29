@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 interface TradingProcessSetupInfoProps {
   open: boolean;
@@ -43,18 +44,27 @@ const TradingProcessSetupInfo = ({
   onClose, 
   setupData 
 }: TradingProcessSetupInfoProps) => {
+  const { t } = useTranslation();
   // Get trade mode display text
   const getTradeModeText = (mode?: number) => {
     switch (mode) {
       case -1:
-        return "SHORT ONLY";
+        return t("trading.form.tradeModes.shortOnly");
       case 0:
-        return "BOTH";
+        return t("trading.form.tradeModes.both");
       case 1:
-        return "LONG ONLY";
+        return t("trading.form.tradeModes.longOnly");
       default:
-        return "N/A";
+        return t("common.notAvailable");
     }
+  };
+
+  const formatValue = (value?: number | string | null, suffix?: string, transform?: (v: string) => string) => {
+    if (value === undefined || value === null || value === "") {
+      return t("common.notAvailable");
+    }
+    const displayValue = transform ? transform(String(value)) : String(value);
+    return suffix ? `${displayValue}${suffix}` : displayValue;
   };
 
   return (
@@ -64,108 +74,108 @@ const TradingProcessSetupInfo = ({
       maxWidth="md"
       fullWidth
     >
-      <DialogTitle>Thông tin Setup Trading Process</DialogTitle>
+      <DialogTitle>{t("trading.setupInfo.title")}</DialogTitle>
       <DialogContent>
         <Box sx={{ pt: 2 }}>
           {/* Basic Trading Setup */}
           <Typography variant="h6" gutterBottom color="primary">
-            Cấu hình Cơ bản
+            {t("trading.setupInfo.sections.basic")}
           </Typography>
           <Box sx={{ ml: 2, mb: 3 }}>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Symbol:</strong> {setupData?.SYMBOL?.toUpperCase() || "N/A"}
+              <strong>{t("trading.form.fields.symbol")}:</strong> {formatValue(setupData?.SYMBOL?.toUpperCase())}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Interval 1:</strong> {setupData?.INTERVAL_1 || "N/A"}
+              <strong>{t("trading.form.fields.interval1")}:</strong> {formatValue(setupData?.INTERVAL_1)}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Interval 2:</strong> {setupData?.INTERVAL_2 || "N/A"}
+              <strong>{t("trading.form.fields.interval2")}:</strong> {formatValue(setupData?.INTERVAL_2)}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Trade Mode:</strong> {getTradeModeText(setupData?.TRADE_MODE)}
+              <strong>{t("trading.form.fields.tradeMode")}:</strong> {getTradeModeText(setupData?.TRADE_MODE)}
             </Typography>
           </Box>
 
           {/* Trading Parameters */}
           <Typography variant="h6" gutterBottom color="primary">
-            Thông số Trading
+            {t("trading.setupInfo.sections.trading")}
           </Typography>
           <Box sx={{ ml: 2, mb: 3 }}>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Entry Percentage:</strong> {setupData?.ENTRY_PERCENTAGE ? `${setupData.ENTRY_PERCENTAGE}%` : "N/A"}
+              <strong>{t("trading.form.fields.entryPercentage")}:</strong> {formatValue(setupData?.ENTRY_PERCENTAGE, '%')}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Leverage:</strong> {setupData?.LEVERAGE ? `${setupData.LEVERAGE}x` : "N/A"}
+              <strong>{t("trading.form.fields.leverage")}:</strong> {formatValue(setupData?.LEVERAGE, 'x')}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Funds:</strong> ${setupData?.FUNDS || "N/A"}
+              <strong>{t("trading.form.fields.funds")}:</strong> {formatValue(setupData?.FUNDS, '', (v) => `$${v}`)}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Min ROI:</strong> {setupData?.MIN_ROI ? `${setupData.MIN_ROI}%` : "N/A"}
+              <strong>{t("trading.form.fields.minRoi")}:</strong> {formatValue(setupData?.MIN_ROI, '%')}
             </Typography>
           </Box>
 
           {/* Risk Management */}
           <Typography variant="h6" gutterBottom color="primary">
-            Quản lý Rủi ro
+            {t("trading.setupInfo.sections.risk")}
           </Typography>
           <Box sx={{ ml: 2, mb: 3 }}>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Risk/Reward:</strong> {setupData?.R2R || "N/A"}
+              <strong>{t("trading.form.fields.riskToReward")}:</strong> {formatValue(setupData?.R2R)}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Max Loss:</strong> {setupData?.MAX_LOSS ? `$${setupData.MAX_LOSS}` : "N/A"}
+              <strong>{t("trading.form.fields.maxLoss")}:</strong> {formatValue(setupData?.MAX_LOSS, '', (v) => `$${v}`)}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Max Margin %:</strong> {setupData?.MAX_MARGIN_PERCENTAGE ? `${setupData.MAX_MARGIN_PERCENTAGE}%` : "N/A"}
+              <strong>{t("trading.form.fields.maxMarginPercentage")}:</strong> {formatValue(setupData?.MAX_MARGIN_PERCENTAGE, '%')}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Min Margin:</strong> ${setupData?.MIN_MARGIN || "N/A"}
+              <strong>{t("trading.form.fields.minMargin")}:</strong> {formatValue(setupData?.MIN_MARGIN, '', (v) => `$${v}`)}
             </Typography>
           </Box>
 
           {/* Technical Indicators */}
           <Typography variant="h6" gutterBottom color="primary">
-            Chỉ báo Kỹ thuật
+            {t("trading.setupInfo.sections.indicators")}
           </Typography>
           <Box sx={{ ml: 2, mb: 3 }}>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>MA Period:</strong> {setupData?.MA_PERIOD || "N/A"}
+              <strong>{t("trading.form.fields.maPeriod")}:</strong> {formatValue(setupData?.MA_PERIOD)}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>RSI Long Entry:</strong> {setupData?.RSI_ENTRY_LONG || "N/A"}
+              <strong>{t("trading.form.fields.rsiEntryLong")}:</strong> {formatValue(setupData?.RSI_ENTRY_LONG)}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>RSI Long Exit:</strong> {setupData?.RSI_EXIT_LONG || "N/A"}
+              <strong>{t("trading.form.fields.rsiExitLong")}:</strong> {formatValue(setupData?.RSI_EXIT_LONG)}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>RSI Short Entry:</strong> {setupData?.RSI_ENTRY_SHORT || "N/A"}
+              <strong>{t("trading.form.fields.rsiEntryShort")}:</strong> {formatValue(setupData?.RSI_ENTRY_SHORT)}
             </Typography>
           </Box>
 
           {/* DCA Settings */}
           <Typography variant="h6" gutterBottom color="primary">
-            Cài đặt DCA
+            {t("trading.setupInfo.sections.dca")}
           </Typography>
           <Box sx={{ ml: 2, mb: 3 }}>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>DCA Grid:</strong> {setupData?.DCA_GRID || "N/A"}
+              <strong>{t("trading.form.fields.dcaGrid")}:</strong> {formatValue(setupData?.DCA_GRID)}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>DCA Multiplier:</strong> {setupData?.DCA_MULTIPLIER || "N/A"}
+              <strong>{t("trading.form.fields.dcaMultiplier")}:</strong> {formatValue(setupData?.DCA_MULTIPLIER)}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Time Between Orders:</strong> {setupData?.TIME_BETWEEN_ORDERS ? `${setupData.TIME_BETWEEN_ORDERS}s` : "N/A"}
+              <strong>{t("trading.form.fields.timeBetweenOrders")}:</strong> {formatValue(setupData?.TIME_BETWEEN_ORDERS, ` ${t("trading.form.units.seconds")}`)}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
-              <strong>Pause Time:</strong> {setupData?.PAUSE_TIME || "N/A"}
+              <strong>{t("trading.form.fields.pauseTime")}:</strong> {formatValue(setupData?.PAUSE_TIME)}
             </Typography>
           </Box>
         </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} variant="contained">
-          Đóng
+          {t("common.close")}
         </Button>
       </DialogActions>
     </Dialog>

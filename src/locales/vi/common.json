@@ -415,6 +415,65 @@
         "totalVolume": "Tổng khối lượng",
         "volumeUnit": "USDT"
       }
+    },
+    "stopDialog": {
+      "title": "Xác nhận dừng giao dịch",
+      "description": "Bạn có chắc chắn muốn dừng trading process này?",
+      "symbol": "Symbol: {{symbol}}",
+      "sections": {
+        "runningPositions": "Các lệnh đang chạy"
+      },
+      "positionLabel": "{{symbol}} · {{side}}",
+      "positionDetails": "Khối lượng: {{quantity}} · Entry: {{entry}} · PnL: {{pnl}}",
+      "positionSide": "Position side: {{side}}",
+      "emptyPositions": "Không có lệnh nào đang chạy cho tài khoản này.",
+      "noAccount": "Không xác định được tài khoản trading để hiển thị các lệnh đang chạy.",
+      "errors": {
+        "loadPositions": "Không thể tải danh sách lệnh đang chạy"
+      },
+      "actions": {
+        "stop": "Dừng",
+        "stopAndClose": "Dừng và đóng tất cả lệnh"
+      }
+    },
+    "setupInfo": {
+      "title": "Thông tin setup Trading Process",
+      "sections": {
+        "basic": "Cấu hình cơ bản",
+        "trading": "Thông số trading",
+        "risk": "Quản lý rủi ro",
+        "indicators": "Chỉ báo kỹ thuật",
+        "dca": "Cài đặt DCA"
+      }
+    },
+    "details": {
+      "title": "Danh sách giao dịch ({{total}})",
+      "subtitle": "Hiển thị {{count}} mục mỗi trang (tự động điều chỉnh theo màn hình)",
+      "actions": {
+        "refresh": "Làm mới"
+      },
+      "tooltips": {
+        "setup": "Xem thông tin setup"
+      },
+      "empty": "Chưa có giao dịch nào",
+      "errors": {
+        "fetch": "Không thể tải danh sách giao dịch"
+      },
+      "tableHeaders": {
+        "time": "Thời gian",
+        "price": "Giá",
+        "reason": "Lý do",
+        "quantity": "Số lượng",
+        "type": "Loại",
+        "pnl": "PnL",
+        "result": "Kết quả",
+        "positionPnl": "PnL vị thế",
+        "avgPrice": "Giá TB vị thế",
+        "balance": "Số dư"
+      },
+      "pagination": {
+        "summary": "Trang {{current}} / {{total}} • Hiển thị {{visible}} / {{totalItems}} mục"
+      }
     }
   },
   "backtest": {
