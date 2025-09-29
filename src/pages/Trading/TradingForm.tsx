@@ -28,6 +28,7 @@ import type {
 import type { BacktestParameter } from "@/types/backtest.type";
 import { areEqual } from "@/utils/common";
 import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import type { TextFieldProps } from "@mui/material/TextField";
 
 interface TradingFormProps {
@@ -83,9 +84,9 @@ const defaultBotParams = {
 
 // Trade mode options
 const tradeModeOptions = [
-  { value: -1, label: "SHORT ONLY" },
-  { value: 0, label: "BOTH" },
-  { value: 1, label: "LONG ONLY" },
+  { value: -1, labelKey: "trading.form.tradeModes.shortOnly" },
+  { value: 0, labelKey: "trading.form.tradeModes.both" },
+  { value: 1, labelKey: "trading.form.tradeModes.longOnly" },
 ];
 
 // Time interval options
@@ -109,13 +110,13 @@ const timeIntervalOptions = [
 
 // Pause day options
 const pauseDayOptions = [
-  { value: "0", label: "Monday" },
-  { value: "1", label: "Tuesday" },
-  { value: "2", label: "Wednesday" },
-  { value: "3", label: "Thursday" },
-  { value: "4", label: "Friday" },
-  { value: "5", label: "Saturday" },
-  { value: "6", label: "Sunday" },
+  { value: "0", labelKey: "common.weekdays.monday" },
+  { value: "1", labelKey: "common.weekdays.tuesday" },
+  { value: "2", labelKey: "common.weekdays.wednesday" },
+  { value: "3", labelKey: "common.weekdays.thursday" },
+  { value: "4", labelKey: "common.weekdays.friday" },
+  { value: "5", labelKey: "common.weekdays.saturday" },
+  { value: "6", labelKey: "common.weekdays.sunday" },
 ];
 
 const ITEM_HEIGHT = 48;
@@ -136,6 +137,7 @@ const TradingForm = ({
   isEditMode,
   formId,
 }: TradingFormProps) => {
+  const { t } = useTranslation();
   // Get trading accounts and bot templates from the store
   const { 
     activeAccounts, 
@@ -276,10 +278,10 @@ const TradingForm = ({
     return selectedPauseDays
       .map((dayValue) => {
         const day = pauseDayOptions.find((opt) => opt.value === dayValue);
-        return day ? day.label : dayValue;
+        return day ? t(day.labelKey) : dayValue;
       })
       .join(", ");
-  }, [selectedPauseDays]);
+  }, [selectedPauseDays, t]);
 
   return (
     <Box
@@ -294,11 +296,11 @@ const TradingForm = ({
             <Controller
               name="name"
               control={control}
-              rules={{ required: "Tên trading process là bắt buộc" }}
+              rules={{ required: t("trading.form.validation.nameRequired") }}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Tên Trading Process"
+                  label={t("trading.form.fields.name")}
                   fullWidth
                   error={!!errors.name}
                   helperText={errors.name?.message as string}
@@ -311,11 +313,11 @@ const TradingForm = ({
             <Controller
               name="description"
               control={control}
-              rules={{ required: "Mô tả là bắt buộc" }}
+              rules={{ required: t("trading.form.validation.descriptionRequired") }}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Mô tả"
+                  label={t("trading.form.fields.description")}
                   fullWidth
                   multiline
                   rows={3}
@@ -328,7 +330,7 @@ const TradingForm = ({
 
           <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle1" gutterBottom>
-              Cấu hình Trading
+              {t("trading.form.sections.configuration")}
             </Typography>
 
             <FormControl
@@ -337,17 +339,17 @@ const TradingForm = ({
               error={!!errors.bot_template_id}
             >
               <InputLabel id="bot-template-select-label">
-                Bot Template
+                {t("trading.form.fields.botTemplate")}
               </InputLabel>
               <Controller
                 name="bot_template_id"
                 control={control}
-                rules={{ required: "Bot Template là bắt buộc" }}
+                rules={{ required: t("trading.form.validation.botTemplateRequired") }}
                 render={({ field }) => (
                   <Select
                     {...field}
                     labelId="bot-template-select-label"
-                    label="Bot Template"
+                    label={t("trading.form.fields.botTemplate")}
                     onChange={(e) => {
                       field.onChange(e);
                     }}
@@ -376,14 +378,14 @@ const TradingForm = ({
 
             {/* Exchange Filter */}
             <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Lọc theo sàn giao dịch</InputLabel>
+              <InputLabel>{t("trading.form.fields.exchangeFilter")}</InputLabel>
               <Select
                 value={exchangeFilter}
-                label="Lọc theo sàn giao dịch"
+                label={t("trading.form.fields.exchangeFilter")}
                 onChange={(e) => handleExchangeFilterChange(e.target.value)}
               >
                 <MenuItem value="">
-                  <em>Tất cả sàn giao dịch</em>
+                  <em>{t("trading.form.options.allExchanges")}</em>
                 </MenuItem>
                 <MenuItem value="binance">Binance</MenuItem>
                 <MenuItem value="bybit">Bybit</MenuItem>
@@ -398,29 +400,29 @@ const TradingForm = ({
                 error={!!errors.trading_account_id}
               >
                 <InputLabel id="trading-account-select-label">
-                  Tài khoản Trading
+                  {t("trading.form.fields.tradingAccount")}
                 </InputLabel>
                 <Controller
                   name="trading_account_id"
                   control={control}
-                  rules={{ required: "Tài khoản Trading là bắt buộc" }}
+                  rules={{ required: t("trading.form.validation.tradingAccountRequired") }}
                   render={({ field }) => (
                     <Select
                       {...field}
                       labelId="trading-account-select-label"
-                      label="Tài khoản Trading"
+                      label={t("trading.form.fields.tradingAccount")}
                       onChange={(e) => {
                         field.onChange(e);
                       }}
                       disabled={isSubmitting || isLoadingAccounts}
                     >
                       <MenuItem value="">
-                        <em>Chọn tài khoản trading</em>
+                        <em>{t("trading.form.placeholders.selectAccount")}</em>
                       </MenuItem>
                       {isLoadingAccounts ? (
                         <MenuItem value="" disabled>
                           <CircularProgress size={20} sx={{ mr: 1 }} />
-                          Đang tải tài khoản...
+                          {t("trading.form.states.loadingAccounts")}
                         </MenuItem>
                       ) : (
                         activeAccounts.map((account) => (
@@ -444,22 +446,22 @@ const TradingForm = ({
                     </Select>
                   )}
                 />
-                {errors.trading_account_id && (
-                  <Typography color="error" variant="caption">
-                    {errors.trading_account_id.message as string}
-                  </Typography>
-                )}
-                {accountsError && (
-                  <Typography color="error" variant="caption" sx={{ mt: 1 }}>
-                    Lỗi tải tài khoản: {accountsError}
-                  </Typography>
-                )}
-              </FormControl>
-              
-              <Tooltip title="Làm mới danh sách tài khoản">
-                <IconButton 
-                  onClick={handleRefreshAccounts}
-                  disabled={isLoadingAccounts || isSubmitting}
+              {errors.trading_account_id && (
+                <Typography color="error" variant="caption">
+                  {errors.trading_account_id.message as string}
+                </Typography>
+              )}
+              {accountsError && (
+                <Typography color="error" variant="caption" sx={{ mt: 1 }}>
+                  {t("trading.form.errors.loadAccounts", { message: accountsError })}
+                </Typography>
+              )}
+            </FormControl>
+            
+            <Tooltip title={t("trading.form.tooltips.refreshAccounts")}>
+              <IconButton 
+                onClick={handleRefreshAccounts}
+                disabled={isLoadingAccounts || isSubmitting}
                   sx={{ mt: 1 }}
                 >
                   <RefreshIcon />
@@ -470,14 +472,14 @@ const TradingForm = ({
             {/* Basic configuration */}
             <Accordion defaultExpanded>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Cấu hình cơ bản</Typography>
+                <Typography>{t("trading.form.sections.basic")}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="SYMBOL"
-                      label="Cặp giao dịch"
+                      label={t("trading.form.fields.symbol")}
                       fullWidth
                     />
                   </Grid>
@@ -487,10 +489,10 @@ const TradingForm = ({
                       name="parameters.INTERVAL_1"
                       render={({ field }) => (
                         <FormControl fullWidth>
-                          <InputLabel>Khung thời gian 1</InputLabel>
+                          <InputLabel>{t("trading.form.fields.interval1")}</InputLabel>
                           <Select
                             {...field}
-                            label="Khung thời gian 1"
+                            label={t("trading.form.fields.interval1")}
                             value={field.value ?? defaultBotParams.INTERVAL_1}
                             onChange={(event) => field.onChange(event.target.value)}
                           >
@@ -510,10 +512,10 @@ const TradingForm = ({
                       name="parameters.INTERVAL_2"
                       render={({ field }) => (
                         <FormControl fullWidth>
-                          <InputLabel>Khung thời gian 2</InputLabel>
+                          <InputLabel>{t("trading.form.fields.interval2")}</InputLabel>
                           <Select
                             {...field}
-                            label="Khung thời gian 2"
+                            label={t("trading.form.fields.interval2")}
                             value={field.value ?? defaultBotParams.INTERVAL_2}
                             onChange={(event) => field.onChange(event.target.value)}
                           >
@@ -533,16 +535,16 @@ const TradingForm = ({
                       name="parameters.TRADE_MODE"
                       render={({ field }) => (
                         <FormControl fullWidth>
-                          <InputLabel>Chế độ giao dịch</InputLabel>
+                          <InputLabel>{t("trading.form.fields.tradeMode")}</InputLabel>
                           <Select
                             {...field}
-                            label="Chế độ giao dịch"
+                            label={t("trading.form.fields.tradeMode")}
                             value={field.value ?? defaultBotParams.TRADE_MODE}
                             onChange={(event) => field.onChange(Number(event.target.value))}
                           >
                             {tradeModeOptions.map((option) => (
                               <MenuItem key={option.value} value={option.value}>
-                                {option.label}
+                                {t(option.labelKey)}
                               </MenuItem>
                             ))}
                           </Select>
@@ -557,14 +559,14 @@ const TradingForm = ({
             {/* Trading parameters */}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Tham số giao dịch</Typography>
+                <Typography>{t("trading.form.sections.trading")}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="ENTRY_PERCENTAGE"
-                      label="Tỷ lệ vào lệnh (ENTRY_PERCENTAGE)"
+                      label={t("trading.form.fields.entryPercentage")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -581,7 +583,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="LEVERAGE"
-                      label="Đòn bẩy (LEVERAGE)"
+                      label={t("trading.form.fields.leverage")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -590,7 +592,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="FUNDS"
-                      label="Vốn ban đầu (FUNDS)"
+                      label={t("trading.form.fields.funds")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -606,7 +608,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="TIME_BETWEEN_ORDERS"
-                      label="Thời gian nghỉ giữa các lệnh (giây)"
+                      label={t("trading.form.fields.timeBetweenOrders")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -614,7 +616,9 @@ const TradingForm = ({
                       slotProps={{
                         input: {
                           endAdornment: (
-                            <InputAdornment position="end">giây</InputAdornment>
+                            <InputAdornment position="end">
+                              {t("trading.form.units.seconds")}
+                            </InputAdornment>
                           ),
                         },
                       }}
@@ -623,9 +627,9 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="PAUSE_TIME"
-                      label="Thời gian tạm dừng (PAUSE_TIME)"
+                      label={t("trading.form.fields.pauseTime")}
                       fullWidth
-                      placeholder="HH:MM-HH:MM"
+                      placeholder={t("trading.form.placeholders.pauseTime")}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
@@ -635,11 +639,11 @@ const TradingForm = ({
                       render={({ field }) => (
                         <FormControl fullWidth>
                           <InputLabel id="pause-days-select-label">
-                            Ngày tạm dừng
+                            {t("trading.form.fields.pauseDay")}
                           </InputLabel>
                           <Select
                             labelId="pause-days-select-label"
-                            label="Ngày tạm dừng"
+                            label={t("trading.form.fields.pauseDay")}
                             multiple
                             value={selectedPauseDays}
                             onChange={(event) => {
@@ -665,7 +669,7 @@ const TradingForm = ({
                           >
                             {pauseDayOptions.map((option) => (
                               <MenuItem key={option.value} value={option.value}>
-                                {option.label}
+                                {t(option.labelKey)}
                               </MenuItem>
                             ))}
                           </Select>
@@ -680,14 +684,14 @@ const TradingForm = ({
             {/* Profit and Margin Settings */}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Cài đặt lợi nhuận và biên độ</Typography>
+                <Typography>{t("trading.form.sections.profitMargin")}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="MIN_ROI"
-                      label="Lợi nhuận tối thiểu (MIN_ROI)"
+                      label={t("trading.form.fields.minRoi")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -704,7 +708,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="R2R"
-                      label="Risk to Reward Ratio (R2R)"
+                      label={t("trading.form.fields.riskToReward")}
                       fullWidth
                       placeholder="1:2"
                     />
@@ -712,7 +716,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="MIN_MARGIN"
-                      label="Biên độ tối thiểu (MIN_MARGIN)"
+                      label={t("trading.form.fields.minMargin")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -722,7 +726,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="MAX_MARGIN_PERCENTAGE"
-                      label="Biên độ tối đa (MAX_MARGIN_PERCENTAGE)"
+                      label={t("trading.form.fields.maxMarginPercentage")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -732,7 +736,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="MAX_LOSS"
-                      label="Lỗ tối đa (MAX_LOSS)"
+                      label={t("trading.form.fields.maxLoss")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -746,23 +750,23 @@ const TradingForm = ({
             {/* Technical indicators */}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Chỉ báo kỹ thuật</Typography>
+                <Typography>{t("trading.form.sections.indicators")}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="MA_PERIOD"
-                      label="Chu kỳ MA (MA_PERIOD)"
+                      label={t("trading.form.fields.maPeriod")}
                       fullWidth
-                      placeholder="8:20"
-                      helperText="Định dạng: 'chu kỳ ngắn:chu kỳ dài' (vd: 8:20)"
+                      placeholder={t("trading.form.placeholders.maPeriod")}
+                      helperText={t("trading.form.helper.maPeriod")}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="RSI_ENTRY_LONG"
-                      label="RSI Long Entry"
+                      label={t("trading.form.fields.rsiEntryLong")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -771,7 +775,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="RSI_ENTRY_LONG_CANDLE"
-                      label="RSI Long Entry Candle"
+                      label={t("trading.form.fields.rsiEntryLongCandle")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -780,7 +784,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="RSI_EXIT_LONG"
-                      label="RSI Long Exit"
+                      label={t("trading.form.fields.rsiExitLong")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -789,7 +793,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="RSI_EXIT_LONG_CANDLE"
-                      label="RSI Long Exit Candle"
+                      label={t("trading.form.fields.rsiExitLongCandle")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -799,7 +803,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="RSI_ENTRY_SHORT"
-                      label="RSI Short Entry"
+                      label={t("trading.form.fields.rsiEntryShort")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -808,7 +812,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="RSI_ENTRY_SHORT_CANDLE"
-                      label="RSI Short Entry Candle"
+                      label={t("trading.form.fields.rsiEntryShortCandle")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -817,7 +821,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="RSI_EXIT_SHORT"
-                      label="RSI Short Exit"
+                      label={t("trading.form.fields.rsiExitShort")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -826,7 +830,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="RSI_EXIT_SHORT_CANDLE"
-                      label="RSI Short Exit Candle"
+                      label={t("trading.form.fields.rsiExitShortCandle")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -839,25 +843,25 @@ const TradingForm = ({
             {/* DCA Settings */}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Cài đặt DCA (Dollar-Cost Averaging)</Typography>
+                <Typography>{t("trading.form.sections.dca")}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="DCA_GRID"
-                      label="Lưới DCA (DCA_GRID)"
+                      label={t("trading.form.fields.dcaGrid")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
                       inputProps={{ step: "0.001" }}
-                      helperText="Ví dụ: 0.008 là 0.8%"
+                      helperText={t("trading.form.helper.dcaGrid")}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="GRID_MULTIPLIER"
-                      label="Hệ số lưới (GRID_MULTIPLIER)"
+                      label={t("trading.form.fields.gridMultiplier")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}
@@ -867,7 +871,7 @@ const TradingForm = ({
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <ParameterTextField
                       paramName="DCA_MULTIPLIER"
-                      label="Hệ số DCA (DCA_MULTIPLIER)"
+                      label={t("trading.form.fields.dcaMultiplier")}
                       type="number"
                       fullWidth
                       parseValue={toNumber}

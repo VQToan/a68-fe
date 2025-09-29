@@ -22,6 +22,7 @@ import type {
   TradingExchangeType 
 } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 interface TradingAccountFormProps {
   initialData?: Partial<TradingAccount> & { 
@@ -50,6 +51,7 @@ const TradingAccountForm = ({
   isViewMode = false,
   formId,
 }: TradingAccountFormProps) => {
+  const { t } = useTranslation();
   // Form state
   const [formData, setFormData] = useState({
     account_name: initialData?.account_name || "",
@@ -80,22 +82,22 @@ const TradingAccountForm = ({
     const newErrors: Record<string, string> = {};
 
     if (!formData.account_name.trim()) {
-      newErrors.account_name = "Tên tài khoản là bắt buộc";
+      newErrors.account_name = t("tradingAccount.form.validation.accountNameRequired");
     }
 
     if (!formData.exchange) {
-      newErrors.exchange = "Sàn giao dịch là bắt buộc";
+      newErrors.exchange = t("tradingAccount.form.validation.exchangeRequired");
     }
 
     if (!isEditMode || formData.api_key) {
       if (!formData.api_key.trim()) {
-        newErrors.api_key = "API Key là bắt buộc";
+        newErrors.api_key = t("tradingAccount.form.validation.apiKeyRequired");
       }
     }
 
     if (!isEditMode || formData.secret_key) {
       if (!formData.secret_key.trim()) {
-        newErrors.secret_key = "Secret Key là bắt buộc";
+        newErrors.secret_key = t("tradingAccount.form.validation.secretKeyRequired");
       }
     }
 
@@ -202,7 +204,7 @@ const TradingAccountForm = ({
         <Grid size={{ xs: 12, md: 6 }}>
           <TextField
             fullWidth
-            label="Tên tài khoản"
+            label={t("tradingAccount.form.fields.accountName")}
             name="account_name"
             value={formData.account_name}
             onChange={handleInputChange}
@@ -215,9 +217,9 @@ const TradingAccountForm = ({
 
         <Grid size={{ xs: 12, md: 6 }}>
           <FormControl fullWidth error={!!errors.exchange}>
-            <InputLabel>Sàn giao dịch</InputLabel>
+            <InputLabel>{t("tradingAccount.form.fields.exchange")}</InputLabel>
             <Select
-              label="Sàn giao dịch"
+              label={t("tradingAccount.form.fields.exchange")}
               name="exchange"
               value={formData.exchange}
               onChange={handleSelectChange}
@@ -225,7 +227,7 @@ const TradingAccountForm = ({
               required
             >
               <MenuItem value="">
-                <em>Chọn sàn giao dịch</em>
+                <em>{t("tradingAccount.form.placeholders.selectExchange")}</em>
               </MenuItem>
               {exchangeOptions.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
@@ -243,7 +245,7 @@ const TradingAccountForm = ({
 
         <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>
-            Thông tin API
+            {t("tradingAccount.form.sections.api")}
           </Typography>
         </Grid>
 
@@ -251,10 +253,10 @@ const TradingAccountForm = ({
           <Grid size={{ xs: 12 }}>
             <TextField
               fullWidth
-              label="API Key hiện tại"
+              label={t("tradingAccount.form.fields.apiKeyCurrent")}
               value={initialData.api_key_masked}
               disabled
-              helperText="Để trống nếu không muốn thay đổi API Key"
+              helperText={t("tradingAccount.form.helper.keepCurrentApiKey")}
             />
           </Grid>
         )}
@@ -262,13 +264,13 @@ const TradingAccountForm = ({
         <Grid size={{ xs: 12 }}>
           <TextField
             fullWidth
-            label={isEditMode ? "API Key mới (để trống nếu không đổi)" : "API Key"}
+            label={isEditMode ? t("tradingAccount.form.fields.apiKeyNew") : t("tradingAccount.form.fields.apiKey")}
             name="api_key"
             type="password"
             value={formData.api_key}
             onChange={handleInputChange}
             error={!!errors.api_key}
-            helperText={errors.api_key || (isEditMode ? "Để trống nếu không muốn thay đổi" : "")}
+            helperText={errors.api_key || (isEditMode ? t("tradingAccount.form.helper.keepEmptyIfUnchanged") : "")}
             disabled={isReadOnly}
             required={!isEditMode}
           />
@@ -277,13 +279,13 @@ const TradingAccountForm = ({
         <Grid size={{ xs: 12 }}>
           <TextField
             fullWidth
-            label={isEditMode ? "Secret Key mới (để trống nếu không đổi)" : "Secret Key"}
+            label={isEditMode ? t("tradingAccount.form.fields.secretKeyNew") : t("tradingAccount.form.fields.secretKey")}
             name="secret_key"
             type="password"
             value={formData.secret_key}
             onChange={handleInputChange}
             error={!!errors.secret_key}
-            helperText={errors.secret_key || (isEditMode ? "Để trống nếu không muốn thay đổi" : "")}
+            helperText={errors.secret_key || (isEditMode ? t("tradingAccount.form.helper.keepEmptyIfUnchanged") : "")}
             disabled={isReadOnly}
             required={!isEditMode}
           />
@@ -291,14 +293,14 @@ const TradingAccountForm = ({
 
         <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>
-            Cài đặt thông báo
+            {t("tradingAccount.form.sections.notifications")}
           </Typography>
         </Grid>
 
         <Grid size={{ xs: 12 }}>
           <Box>
             <Typography variant="body2" gutterBottom>
-              Telegram Chat IDs
+              {t("tradingAccount.form.fields.chatIds")}
             </Typography>
             
             {/* Display existing chat IDs */}
@@ -314,7 +316,7 @@ const TradingAccountForm = ({
               ))}
               {formData.chat_ids.length === 0 && (
                 <Typography variant="body2" color="text.secondary">
-                  Chưa có chat ID nào
+                  {t("tradingAccount.form.empty.chatIds")}
                 </Typography>
               )}
             </Box>
@@ -323,7 +325,7 @@ const TradingAccountForm = ({
             {!isReadOnly && (
               <TextField
                 fullWidth
-                label="Thêm Chat ID"
+                label={t("tradingAccount.form.fields.addChatId")}
                 value={newChatId}
                 onChange={(e) => setNewChatId(e.target.value)}
                 onKeyPress={(e) => {
@@ -332,7 +334,7 @@ const TradingAccountForm = ({
                     handleAddChatId();
                   }
                 }}
-                helperText="Nhập Telegram Chat ID để nhận thông báo"
+                helperText={t("tradingAccount.form.helper.chatId")}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">

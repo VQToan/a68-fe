@@ -9,16 +9,18 @@ import {
 } from "@mui/material";
 import type { TradingAccount } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 interface AccountBalanceTabProps {
   account: TradingAccount;
 }
 
 const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
+  const { t } = useTranslation();
   return (
     <Box sx={{ p: { xs: 1.5, sm: 2.5, md: 3 } }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
-        Chi tiết Balance
+        {t("tradingAccount.detail.balance.title")}
       </Typography>
       
       {/* Summary Cards */}
@@ -28,7 +30,7 @@ const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="body2" color="textSecondary">
-                  Tổng số dư ví
+                  {t("tradingAccount.detail.balance.totalWallet")}
                 </Typography>
                 <Typography variant="h6">
                   ${account.balance.total_wallet_balance.toFixed(8)}
@@ -40,7 +42,7 @@ const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="body2" color="textSecondary">
-                  Số dư khả dụng
+                  {t("tradingAccount.detail.balance.available")}
                 </Typography>
                 <Typography variant="h6">
                   ${account.balance.available_balance.toFixed(8)}
@@ -52,7 +54,7 @@ const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="body2" color="textSecondary">
-                  PnL chưa thực hiện
+                  {t("tradingAccount.detail.balance.unrealizedPnl")}
                 </Typography>
                 <Typography 
                   variant="h6"
@@ -67,7 +69,7 @@ const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="body2" color="textSecondary">
-                  Số tiền có thể rút
+                  {t("tradingAccount.detail.balance.maxWithdraw")}
                 </Typography>
                 <Typography variant="h6">
                   ${account.balance.max_withdraw_amount.toFixed(8)}
@@ -80,7 +82,7 @@ const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
 
       {/* Assets Details */}
       <Typography variant="h6" sx={{ mb: 2 }}>
-        Chi tiết từng Asset
+        {t("tradingAccount.detail.balance.assetsTitle")}
       </Typography>
       
       {account?.balance?.assets && account.balance.assets.length > 0 ? (
@@ -90,7 +92,7 @@ const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
               <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                 <Typography variant="h6">{asset.asset}</Typography>
                 <Chip 
-                  label={asset.margin_available ? "Margin khả dụng" : "Margin không khả dụng"}
+                  label={asset.margin_available ? t("tradingAccount.detail.balance.marginAvailable") : t("tradingAccount.detail.balance.marginUnavailable")}
                   color={asset.margin_available ? "success" : "default"}
                   size="small"
                 />
@@ -99,7 +101,7 @@ const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
                 <Grid size={{ xs: 12, md: 4 }}>
                   <Box>
                     <Typography variant="body2" color="textSecondary">
-                      Số dư ví
+                      {t("tradingAccount.detail.balance.asset.wallet")}
                     </Typography>
                     <Typography variant="body1" fontWeight="medium">
                       {asset.wallet_balance.toFixed(8)}
@@ -109,7 +111,7 @@ const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
                 <Grid size={{ xs: 12, md: 4 }}>
                   <Box>
                     <Typography variant="body2" color="textSecondary">
-                      Số dư khả dụng
+                      {t("tradingAccount.detail.balance.asset.available")}
                     </Typography>
                     <Typography variant="body1" fontWeight="medium">
                       {asset.available_balance.toFixed(8)}
@@ -119,7 +121,7 @@ const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
                 <Grid size={{ xs: 12, md: 4 }}>
                   <Box>
                     <Typography variant="body2" color="textSecondary">
-                      Số dư margin
+                      {t("tradingAccount.detail.balance.asset.margin")}
                     </Typography>
                     <Typography variant="body1" fontWeight="medium">
                       {asset.margin_balance.toFixed(8)}
@@ -129,7 +131,7 @@ const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
                 <Grid size={{ xs: 12, md: 4 }}>
                   <Box>
                     <Typography variant="body2" color="textSecondary">
-                      PnL chưa thực hiện
+                      {t("tradingAccount.detail.balance.asset.unrealizedPnl")}
                     </Typography>
                     <Typography 
                       variant="body1" 
@@ -143,7 +145,7 @@ const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
                 <Grid size={{ xs: 12, md: 4 }}>
                   <Box>
                     <Typography variant="body2" color="textSecondary">
-                      Cross wallet balance
+                      {t("tradingAccount.detail.balance.asset.crossWallet")}
                     </Typography>
                     <Typography variant="body1" fontWeight="medium">
                       {asset.cross_wallet_balance.toFixed(8)}
@@ -153,10 +155,10 @@ const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
                 <Grid size={{ xs: 12, md: 4 }}>
                   <Box>
                     <Typography variant="body2" color="textSecondary">
-                      Cập nhật lần cuối
+                      {t("tradingAccount.detail.balance.asset.updatedAt")}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
-                      {new Date(asset.update_time).toLocaleString('vi-VN')}
+                      {new Date(asset.update_time).toLocaleString()}
                     </Typography>
                   </Box>
                 </Grid>
@@ -167,7 +169,7 @@ const AccountBalanceTab = ({ account }: AccountBalanceTabProps) => {
       ) : (
         <Box sx={{ textAlign: "center", py: 4 }}>
           <Typography variant="body1" color="textSecondary">
-            Không có dữ liệu balance
+            {t("tradingAccount.detail.balance.noData")}
           </Typography>
         </Box>
       )}

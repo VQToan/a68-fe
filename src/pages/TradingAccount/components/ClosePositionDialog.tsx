@@ -12,6 +12,7 @@ import {
   Chip,
 } from "@mui/material";
 import type { PositionSummary, ClosePositionRequest } from "@/types/trading.types";
+import { useTranslation } from "react-i18next";
 
 interface ClosePositionDialogProps {
   open: boolean;
@@ -26,6 +27,7 @@ const ClosePositionDialog = ({
   onSubmit,
   position,
 }: ClosePositionDialogProps) => {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,7 +47,7 @@ const ClosePositionDialog = ({
       await onSubmit(closeData);
       onClose();
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Có lỗi xảy ra khi đóng lệnh");
+      setError(error instanceof Error ? error.message : t("tradingAccount.detail.closeDialog.error"));
     } finally {
       setIsSubmitting(false);
     }
@@ -63,7 +65,7 @@ const ClosePositionDialog = ({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>
-        Đóng lệnh
+        {t("tradingAccount.detail.closeDialog.title")}
       </DialogTitle>
       <DialogContent>
         <Box sx={{ pt: 2 }}>
@@ -74,19 +76,19 @@ const ClosePositionDialog = ({
           )}
 
           <Alert severity="warning" sx={{ mb: 3 }}>
-            Bạn có chắc chắn muốn đóng toàn bộ lệnh này không? Hành động này không thể hoàn tác.
+            {t("tradingAccount.detail.closeDialog.warning")}
           </Alert>
 
           {/* Position Details */}
           <Box sx={{ p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
             <Typography variant="subtitle2" sx={{ mb: 2 }}>
-              Chi tiết lệnh:
+              {t("tradingAccount.detail.closeDialog.detailsTitle")}
             </Typography>
             
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="textSecondary">
-                  Symbol:
+                  {t("tradingAccount.detail.closeDialog.fields.symbol")}
                 </Typography>
                 <Typography variant="body2" fontWeight="medium">
                   {position.symbol}
@@ -95,7 +97,7 @@ const ClosePositionDialog = ({
 
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="textSecondary">
-                  Loại:
+                  {t("tradingAccount.detail.closeDialog.fields.type")}
                 </Typography>
                 <Chip
                   label={`${position.side} ${position.position_side}`}
@@ -106,7 +108,7 @@ const ClosePositionDialog = ({
 
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="textSecondary">
-                  Số lượng:
+                  {t("tradingAccount.detail.closeDialog.fields.quantity")}
                 </Typography>
                 <Typography variant="body2" fontWeight="medium">
                   {position.quantity}
@@ -115,7 +117,7 @@ const ClosePositionDialog = ({
 
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="textSecondary">
-                  Giá vào:
+                  {t("tradingAccount.detail.closeDialog.fields.entryPrice")}
                 </Typography>
                 <Typography variant="body2" fontWeight="medium">
                   ${position.entry_price.toFixed(2)}
@@ -124,7 +126,7 @@ const ClosePositionDialog = ({
 
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="textSecondary">
-                  Giá hiện tại:
+                  {t("tradingAccount.detail.closeDialog.fields.currentPrice")}
                 </Typography>
                 <Typography variant="body2" fontWeight="medium">
                   ${position.mark_price.toFixed(2)}
@@ -133,7 +135,7 @@ const ClosePositionDialog = ({
 
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="textSecondary">
-                  PnL chưa thực hiện:
+                  {t("tradingAccount.detail.closeDialog.fields.unrealizedPnl")}
                 </Typography>
                 <Box sx={{ textAlign: "right" }}>
                   <Typography 
@@ -157,7 +159,7 @@ const ClosePositionDialog = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} disabled={isSubmitting}>
-          Hủy
+          {t("common.cancel")}
         </Button>
         <Button
           onClick={handleSubmit}
@@ -166,7 +168,7 @@ const ClosePositionDialog = ({
           disabled={isSubmitting}
           startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
         >
-          {isSubmitting ? "Đang đóng..." : "Đóng lệnh"}
+          {isSubmitting ? t("tradingAccount.detail.closeDialog.actions.submitting") : t("tradingAccount.detail.closeDialog.actions.submit")}
         </Button>
       </DialogActions>
     </Dialog>

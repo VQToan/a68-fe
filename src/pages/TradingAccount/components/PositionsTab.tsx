@@ -23,6 +23,7 @@ import type {
   ClosePartialPositionRequest 
 } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 import PositionActionButtons from "./PositionActionButtons";
 import OpenPositionDialog from "./OpenPositionDialog";
 import ClosePositionDialog from "./ClosePositionDialog";
@@ -45,6 +46,7 @@ const PositionsTab = ({
   onClosePosition,
   onClosePartialPosition,
 }: PositionsTabProps) => {
+  const { t } = useTranslation();
   // Dialog states
   const [openPositionDialog, setOpenPositionDialog] = useState(false);
   const [closePositionDialog, setClosePositionDialog] = useState(false);
@@ -138,7 +140,7 @@ const PositionsTab = ({
     <Box sx={{ p: { xs: 1.5, sm: 2.5, md: 3 } }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, gap: 1, flexWrap: 'wrap' }}>
         <Typography variant="h6">
-          Lệnh đang mở ({positions.length})
+          {t("tradingAccount.detail.positions.title", { count: positions.length })}
         </Typography>
         <Button
           variant="outlined"
@@ -147,7 +149,7 @@ const PositionsTab = ({
           disabled={isLoading}
           size="small"
         >
-          {isLoading ? "Đang tải..." : "Làm mới"}
+          {isLoading ? t("common.loading") : t("tradingAccount.detail.positions.actions.refresh")}
         </Button>
       </Box>
       
@@ -158,14 +160,14 @@ const PositionsTab = ({
       ) : positions.length === 0 ? (
         <Box sx={{ textAlign: "center", py: 4 }}>
           <Typography variant="body1" color="textSecondary" sx={{ mb: 2 }}>
-            Không có lệnh nào đang mở
+            {t("tradingAccount.detail.positions.empty")}
           </Typography>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={handleOpenNewPosition}
           >
-            Mở lệnh mới
+            {t("tradingAccount.detail.positions.openNew")}
           </Button>
         </Box>
       ) : (
@@ -176,16 +178,16 @@ const PositionsTab = ({
             head={
               <TableHead>
                 <TableRow>
-                  <TableCell>Mã lệnh</TableCell>
-                  <TableCell>Symbol</TableCell>
-                  <TableCell>Loại</TableCell>
-                  <TableCell>Số lượng</TableCell>
-                  <TableCell>Giá vào</TableCell>
-                  <TableCell>Giá hiện tại</TableCell>
-                  <TableCell>Liquid</TableCell>
-                  <TableCell>PnL</TableCell>
-                  <TableCell>Thời gian</TableCell>
-                  <TableCell align="center">Hành động</TableCell>
+                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.orderId")}</TableCell>
+                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.symbol")}</TableCell>
+                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.type")}</TableCell>
+                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.quantity")}</TableCell>
+                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.entryPrice")}</TableCell>
+                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.currentPrice")}</TableCell>
+                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.liquidationPrice")}</TableCell>
+                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.pnl")}</TableCell>
+                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.time")}</TableCell>
+                  <TableCell align="center">{t("tradingAccount.detail.positions.tableHeaders.actions")}</TableCell>
                 </TableRow>
               </TableHead>
             }
@@ -248,7 +250,7 @@ const PositionsTab = ({
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" color="textSecondary">
-                        {new Date(position.timestamp).toLocaleString('vi-VN')}
+                        {new Date(position.timestamp).toLocaleString()}
                       </Typography>
                     </TableCell>
                     <TableCell align="center">
@@ -268,7 +270,7 @@ const PositionsTab = ({
           {/* Floating Action Button for New Position */}
           <Fab
             color="primary"
-            aria-label="add"
+            aria-label={t("tradingAccount.detail.positions.fabAria")}
             sx={{ position: 'fixed', bottom: 16, right: 16 }}
             onClick={handleOpenNewPosition}
           >

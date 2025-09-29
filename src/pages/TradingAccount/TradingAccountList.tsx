@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import {
   TableBody,
   TableCell,
@@ -19,6 +19,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import type { TradingAccount, TradingExchangeType, AccountStatusType } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 interface TradingAccountListProps {
   accounts: TradingAccount[];
@@ -86,23 +87,6 @@ const getStatusColor = (status: AccountStatusType): "default" | "primary" | "sec
   }
 };
 
-const getStatusLabel = (status: AccountStatusType): string => {
-  switch (status) {
-    case "valid":
-      return "Hợp lệ";
-    case "invalid":
-      return "Không hợp lệ";
-    case "pending":
-      return "Đang xác thực";
-    case "error":
-      return "Lỗi";
-    case "unsupported":
-      return "Không hỗ trợ";
-    default:
-      return String(status).toUpperCase();
-  }
-};
-
 const TradingAccountList = ({
   accounts,
   isLoading,
@@ -113,6 +97,17 @@ const TradingAccountList = ({
   onPageChange,
   onRowsPerPageChange,
 }: TradingAccountListProps) => {
+  const { t } = useTranslation();
+  const statusLabels = useMemo(
+    () => ({
+      valid: t("tradingAccount.status.valid"),
+      invalid: t("tradingAccount.status.invalid"),
+      pending: t("tradingAccount.status.pending"),
+      error: t("tradingAccount.status.error"),
+      unsupported: t("tradingAccount.status.unsupported"),
+    }),
+    [t]
+  );
   const handlePageChange = (_event: unknown, newPage: number) => {
     onPageChange(newPage + 1); // MUI uses 0-based indexing, our API uses 1-based
   };
@@ -143,7 +138,7 @@ const TradingAccountList = ({
         minHeight="200px"
       >
         <Typography variant="body1" color="text.secondary">
-          Không có tài khoản trading nào
+          {t("tradingAccount.list.empty")}
         </Typography>
       </Box>
     );
@@ -157,14 +152,14 @@ const TradingAccountList = ({
         head={
           <TableHead>
             <TableRow>
-              <TableCell>Tên tài khoản</TableCell>
-              <TableCell>Sàn giao dịch</TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>API Key</TableCell>
-              <TableCell>Trạng thái</TableCell>
-              <TableCell>Số dư</TableCell>
-              <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>Chat IDs</TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Ngày tạo</TableCell>
-              <TableCell align="right">Thao tác</TableCell>
+              <TableCell>{t("tradingAccount.list.headers.accountName")}</TableCell>
+              <TableCell>{t("tradingAccount.list.headers.exchange")}</TableCell>
+              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>{t("tradingAccount.list.headers.apiKey")}</TableCell>
+              <TableCell>{t("tradingAccount.list.headers.status")}</TableCell>
+              <TableCell>{t("tradingAccount.list.headers.balance")}</TableCell>
+              <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>{t("tradingAccount.list.headers.chatIds")}</TableCell>
+              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>{t("tradingAccount.list.headers.createdAt")}</TableCell>
+              <TableCell align="right">{t("tradingAccount.list.headers.actions")}</TableCell>
             </TableRow>
           </TableHead>
         }
@@ -195,7 +190,7 @@ const TradingAccountList = ({
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={getStatusLabel(account.status)}
+                    label={statusLabels[account.status] ?? account.status.toUpperCase()}
                     color={getStatusColor(account.status)}
                     size="small"
                   />
@@ -207,20 +202,20 @@ const TradingAccountList = ({
                         ${account.balance.available_balance.toFixed(4)}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        Khả dụng
+                        {t("tradingAccount.list.balance.available")}
                       </Typography>
                     </Box>
                   ) : (
                     <Typography variant="body2" color="text.secondary">
-                      Chưa có dữ liệu
+                      {t("tradingAccount.list.balance.noData")}
                     </Typography>
                   )}
                 </TableCell>
                 <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>
                   <Typography variant="body2" color="text.secondary">
                     {account.chat_ids.length > 0 
-                      ? `${account.chat_ids.length} chat ID(s)`
-                      : "Không có"
+                      ? t("tradingAccount.list.chatIds.count", { count: account.chat_ids.length })
+                      : t("tradingAccount.list.chatIds.empty")
                     }
                   </Typography>
                 </TableCell>
@@ -232,7 +227,7 @@ const TradingAccountList = ({
                 <TableCell align="right">
                   <Box sx={{ display: "flex", gap: 0.5 }}>
                     {/* View button */}
-                    <Tooltip title="Xem chi tiết">
+                    <Tooltip title={t("tradingAccount.list.tooltips.view")}>
                       <IconButton
                         size="small"
                         color="info"
@@ -243,7 +238,7 @@ const TradingAccountList = ({
                     </Tooltip>
 
                     {/* Edit button */}
-                    <Tooltip title="Chỉnh sửa">
+                    <Tooltip title={t("tradingAccount.list.tooltips.edit")}>
                       <IconButton
                         size="small"
                         color="primary"
@@ -254,7 +249,7 @@ const TradingAccountList = ({
                     </Tooltip>
 
                     {/* Delete button */}
-                    <Tooltip title="Xóa">
+                    <Tooltip title={t("tradingAccount.list.tooltips.delete")}>
                       <IconButton
                         size="small"
                         color="error"
@@ -279,9 +274,13 @@ const TradingAccountList = ({
         rowsPerPage={pagination.page_size}
         onRowsPerPageChange={handleRowsPerPageChange}
         rowsPerPageOptions={[10, 20, 50, 100]}
-        labelRowsPerPage="Số dòng:"
+        labelRowsPerPage={t("tradingAccount.list.pagination.rowsPerPage")}
         labelDisplayedRows={({ from, to, count }) =>
-          `${from}–${to}/ ${count !== -1 ? count : `hơn ${to}`}`
+          t("tradingAccount.list.pagination.displayedRows", {
+            from,
+            to,
+            count
+          })
         }
       />
     </Paper>

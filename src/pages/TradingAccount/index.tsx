@@ -23,6 +23,7 @@ import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
 import type { TradingAccountCreate, TradingAccountUpdate, TradingExchangeType } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 import FilterTabs from "@components/FilterTabs";
 
 export type FormMode = "create" | "view" | "edit";
@@ -59,6 +60,7 @@ const tabFilterMap: Record<string, { exchange?: TradingExchangeType }> = {
 };
 
 const TradingAccount = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   
   // Use the trading account hook for state management
@@ -85,7 +87,7 @@ const TradingAccount = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
-  const [dialogTitle, setDialogTitle] = useState("Tạo Tài Khoản Trading Mới");
+  const [dialogTitleKey, setDialogTitleKey] = useState<string>("tradingAccount.dialog.createTitle");
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -171,13 +173,13 @@ const TradingAccount = () => {
     // Set dialog title based on mode
     switch (mode) {
       case "create":
-        setDialogTitle("Tạo Tài Khoản Trading Mới");
+        setDialogTitleKey("tradingAccount.dialog.createTitle");
         break;
       case "view":
-        setDialogTitle("Chi Tiết Tài Khoản Trading");
+        setDialogTitleKey("tradingAccount.dialog.viewTitle");
         break;
       case "edit":
-        setDialogTitle("Chỉnh Sửa Tài Khoản Trading");
+        setDialogTitleKey("tradingAccount.dialog.editTitle");
         break;
     }
 
@@ -197,11 +199,11 @@ const TradingAccount = () => {
         if (dialogMode === "create") {
           // Create new trading account
           await createAccount(formData as TradingAccountCreate);
-          showNotification("Tài khoản trading đã được tạo thành công", "success");
+          showNotification(t("tradingAccount.notifications.createSuccess"), "success");
         } else if (dialogMode === "edit" && currentAccount) {
           // Update existing trading account
           await updateAccount(currentAccount._id, formData as TradingAccountUpdate);
-          showNotification("Tài khoản trading đã được cập nhật thành công", "success");
+          showNotification(t("tradingAccount.notifications.updateSuccess"), "success");
         }
         handleCloseDialog();
         // Re-fetch the list with latest data
@@ -210,13 +212,13 @@ const TradingAccount = () => {
         console.error("Error submitting trading account:", error);
       }
     },
-    [dialogMode, currentAccount, createAccount, updateAccount, showNotification, handleCloseDialog, fetchTradingAccounts]
+    [dialogMode, currentAccount, createAccount, updateAccount, showNotification, handleCloseDialog, fetchTradingAccounts, t]
   );
 
   // Handle edit mode toggle from view mode
   const handleSwitchToEditMode = useCallback(() => {
     setDialogMode("edit");
-    setDialogTitle("Chỉnh Sửa Tài Khoản Trading");
+    setDialogTitleKey("tradingAccount.dialog.editTitle");
   }, []);
 
   // Handle view trading account
@@ -264,20 +266,20 @@ const TradingAccount = () => {
 
     try {
       await deleteAccount(confirmDelete.id);
-      showNotification("Tài khoản trading đã được xóa thành công", "success");
+      showNotification(t("tradingAccount.notifications.deleteSuccess"), "success");
       handleCloseDeleteConfirm();
       // Re-fetch the list with latest data
       fetchTradingAccounts();
     } catch (error) {
       console.error("Error deleting trading account:", error);
     }
-  }, [confirmDelete.id, deleteAccount, showNotification, handleCloseDeleteConfirm, fetchTradingAccounts]);
+  }, [confirmDelete.id, deleteAccount, showNotification, handleCloseDeleteConfirm, fetchTradingAccounts, t]);
 
   // Handle refreshing the trading account list
   const handleRefreshTradingAccounts = useCallback(() => {
     fetchTradingAccounts();
-    showNotification("Danh sách tài khoản trading đã được cập nhật", "success");
-  }, [fetchTradingAccounts, showNotification]);
+    showNotification(t("tradingAccount.notifications.refreshSuccess"), "success");
+  }, [fetchTradingAccounts, showNotification, t]);
 
   // Create form footer based on dialog mode
   const getModalFooter = useCallback(() => {
@@ -289,10 +291,10 @@ const TradingAccount = () => {
             variant="outlined"
             color="primary"
           >
-            Chỉnh sửa
+            {t("common.edit")}
           </Button>
           <Button onClick={handleCloseDialog} variant="contained">
-            Đóng
+            {t("common.close")}
           </Button>
         </>
       );
@@ -301,7 +303,7 @@ const TradingAccount = () => {
     return (
       <>
         <Button onClick={handleCloseDialog} variant="outlined">
-          Hủy
+          {t("common.cancel")}
         </Button>
         <Button
           onClick={() => {
@@ -311,11 +313,11 @@ const TradingAccount = () => {
           variant="contained"
           disabled={isLoading}
         >
-          {dialogMode === "edit" ? "Cập nhật" : "Tạo"}
+          {dialogMode === "edit" ? t("common.update") : t("common.create")}
         </Button>
       </>
     );
-  }, [dialogMode, handleCloseDialog, handleSwitchToEditMode, isLoading]);
+  }, [dialogMode, handleCloseDialog, handleSwitchToEditMode, isLoading, t]);
 
   return (
     <Box>
@@ -329,7 +331,7 @@ const TradingAccount = () => {
         >
           <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ flexGrow: 1, minWidth: 0 }}>
             <Typography variant="h5" component="h1" gutterBottom>
-              Quản lý Tài Khoản Trading
+              {t("tradingAccount.pageTitle")}
             </Typography>
           </Grid>
           <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ ml: { xs: 'auto', md: 0 } }}>
@@ -338,7 +340,7 @@ const TradingAccount = () => {
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => handleOpenDialog("create")}
-                aria-label="Tạo tài khoản mới"
+                aria-label={t("tradingAccount.create.aria")}
                 sx={{
                   px: { xs: 1.25, sm: 2 },
                   minHeight: 40,
@@ -349,7 +351,7 @@ const TradingAccount = () => {
                 }}
               >
                 <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                  Tạo tài khoản mới
+                  {t("tradingAccount.create.button")}
                 </Box>
               </Button>
             </Box>
@@ -359,11 +361,11 @@ const TradingAccount = () => {
         <Divider sx={{ my: 2 }} />
 
         <FilterTabs
-          ariaLabel="trading account tabs"
+          ariaLabel={t("tradingAccount.tabs.ariaLabel")}
           value={currentTab}
           onChange={handleFilterTabChange}
           items={[
-            { label: 'Tất cả', value: 'all' },
+            { label: t("tradingAccount.tabs.all"), value: 'all' },
             { label: 'Binance', value: 'binance' },
             { label: 'Bybit', value: 'bybit' },
             { label: 'OKX', value: 'okx' },
@@ -374,7 +376,7 @@ const TradingAccount = () => {
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Tìm kiếm tài khoản trading..."
+          placeholder={t("tradingAccount.searchPlaceholder")}
           value={searchTerm}
           onChange={handleSearch}
           sx={{ mb: 3 }}
@@ -386,7 +388,7 @@ const TradingAccount = () => {
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <Tooltip title="Làm mới danh sách">
+                <Tooltip title={t("tradingAccount.tooltips.refreshList")}>
                   <IconButton 
                     onClick={handleRefreshTradingAccounts}
                     disabled={isLoading}
@@ -419,7 +421,7 @@ const TradingAccount = () => {
       <Modal
         open={openDialog}
         onClose={handleCloseDialog}
-        title={dialogTitle}
+        title={t(dialogTitleKey)}
         maxWidth="sm"
         footer={getModalFooter()}
       >
@@ -442,9 +444,9 @@ const TradingAccount = () => {
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
         open={confirmDelete.open}
-        title="Xác nhận xóa"
-        message={`Bạn có chắc chắn muốn xóa tài khoản trading "${confirmDelete.name}"? Hành động này không thể hoàn tác.`}
-        confirmLabel="Xóa"
+        title={t("tradingAccount.confirmDelete.title")}
+        message={t("tradingAccount.confirmDelete.message", { name: confirmDelete.name })}
+        confirmLabel={t("common.delete")}
         confirmColor="error"
         onConfirm={handleDeleteTradingAccount}
         onCancel={handleCloseDeleteConfirm}

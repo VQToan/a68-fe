@@ -283,6 +283,138 @@
         "rowsPerPage": "Số dòng:",
         "displayedRows": "{{from}}–{{to}}/{{count}}"
       }
+    },
+    "form": {
+      "sections": {
+        "configuration": "Cấu hình trading",
+        "basic": "Thiết lập cơ bản",
+        "trading": "Tham số giao dịch",
+        "profitMargin": "Cài đặt lợi nhuận và biên độ",
+        "indicators": "Chỉ báo kỹ thuật",
+        "dca": "Cài đặt DCA"
+      },
+      "fields": {
+        "name": "Tên trading process",
+        "description": "Mô tả",
+        "botTemplate": "Bot Template",
+        "exchangeFilter": "Lọc theo sàn giao dịch",
+        "tradingAccount": "Tài khoản trading",
+        "symbol": "Cặp giao dịch (SYMBOL)",
+        "interval1": "Khung thời gian 1",
+        "interval2": "Khung thời gian 2",
+        "tradeMode": "Chế độ giao dịch",
+        "entryPercentage": "Tỷ lệ vào lệnh (ENTRY_PERCENTAGE)",
+        "leverage": "Đòn bẩy (LEVERAGE)",
+        "funds": "Vốn ban đầu (FUNDS)",
+        "timeBetweenOrders": "Thời gian nghỉ giữa các lệnh (giây)",
+        "pauseTime": "Thời gian tạm dừng (PAUSE_TIME)",
+        "pauseDay": "Ngày tạm dừng",
+        "minRoi": "Lợi nhuận tối thiểu (MIN_ROI)",
+        "riskToReward": "Tỷ lệ lợi nhuận/rủi ro (R2R)",
+        "minMargin": "Biên độ tối thiểu (MIN_MARGIN)",
+        "maxMarginPercentage": "Biên độ tối đa (%) (MAX_MARGIN_PERCENTAGE)",
+        "maxLoss": "Lỗ tối đa (MAX_LOSS)",
+        "maPeriod": "Chu kỳ MA (MA_PERIOD)",
+        "rsiEntryLong": "RSI Long Entry",
+        "rsiEntryLongCandle": "RSI Long Entry (candle)",
+        "rsiExitLong": "RSI Long Exit",
+        "rsiExitLongCandle": "RSI Long Exit (candle)",
+        "rsiEntryShort": "RSI Short Entry",
+        "rsiEntryShortCandle": "RSI Short Entry (candle)",
+        "rsiExitShort": "RSI Short Exit",
+        "rsiExitShortCandle": "RSI Short Exit (candle)",
+        "dcaGrid": "Lưới DCA (DCA_GRID)",
+        "gridMultiplier": "Hệ số lưới (GRID_MULTIPLIER)",
+        "dcaMultiplier": "Hệ số DCA (DCA_MULTIPLIER)"
+      },
+      "validation": {
+        "nameRequired": "Tên trading process là bắt buộc",
+        "descriptionRequired": "Mô tả là bắt buộc",
+        "botTemplateRequired": "Bot Template là bắt buộc",
+        "tradingAccountRequired": "Tài khoản trading là bắt buộc"
+      },
+      "placeholders": {
+        "pauseTime": "HH:MM-HH:MM",
+        "maPeriod": "8:20"
+      },
+      "helper": {
+        "maPeriod": "Định dạng: 'ngắn:dài' (vd: 8:20)",
+        "dcaGrid": "Ví dụ: 0.008 tương đương 0.8%"
+      },
+      "units": {
+        "seconds": "giây"
+      },
+      "tradeModes": {
+        "shortOnly": "Chỉ Short",
+        "both": "Cả hai",
+        "longOnly": "Chỉ Long"
+      },
+      "options": {
+        "allExchanges": "Tất cả sàn giao dịch"
+      },
+      "states": {
+        "loadingAccounts": "Đang tải tài khoản..."
+      },
+      "errors": {
+        "loadAccounts": "Lỗi tải tài khoản: {{message}}"
+      },
+      "tooltips": {
+        "refreshAccounts": "Làm mới danh sách tài khoản"
+      }
+    },
+    "detail": {
+      "errors": {
+        "performance": "Không thể tải dữ liệu hiệu suất",
+        "notificationStatus": "Không thể tải trạng thái thông báo",
+        "combineBalanceStatus": "Không thể tải trạng thái combine balance",
+        "updateNotificationStatus": "Không thể cập nhật trạng thái thông báo",
+        "updateCombineBalanceStatus": "Không thể cập nhật trạng thái combine balance"
+      },
+      "notifications": {
+        "refreshSuccess": "Dữ liệu đã được cập nhật",
+        "startSuccess": "Trading process đã được khởi động",
+        "stopSuccess": "Trading process đã được dừng",
+        "stopWithCloseSuccess": "Trading process đã dừng và đóng tất cả lệnh",
+        "enabled": "Các thông tin về hoạt động của bot sẽ được gửi đến chat của bạn",
+        "disabled": "Đã tắt thông báo qua message",
+        "combineBalanceEnabled": "Đã bật chế độ combine balance",
+        "combineBalanceDisabled": "Đã tắt chế độ combine balance"
+      },
+      "status": {
+        "running": "Đang chạy",
+        "stopped": "Đã dừng",
+        "paused": "Tạm dừng",
+        "created": "Đã tạo",
+        "queued": "Chờ xử lý",
+        "failed": "Lỗi"
+      },
+      "empty": "Không tìm thấy trading process",
+      "actions": {
+        "back": "Quay lại",
+        "stop": "Dừng",
+        "start": "Khởi động",
+        "refresh": "Làm mới"
+      },
+      "controls": {
+        "notifications": "Thông báo",
+        "combineBalance": "Combine balance"
+      },
+      "header": {
+        "title": "Chi tiết Trading Process"
+      },
+      "runningDays": {
+        "none": "Số ngày chạy: -",
+        "value": "Số ngày chạy: {{count}} ngày"
+      },
+      "metrics": {
+        "roi": "ROI",
+        "pnl": "PnL",
+        "winRate": "Tỷ lệ thắng",
+        "totalTrades": "Tổng giao dịch",
+        "ordersLabel": "lệnh",
+        "totalVolume": "Tổng khối lượng",
+        "volumeUnit": "USDT"
+      }
     }
   },
   "backtest": {
@@ -563,6 +695,286 @@
       "friday": "Thứ sáu",
       "saturday": "Thứ bảy",
       "sunday": "Chủ nhật"
+    }
+  },
+  "tradingAccount": {
+    "pageTitle": "Quản lý Tài khoản Trading",
+    "create": {
+      "button": "Tạo tài khoản mới",
+      "aria": "Tạo tài khoản trading mới"
+    },
+    "tabs": {
+      "ariaLabel": "danh mục tài khoản trading",
+      "all": "Tất cả"
+    },
+    "searchPlaceholder": "Tìm kiếm tài khoản trading...",
+    "tooltips": {
+      "refreshList": "Làm mới danh sách"
+    },
+    "dialog": {
+      "createTitle": "Tạo tài khoản trading",
+      "viewTitle": "Chi tiết tài khoản trading",
+      "editTitle": "Chỉnh sửa tài khoản trading"
+    },
+    "notifications": {
+      "createSuccess": "Tài khoản trading đã được tạo thành công",
+      "updateSuccess": "Tài khoản trading đã được cập nhật thành công",
+      "deleteSuccess": "Tài khoản trading đã được xóa thành công",
+      "refreshSuccess": "Danh sách tài khoản trading đã được cập nhật"
+    },
+    "confirmDelete": {
+      "title": "Xóa tài khoản trading",
+      "message": "Bạn có chắc chắn muốn xóa tài khoản trading \"{{name}}\"? Hành động này không thể hoàn tác."
+    },
+    "status": {
+      "valid": "Hợp lệ",
+      "invalid": "Không hợp lệ",
+      "pending": "Đang xác thực",
+      "error": "Lỗi",
+      "unsupported": "Không hỗ trợ"
+    },
+    "list": {
+      "empty": "Không có tài khoản trading nào",
+      "headers": {
+        "accountName": "Tên tài khoản",
+        "exchange": "Sàn giao dịch",
+        "apiKey": "API Key",
+        "status": "Trạng thái",
+        "balance": "Số dư",
+        "chatIds": "Chat IDs",
+        "createdAt": "Ngày tạo",
+        "actions": "Thao tác"
+      },
+      "balance": {
+        "available": "Khả dụng",
+        "noData": "Chưa có dữ liệu"
+      },
+      "chatIds": {
+        "count_one": "{{count}} chat ID",
+        "count_other": "{{count}} chat ID",
+        "empty": "Không có"
+      },
+      "tooltips": {
+        "view": "Xem chi tiết",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa"
+      },
+      "pagination": {
+        "rowsPerPage": "Số dòng:",
+        "displayedRows": "{{from}}–{{to}}/ {{count}}",
+        "moreThan": "hơn {{value}}"
+      }
+    },
+    "form": {
+      "fields": {
+        "accountName": "Tên tài khoản",
+        "exchange": "Sàn giao dịch",
+        "apiKey": "API Key",
+        "apiKeyNew": "API Key mới (để trống nếu không đổi)",
+        "apiKeyCurrent": "API Key hiện tại",
+        "secretKey": "Secret Key",
+        "secretKeyNew": "Secret Key mới (để trống nếu không đổi)",
+        "chatIds": "Telegram Chat IDs",
+        "addChatId": "Thêm Chat ID"
+      },
+      "sections": {
+        "api": "Thông tin API",
+        "notifications": "Cài đặt thông báo"
+      },
+      "placeholders": {
+        "selectExchange": "Chọn sàn giao dịch"
+      },
+      "validation": {
+        "accountNameRequired": "Tên tài khoản là bắt buộc",
+        "exchangeRequired": "Sàn giao dịch là bắt buộc",
+        "apiKeyRequired": "API Key là bắt buộc",
+        "secretKeyRequired": "Secret Key là bắt buộc"
+      },
+      "helper": {
+        "keepCurrentApiKey": "Để trống nếu không muốn thay đổi API Key",
+        "keepEmptyIfUnchanged": "Để trống nếu không muốn thay đổi",
+        "chatId": "Nhập Telegram Chat ID để nhận thông báo"
+      },
+      "empty": {
+        "chatIds": "Chưa có chat ID nào"
+      }
+    },
+    "detail": {
+      "errors": {
+        "dashboard": "Không thể tải dữ liệu tài khoản",
+        "positions": "Không thể tải danh sách lệnh",
+        "refresh": "Không thể làm mới dữ liệu",
+        "openPosition": "Không thể mở lệnh",
+        "closePosition": "Không thể đóng lệnh",
+        "closePartialPosition": "Không thể đóng một phần lệnh"
+      },
+      "notifications": {
+        "refreshSuccess": "Dữ liệu đã được làm mới",
+        "openPosition": "Lệnh đã được mở thành công",
+        "closePosition": "Lệnh đã được đóng thành công",
+        "closePartialPosition": "Đã đóng một phần lệnh thành công"
+      },
+      "actions": {
+        "back": "Quay lại",
+        "refresh": "Làm mới"
+      },
+      "tabs": {
+        "balance": "Số dư",
+        "positions": "Lệnh đang mở"
+      },
+      "header": {
+        "title": "Chi tiết tài khoản trading"
+      },
+      "summary": {
+        "totalBalance": "Tổng số dư",
+        "unrealizedPnl": "PnL chưa thực hiện",
+        "openPositions": "Lệnh đang mở"
+      },
+      "balance": {
+        "title": "Chi tiết số dư",
+        "totalWallet": "Tổng số dư ví",
+        "available": "Số dư khả dụng",
+        "unrealizedPnl": "PnL chưa thực hiện",
+        "maxWithdraw": "Số tiền có thể rút",
+        "assetsTitle": "Chi tiết từng tài sản",
+        "marginAvailable": "Margin khả dụng",
+        "marginUnavailable": "Margin không khả dụng",
+        "asset": {
+          "wallet": "Số dư ví",
+          "available": "Số dư khả dụng",
+          "margin": "Số dư margin",
+          "unrealizedPnl": "PnL chưa thực hiện",
+          "crossWallet": "Số dư cross wallet",
+          "updatedAt": "Cập nhật lần cuối"
+        },
+        "noData": "Không có dữ liệu balance"
+      },
+      "positions": {
+        "title": "Lệnh đang mở ({{count}})",
+        "actions": {
+          "openLong": "Mở Long {{symbol}}",
+          "openShort": "Mở Short {{symbol}}",
+          "closePartial": "Đóng một phần",
+          "closeAll": "Đóng toàn bộ lệnh",
+          "refresh": "Làm mới"
+        },
+        "empty": "Không có lệnh nào đang mở",
+        "openNew": "Mở lệnh mới",
+        "tableHeaders": {
+          "orderId": "Mã lệnh",
+          "symbol": "Symbol",
+          "type": "Loại",
+          "quantity": "Số lượng",
+          "entryPrice": "Giá vào",
+          "currentPrice": "Giá hiện tại",
+          "liquidationPrice": "Giá thanh lý",
+          "pnl": "PnL",
+          "time": "Thời gian",
+          "actions": "Hành động"
+        },
+        "tooltips": {
+          "close": "Đóng lệnh",
+          "moreActions": "Thêm hành động"
+        },
+        "fabAria": "Mở lệnh mới"
+      },
+      "openDialog": {
+        "title": "Mở lệnh mới",
+        "validation": {
+          "symbol": "Vui lòng nhập symbol",
+          "quantity": "Số lượng phải lớn hơn 0",
+          "limitPrice": "Vui lòng nhập giá hợp lệ cho lệnh LIMIT",
+          "generic": "Có lỗi xảy ra khi mở lệnh"
+        },
+        "fields": {
+          "symbol": "Symbol",
+          "side": "Hướng",
+          "positionSide": "Position Side",
+          "quantity": "Số lượng",
+          "orderType": "Loại lệnh",
+          "price": "Giá",
+          "timeInForce": "Time in Force"
+        },
+        "side": {
+          "buy": "BUY (Mua)",
+          "sell": "SELL (Bán)"
+        },
+        "positionSides": {
+          "long": "LONG",
+          "short": "SHORT",
+          "both": "BOTH"
+        },
+        "orderTypes": {
+          "market": "MARKET",
+          "limit": "LIMIT"
+        },
+        "timeInForce": {
+          "gtc": "GTC (Good Till Cancel)",
+          "ioc": "IOC (Immediate or Cancel)",
+          "fok": "FOK (Fill or Kill)"
+        },
+        "summary": {
+          "title": "Tóm tắt lệnh",
+          "line1": "{{side}} {{quantity}} {{symbol}} {{positionSide}}",
+          "orderType": "Loại: {{orderType}}",
+          "limitPrice": "tại giá {{price}}"
+        },
+        "actions": {
+          "submit": "Mở lệnh",
+          "submitting": "Đang xử lý..."
+        }
+      },
+      "closeDialog": {
+        "title": "Đóng lệnh",
+        "warning": "Bạn có chắc chắn muốn đóng toàn bộ lệnh này không? Hành động này không thể hoàn tác.",
+        "detailsTitle": "Chi tiết lệnh",
+        "fields": {
+          "symbol": "Symbol:",
+          "type": "Loại:",
+          "quantity": "Số lượng:",
+          "entryPrice": "Giá vào:",
+          "currentPrice": "Giá hiện tại:",
+          "unrealizedPnl": "PnL chưa thực hiện:"
+        },
+        "error": "Có lỗi xảy ra khi đóng lệnh",
+        "actions": {
+          "submit": "Đóng lệnh",
+          "submitting": "Đang đóng..."
+        }
+      },
+      "closePartialDialog": {
+        "title": "Đóng một phần lệnh",
+        "detailsTitle": "Thông tin lệnh hiện tại",
+        "fields": {
+          "symbol": "Symbol:",
+          "type": "Loại:",
+          "currentQuantity": "Số lượng hiện tại:",
+          "currentPnl": "PnL hiện tại:",
+          "closeQuantity": "Số lượng muốn đóng",
+          "maxQuantity": "Tối đa: {{value}}"
+        },
+        "validation": {
+          "quantity": "Số lượng phải lớn hơn 0",
+          "maxQuantity": "Số lượng đóng không thể lớn hơn hoặc bằng số lượng hiện tại",
+          "generic": "Có lỗi xảy ra khi đóng một phần lệnh"
+        },
+        "quickSelect": {
+          "twentyFive": "25%",
+          "fifty": "50%",
+          "seventyFive": "75%"
+        },
+        "preview": {
+          "title": "Xem trước",
+          "closeQuantity": "Số lượng đóng:",
+          "remainingQuantity": "Số lượng còn lại:",
+          "estimatedPnl": "PnL ước tính khi đóng:"
+        },
+        "actions": {
+          "submit": "Đóng một phần",
+          "submitting": "Đang đóng..."
+        }
+      },
+      "empty": "Không tìm thấy tài khoản trading"
     }
   }
 }

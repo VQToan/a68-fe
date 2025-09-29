@@ -17,6 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import type { OpenPositionRequest } from "@/types/trading.types";
+import { useTranslation } from "react-i18next";
 
 interface OpenPositionDialogProps {
   open: boolean;
@@ -35,6 +36,7 @@ const OpenPositionDialog = ({
   initialSide = "BUY",
   initialPositionSide = "LONG",
 }: OpenPositionDialogProps) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<OpenPositionRequest>({
     symbol: initialSymbol,
     side: initialSide,
@@ -73,17 +75,17 @@ const OpenPositionDialog = ({
 
   const handleSubmit = async () => {
     if (!formData.symbol.trim()) {
-      setError("Vui lòng nhập symbol");
+      setError(t("tradingAccount.detail.openDialog.validation.symbol"));
       return;
     }
 
     if (formData.quantity <= 0) {
-      setError("Số lượng phải lớn hơn 0");
+      setError(t("tradingAccount.detail.openDialog.validation.quantity"));
       return;
     }
 
     if (formData.order_type === "LIMIT" && (!formData.price || formData.price <= 0)) {
-      setError("Vui lòng nhập giá hợp lệ cho lệnh LIMIT");
+      setError(t("tradingAccount.detail.openDialog.validation.limitPrice"));
       return;
     }
 
@@ -94,7 +96,7 @@ const OpenPositionDialog = ({
       await onSubmit(formData);
       onClose();
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Có lỗi xảy ra khi mở lệnh");
+      setError(error instanceof Error ? error.message : t("tradingAccount.detail.openDialog.validation.generic"));
     } finally {
       setIsSubmitting(false);
     }
@@ -109,7 +111,7 @@ const OpenPositionDialog = ({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>
-        Mở lệnh mới
+        {t("tradingAccount.detail.openDialog.title")}
       </DialogTitle>
       <DialogContent>
         <Box sx={{ pt: 2 }}>
@@ -123,7 +125,7 @@ const OpenPositionDialog = ({
             <Grid size={{ xs: 12 }}>
               <TextField
                 fullWidth
-                label="Symbol"
+                label={t("tradingAccount.detail.openDialog.fields.symbol")}
                 value={formData.symbol}
                 onChange={handleInputChange('symbol')}
                 placeholder="BTCUSDT"
@@ -133,29 +135,29 @@ const OpenPositionDialog = ({
 
             <Grid size={{ xs: 12, md: 6 }}>
               <FormControl fullWidth disabled={isSubmitting}>
-                <InputLabel>Hướng</InputLabel>
+                <InputLabel>{t("tradingAccount.detail.openDialog.fields.side")}</InputLabel>
                 <Select
                   value={formData.side}
-                  label="Hướng"
+                  label={t("tradingAccount.detail.openDialog.fields.side")}
                   onChange={handleInputChange('side')}
                 >
-                  <MenuItem value="BUY">BUY (Mua)</MenuItem>
-                  <MenuItem value="SELL">SELL (Bán)</MenuItem>
+                  <MenuItem value="BUY">{t("tradingAccount.detail.openDialog.side.buy")}</MenuItem>
+                  <MenuItem value="SELL">{t("tradingAccount.detail.openDialog.side.sell")}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
               <FormControl fullWidth disabled={isSubmitting}>
-                <InputLabel>Position Side</InputLabel>
+                <InputLabel>{t("tradingAccount.detail.openDialog.fields.positionSide")}</InputLabel>
                 <Select
                   value={formData.position_side}
-                  label="Position Side"
+                  label={t("tradingAccount.detail.openDialog.fields.positionSide")}
                   onChange={handleInputChange('position_side')}
                 >
-                  <MenuItem value="LONG">LONG</MenuItem>
-                  <MenuItem value="SHORT">SHORT</MenuItem>
-                  <MenuItem value="BOTH">BOTH</MenuItem>
+                  <MenuItem value="LONG">{t("tradingAccount.detail.openDialog.positionSides.long")}</MenuItem>
+                  <MenuItem value="SHORT">{t("tradingAccount.detail.openDialog.positionSides.short")}</MenuItem>
+                  <MenuItem value="BOTH">{t("tradingAccount.detail.openDialog.positionSides.both")}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -163,7 +165,7 @@ const OpenPositionDialog = ({
             <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 fullWidth
-                label="Số lượng"
+                label={t("tradingAccount.detail.openDialog.fields.quantity")}
                 type="number"
                 value={formData.quantity}
                 onChange={handleInputChange('quantity')}
@@ -174,14 +176,14 @@ const OpenPositionDialog = ({
 
             <Grid size={{ xs: 12, md: 6 }}>
               <FormControl fullWidth disabled={isSubmitting}>
-                <InputLabel>Loại lệnh</InputLabel>
+                <InputLabel>{t("tradingAccount.detail.openDialog.fields.orderType")}</InputLabel>
                 <Select
                   value={formData.order_type}
-                  label="Loại lệnh"
+                  label={t("tradingAccount.detail.openDialog.fields.orderType")}
                   onChange={handleInputChange('order_type')}
                 >
-                  <MenuItem value="MARKET">MARKET</MenuItem>
-                  <MenuItem value="LIMIT">LIMIT</MenuItem>
+                  <MenuItem value="MARKET">{t("tradingAccount.detail.openDialog.orderTypes.market")}</MenuItem>
+                  <MenuItem value="LIMIT">{t("tradingAccount.detail.openDialog.orderTypes.limit")}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -190,7 +192,7 @@ const OpenPositionDialog = ({
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
-                  label="Giá"
+                  label={t("tradingAccount.detail.openDialog.fields.price")}
                   type="number"
                   value={formData.price || ""}
                   onChange={handleInputChange('price')}
@@ -202,15 +204,15 @@ const OpenPositionDialog = ({
 
             <Grid size={{ xs: 12, md: 6 }}>
               <FormControl fullWidth disabled={isSubmitting}>
-                <InputLabel>Time in Force</InputLabel>
+                <InputLabel>{t("tradingAccount.detail.openDialog.fields.timeInForce")}</InputLabel>
                 <Select
                   value={formData.time_in_force}
-                  label="Time in Force"
+                  label={t("tradingAccount.detail.openDialog.fields.timeInForce")}
                   onChange={handleInputChange('time_in_force')}
                 >
-                  <MenuItem value="GTC">GTC (Good Till Cancel)</MenuItem>
-                  <MenuItem value="IOC">IOC (Immediate or Cancel)</MenuItem>
-                  <MenuItem value="FOK">FOK (Fill or Kill)</MenuItem>
+                  <MenuItem value="GTC">{t("tradingAccount.detail.openDialog.timeInForce.gtc")}</MenuItem>
+                  <MenuItem value="IOC">{t("tradingAccount.detail.openDialog.timeInForce.ioc")}</MenuItem>
+                  <MenuItem value="FOK">{t("tradingAccount.detail.openDialog.timeInForce.fok")}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -219,21 +221,30 @@ const OpenPositionDialog = ({
           {/* Order Summary */}
           <Box sx={{ mt: 3, p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              Tóm tắt lệnh:
+              {t("tradingAccount.detail.openDialog.summary.title")}
             </Typography>
             <Typography variant="body2">
-              {formData.side} {formData.quantity} {formData.symbol} {formData.position_side}
+              {t("tradingAccount.detail.openDialog.summary.line1", {
+                side: formData.side,
+                quantity: formData.quantity,
+                symbol: formData.symbol,
+                positionSide: formData.position_side,
+              })}
             </Typography>
             <Typography variant="body2">
-              Loại: {formData.order_type}
-              {formData.order_type === "LIMIT" && formData.price && ` tại giá ${formData.price}`}
+              {t("tradingAccount.detail.openDialog.summary.orderType", {
+                orderType: formData.order_type,
+              })}
+              {formData.order_type === "LIMIT" && formData.price
+                ? ` ${t("tradingAccount.detail.openDialog.summary.limitPrice", { price: formData.price })}`
+                : ""}
             </Typography>
           </Box>
         </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} disabled={isSubmitting}>
-          Hủy
+          {t("common.cancel")}
         </Button>
         <Button
           onClick={handleSubmit}
@@ -241,7 +252,7 @@ const OpenPositionDialog = ({
           disabled={isSubmitting}
           startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
         >
-          {isSubmitting ? "Đang xử lý..." : "Mở lệnh"}
+          {isSubmitting ? t("tradingAccount.detail.openDialog.actions.submitting") : t("tradingAccount.detail.openDialog.actions.submit")}
         </Button>
       </DialogActions>
     </Dialog>

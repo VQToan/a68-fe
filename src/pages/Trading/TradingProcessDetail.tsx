@@ -34,8 +34,10 @@ import StopTradingConfirmDialog from "./components/StopTradingConfirmDialog";
 import TradingDetailsList from "./components/TradingDetailsList";
 import type { TradingPerformanceResponse } from "@/types/trading.types";
 import * as tradingProcessService from "@services/tradingProcess.service";
+import { useTranslation } from "react-i18next";
 
 const TradingProcessDetail = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { showNotification } = useNotification();
@@ -74,12 +76,13 @@ const TradingProcessDetail = () => {
       const performance = await tradingProcessService.getTradingPerformance(id);
       setPerformanceData(performance);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch performance data';
+      const fallbackMessage = t("trading.detail.errors.performance");
+      const errorMessage = error instanceof Error ? error.message : fallbackMessage;
       showNotification(errorMessage, 'error');
     } finally {
       setIsLoadingPerformance(false);
     }
-  }, [id, showNotification]);
+  }, [id, showNotification, t]);
 
   // Fetch notification status
   const fetchNotificationStatus = useCallback(async () => {
@@ -90,12 +93,13 @@ const TradingProcessDetail = () => {
       const notificationStatus = await tradingProcessService.getNotificationStatus(id);
       setNotificationsEnabled(notificationStatus.status);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch notification status';
+      const fallbackMessage = t("trading.detail.errors.notificationStatus");
+      const errorMessage = error instanceof Error ? error.message : fallbackMessage;
       showNotification(errorMessage, 'error');
     } finally {
       setIsLoadingNotifications(false);
     }
-  }, [id, showNotification]);
+  }, [id, showNotification, t]);
 
   const fetchCombineBalanceStatus = useCallback(async () => {
     if (!id) return;
@@ -105,12 +109,13 @@ const TradingProcessDetail = () => {
       const response = await tradingProcessService.getCombineBalanceStatus(id);
       setCombineBalanceEnabled(Boolean(response.status));
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch combine balance status';
+      const fallbackMessage = t("trading.detail.errors.combineBalanceStatus");
+      const errorMessage = error instanceof Error ? error.message : fallbackMessage;
       showNotification(errorMessage, 'error');
     } finally {
       setIsLoadingCombineBalance(false);
     }
-  }, [id, showNotification]);
+  }, [id, showNotification, t]);
 
   // Fetch process details on mount
   useEffect(() => {
@@ -151,13 +156,14 @@ const TradingProcessDetail = () => {
       fetchCombineBalanceStatus(),
     ]);
     setIsRefreshing(false);
-    showNotification("Dữ liệu đã được cập nhật", "success");
+    showNotification(t("trading.detail.notifications.refreshSuccess"), "success");
   }, [
     fetchProcessDetails,
     fetchPerformanceData,
     fetchNotificationStatus,
     fetchCombineBalanceStatus,
     showNotification,
+    t,
   ]);
 
   // Handle start/stop process
@@ -171,22 +177,22 @@ const TradingProcessDetail = () => {
         return;
       } else {
         await startProcess(currentProcess._id);
-        showNotification("Trading process đã được khởi động", "success");
+        showNotification(t("trading.detail.notifications.startSuccess"), "success");
       }
       await fetchProcessDetails(); // Refresh data
       await fetchPerformanceData(); // Refresh performance data
     } catch (error) {
       console.error("Error toggling process:", error);
     }
-  }, [currentProcess, startProcess, fetchProcessDetails, fetchPerformanceData, showNotification]);
+  }, [currentProcess, startProcess, fetchProcessDetails, fetchPerformanceData, showNotification, t]);
 
   const handleConfirmStop = useCallback(async (shouldClearPositions: boolean) => {
     if (!currentProcess) return;
     try {
       await stopProcess(currentProcess._id, shouldClearPositions ? true : undefined);
       const message = shouldClearPositions
-        ? "Trading process đã được dừng và đóng tất cả lệnh"
-        : "Trading process đã được dừng";
+        ? t("trading.detail.notifications.stopWithCloseSuccess")
+        : t("trading.detail.notifications.stopSuccess");
       showNotification(message, "success");
       setConfirmStopOpen(false);
       await fetchProcessDetails();
@@ -194,7 +200,7 @@ const TradingProcessDetail = () => {
     } catch (error) {
       console.error("Error stopping process:", error);
     }
-  }, [currentProcess, stopProcess, fetchProcessDetails, fetchPerformanceData, showNotification]);
+  }, [currentProcess, stopProcess, fetchProcessDetails, fetchPerformanceData, showNotification, t]);
 
   // Handle notifications toggle
   const handleNotificationsToggle = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -211,17 +217,18 @@ const TradingProcessDetail = () => {
       setNotificationsEnabled(newStatus);
       showNotification(
         newStatus 
-          ? "Các thông tin về hoạt động của bot sẽ được cập nhật về tin nhắn của bạn" 
-          : "Đã tắt thông báo qua message", 
+          ? t("trading.detail.notifications.enabled")
+          : t("trading.detail.notifications.disabled"),
         "success"
       );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update notification status';
+      const fallbackMessage = t("trading.detail.errors.updateNotificationStatus");
+      const errorMessage = error instanceof Error ? error.message : fallbackMessage;
       showNotification(errorMessage, 'error');
       // Reset switch to previous state if update failed
       // The switch will stay at previous state since we don't update state on error
     }
-  }, [id, showNotification]);
+  }, [id, showNotification, t]);
 
   const handleCombineBalanceToggle = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!id) return;
@@ -234,15 +241,16 @@ const TradingProcessDetail = () => {
       setCombineBalanceEnabled(newStatus);
       showNotification(
         newStatus
-          ? "Chế độ combine balance đã được bật"
-          : "Chế độ combine balance đã được tắt",
+          ? t("trading.detail.notifications.combineBalanceEnabled")
+          : t("trading.detail.notifications.combineBalanceDisabled"),
         "success"
       );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update combine balance status';
+      const fallbackMessage = t("trading.detail.errors.updateCombineBalanceStatus");
+      const errorMessage = error instanceof Error ? error.message : fallbackMessage;
       showNotification(errorMessage, 'error');
     }
-  }, [id, showNotification]);
+  }, [id, showNotification, t]);
 
   // Get status color
   const getStatusColor = (status: string) => {
@@ -258,17 +266,17 @@ const TradingProcessDetail = () => {
   };
 
   // Get status display text
-  const getStatusDisplayText = (status: string) => {
+  const getStatusDisplayText = useCallback((status: string) => {
     const statusTexts: Record<string, string> = {
-      running: "Đang chạy",
-      stopped: "Đã dừng",
-      paused: "Tạm dừng",
-      created: "Đã tạo",
-      queued: "Chờ xử lý",
-      failed: "Lỗi",
+      running: t("trading.detail.status.running"),
+      stopped: t("trading.detail.status.stopped"),
+      paused: t("trading.detail.status.paused"),
+      created: t("trading.detail.status.created"),
+      queued: t("trading.detail.status.queued"),
+      failed: t("trading.detail.status.failed"),
     };
     return statusTexts[status] || status;
-  };
+  }, [t]);
 
   // Format currency
   const formatCurrency = (amount: number) => {
@@ -287,10 +295,10 @@ const TradingProcessDetail = () => {
     return (
       <Box sx={{ p: 3 }}>
         <Typography variant="h6" color="error">
-          Không tìm thấy trading process
+          {t("trading.detail.empty")}
         </Typography>
         <Button onClick={() => navigate(-1)} sx={{ mt: 2 }}>
-          Quay lại
+          {t("trading.detail.actions.back")}
         </Button>
       </Box>
     );
@@ -304,7 +312,7 @@ const TradingProcessDetail = () => {
           <Grid size={{ xs: 12, md: 'auto' }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: 'wrap' }}>
               <Typography variant="h5" component="h1">
-                Chi tiết Trading Process
+                {t("trading.detail.header.title")}
               </Typography>
               {currentProcess && (
                 <Chip
@@ -316,17 +324,19 @@ const TradingProcessDetail = () => {
             {currentProcess && (
               <>
                 <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
-                  {currentProcess.name} • {currentProcess.bot_template_name || "N/A"}
+                  {currentProcess.name} • {currentProcess.bot_template_name || t("common.notAvailable")}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" sx={{ mt: 0.5 }}>
                   {(() => {
-                    if (!currentProcess.started_at) return "Số ngày chạy: -";
+                    if (!currentProcess.started_at) {
+                      return t("trading.detail.runningDays.none");
+                    }
                     const start = new Date(currentProcess.started_at).getTime();
                     const end = currentProcess.status === "running" || !currentProcess.stopped_at
                       ? Date.now()
                       : new Date(currentProcess.stopped_at).getTime();
                     const diffDays = Math.max(0, Math.floor((end - start) / (1000 * 60 * 60 * 24)));
-                    return `Số ngày chạy: ${diffDays} ngày`;
+                    return t("trading.detail.runningDays.value", { count: diffDays });
                   })()}
                 </Typography>
               </>
@@ -346,7 +356,7 @@ const TradingProcessDetail = () => {
                   />
                 }
                 sx={{ gap: 1 }}
-                label="Thông báo"
+                label={t("trading.detail.controls.notifications")}
               />
 
               <FormControlLabel
@@ -360,7 +370,7 @@ const TradingProcessDetail = () => {
                   />
                 }
                 sx={{ gap: 1 }}
-                label="Combine balance"
+                label={t("trading.detail.controls.combineBalance")}
               />
               
               {/* Start/Stop Button */}
@@ -372,11 +382,13 @@ const TradingProcessDetail = () => {
                   onClick={handleToggleProcess}
                   disabled={isLoading}
                 >
-                  {currentProcess.status === "running" ? "Dừng" : "Khởi động"}
+                  {currentProcess.status === "running"
+                    ? t("trading.detail.actions.stop")
+                    : t("trading.detail.actions.start")}
                 </Button>
               )}
               
-              <Tooltip title="Làm mới">
+              <Tooltip title={t("trading.detail.actions.refresh")}>
                 <IconButton 
                   onClick={handleRefresh}
                   disabled={isRefreshing}
@@ -389,7 +401,7 @@ const TradingProcessDetail = () => {
                 variant="outlined" 
                 onClick={() => navigate(-1)}
               >
-                Quay lại
+                {t("trading.detail.actions.back")}
               </Button>
             </Box>
           </Grid>
@@ -410,7 +422,7 @@ const TradingProcessDetail = () => {
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <Box>
                   <Typography variant="body2" color="textSecondary">
-                    ROI
+                    {t("trading.detail.metrics.roi")}
                   </Typography>
                   <Typography 
                     variant="h6" 
@@ -437,7 +449,7 @@ const TradingProcessDetail = () => {
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <Box>
                   <Typography variant="body2" color="textSecondary">
-                    PNL
+                    {t("trading.detail.metrics.pnl")}
                   </Typography>
                   <Typography 
                     variant="h6" 
@@ -458,7 +470,7 @@ const TradingProcessDetail = () => {
           <Card>
             <CardContent sx={{ p: 2 }}>
               <Typography variant="body2" color="textSecondary">
-                Tỷ lệ thắng
+                {t("trading.detail.metrics.winRate")}
               </Typography>
               <Typography variant="h6" color="primary.main" sx={{ fontWeight: "bold" }}>
                 {(performanceData?.performance.win_rate ?? 0).toFixed(1)}%
@@ -477,13 +489,13 @@ const TradingProcessDetail = () => {
           <Card>
             <CardContent sx={{ p: 2 }}>
               <Typography variant="body2" color="textSecondary">
-                Tổng giao dịch
+                {t("trading.detail.metrics.totalTrades")}
               </Typography>
               <Typography variant="h6" color="primary.main" sx={{ fontWeight: "bold" }}>
                 {performanceData?.performance.total_orders ?? 0}
               </Typography>
               <Typography variant="caption" color="textSecondary">
-                lệnh
+                {t("trading.detail.metrics.ordersLabel")}
               </Typography>
             </CardContent>
           </Card>
@@ -494,13 +506,13 @@ const TradingProcessDetail = () => {
           <Card>
             <CardContent sx={{ p: 2 }}>
               <Typography variant="body2" color="textSecondary">
-                Tổng Volume
+                {t("trading.detail.metrics.totalVolume")}
               </Typography>
               <Typography variant="h6" color="primary.main" sx={{ fontWeight: "bold" }}>
                 {(performanceData?.performance.total_volume ?? 0).toLocaleString('en-US')}
               </Typography>
               <Typography variant="caption" color="textSecondary">
-                USDT
+                {t("trading.detail.metrics.volumeUnit")}
               </Typography>
             </CardContent>
           </Card>

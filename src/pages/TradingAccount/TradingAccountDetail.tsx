@@ -26,8 +26,10 @@ import {
   PositionsTab,
   TabPanel as CustomTabPanel,
 } from "./components";
+import { useTranslation } from "react-i18next";
 
 const TradingAccountDetail = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { showNotification } = useNotification();
@@ -52,13 +54,14 @@ const TradingAccountDetail = () => {
       const data = await tradingAccountService.getAccountSummary(id);
       setDashboardData(data);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch dashboard data';
+      const fallbackMessage = t("tradingAccount.detail.errors.dashboard");
+      const errorMessage = error instanceof Error ? error.message : fallbackMessage;
       setError(errorMessage);
       showNotification(errorMessage, 'error');
     } finally {
       setIsLoading(false);
     }
-  }, [id, showNotification]);
+  }, [id, showNotification, t]);
 
   // Fetch positions data
   const fetchPositions = useCallback(async () => {
@@ -70,12 +73,13 @@ const TradingAccountDetail = () => {
       const positionsData = await tradingAccountService.getPositions(id);
       setPositions(positionsData);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch positions';
+      const fallbackMessage = t("tradingAccount.detail.errors.positions");
+      const errorMessage = error instanceof Error ? error.message : fallbackMessage;
       showNotification(errorMessage, 'error');
     } finally {
       setIsLoadingPositions(false);
     }
-  }, [id, showNotification]);
+  }, [id, showNotification, t]);
 
   // Handle refresh functionality
   const handleRefresh = useCallback(async () => {
@@ -85,14 +89,15 @@ const TradingAccountDetail = () => {
     try {
       await tradingAccountService.refreshAccountData(id);
       await Promise.all([fetchDashboardData(), fetchPositions()]);
-      showNotification('Dữ liệu đã được làm mới', 'success');
+      showNotification(t("tradingAccount.detail.notifications.refreshSuccess"), 'success');
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to refresh data';
+      const fallbackMessage = t("tradingAccount.detail.errors.refresh");
+      const errorMessage = error instanceof Error ? error.message : fallbackMessage;
       showNotification(errorMessage, 'error');
     } finally {
       setIsRefreshing(false);
     }
-  }, [id, fetchDashboardData, fetchPositions, showNotification]);
+  }, [id, fetchDashboardData, fetchPositions, showNotification, t]);
 
   // Trading operations
   const handleOpenPosition = useCallback(async (data: OpenPositionRequest) => {
@@ -100,42 +105,45 @@ const TradingAccountDetail = () => {
     
     try {
       await tradingAccountService.openPosition(id, data);
-      showNotification('Lệnh đã được mở thành công', 'success');
+      showNotification(t("tradingAccount.detail.notifications.openPosition"), 'success');
       await fetchPositions(); // Refresh positions
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to open position';
+      const fallbackMessage = t("tradingAccount.detail.errors.openPosition");
+      const errorMessage = error instanceof Error ? error.message : fallbackMessage;
       showNotification(errorMessage, 'error');
       throw error;
     }
-  }, [id, showNotification, fetchPositions]);
+  }, [id, showNotification, fetchPositions, t]);
 
   const handleClosePosition = useCallback(async (data: ClosePositionRequest) => {
     if (!id) return;
     
     try {
       await tradingAccountService.closePosition(id, data);
-      showNotification('Lệnh đã được đóng thành công', 'success');
+      showNotification(t("tradingAccount.detail.notifications.closePosition"), 'success');
       await fetchPositions(); // Refresh positions
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to close position';
+      const fallbackMessage = t("tradingAccount.detail.errors.closePosition");
+      const errorMessage = error instanceof Error ? error.message : fallbackMessage;
       showNotification(errorMessage, 'error');
       throw error;
     }
-  }, [id, showNotification, fetchPositions]);
+  }, [id, showNotification, fetchPositions, t]);
 
   const handleClosePartialPosition = useCallback(async (data: ClosePartialPositionRequest) => {
     if (!id) return;
     
     try {
       await tradingAccountService.closePartialPosition(id, data);
-      showNotification('Đã đóng một phần lệnh thành công', 'success');
+      showNotification(t("tradingAccount.detail.notifications.closePartialPosition"), 'success');
       await fetchPositions(); // Refresh positions
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to close partial position';
+      const fallbackMessage = t("tradingAccount.detail.errors.closePartialPosition");
+      const errorMessage = error instanceof Error ? error.message : fallbackMessage;
       showNotification(errorMessage, 'error');
       throw error;
     }
-  }, [id, showNotification, fetchPositions]);
+  }, [id, showNotification, fetchPositions, t]);
 
   // Fetch account details on mount
   useEffect(() => {
@@ -176,7 +184,7 @@ const TradingAccountDetail = () => {
           {error}
         </Typography>
         <Button onClick={() => navigate(-1)} sx={{ mt: 2 }}>
-          Quay lại
+          {t("tradingAccount.detail.actions.back")}
         </Button>
       </Box>
     );
@@ -186,10 +194,10 @@ const TradingAccountDetail = () => {
     return (
       <Box sx={{ p: 3 }}>
         <Typography variant="h6" color="error">
-          Không tìm thấy tài khoản trading
+          {t("tradingAccount.detail.empty")}
         </Typography>
         <Button onClick={() => navigate(-1)} sx={{ mt: 2 }}>
-          Quay lại
+          {t("tradingAccount.detail.actions.back")}
         </Button>
       </Box>
     );
@@ -212,8 +220,8 @@ const TradingAccountDetail = () => {
       <Paper elevation={3}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={currentTab} onChange={handleTabChange}>
-            <Tab label="Balance" value="balance" />
-            <Tab label="Lệnh đang mở" value="positions" />
+            <Tab label={t("tradingAccount.detail.tabs.balance") } value="balance" />
+            <Tab label={t("tradingAccount.detail.tabs.positions") } value="positions" />
           </Tabs>
         </Box>
 

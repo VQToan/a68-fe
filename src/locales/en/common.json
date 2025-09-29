@@ -284,6 +284,138 @@
         "rowsPerPage": "Rows per page:",
         "displayedRows": "{{from}}–{{to}} of {{count}}"
       }
+    },
+    "form": {
+      "sections": {
+        "configuration": "Trading configuration",
+        "basic": "Basic settings",
+        "trading": "Trading parameters",
+        "profitMargin": "Profit and margin settings",
+        "indicators": "Technical indicators",
+        "dca": "DCA settings"
+      },
+      "fields": {
+        "name": "Trading process name",
+        "description": "Description",
+        "botTemplate": "Bot template",
+        "exchangeFilter": "Filter by exchange",
+        "tradingAccount": "Trading account",
+        "symbol": "Trading pair (SYMBOL)",
+        "interval1": "Interval 1",
+        "interval2": "Interval 2",
+        "tradeMode": "Trade mode",
+        "entryPercentage": "Entry percentage (ENTRY_PERCENTAGE)",
+        "leverage": "Leverage (LEVERAGE)",
+        "funds": "Initial funds (FUNDS)",
+        "timeBetweenOrders": "Time between orders (seconds)",
+        "pauseTime": "Pause time (PAUSE_TIME)",
+        "pauseDay": "Pause by day",
+        "minRoi": "Minimum ROI (MIN_ROI)",
+        "riskToReward": "Risk to reward ratio (R2R)",
+        "minMargin": "Minimum margin (MIN_MARGIN)",
+        "maxMarginPercentage": "Maximum margin (%) (MAX_MARGIN_PERCENTAGE)",
+        "maxLoss": "Maximum loss (MAX_LOSS)",
+        "maPeriod": "MA periods (MA_PERIOD)",
+        "rsiEntryLong": "RSI long entry",
+        "rsiEntryLongCandle": "RSI long entry (candle)",
+        "rsiExitLong": "RSI long exit",
+        "rsiExitLongCandle": "RSI long exit (candle)",
+        "rsiEntryShort": "RSI short entry",
+        "rsiEntryShortCandle": "RSI short entry (candle)",
+        "rsiExitShort": "RSI short exit",
+        "rsiExitShortCandle": "RSI short exit (candle)",
+        "dcaGrid": "DCA grid (DCA_GRID)",
+        "gridMultiplier": "Grid multiplier (GRID_MULTIPLIER)",
+        "dcaMultiplier": "DCA multiplier (DCA_MULTIPLIER)"
+      },
+      "validation": {
+        "nameRequired": "Trading process name is required",
+        "descriptionRequired": "Description is required",
+        "botTemplateRequired": "Bot template is required",
+        "tradingAccountRequired": "Trading account is required"
+      },
+      "placeholders": {
+        "pauseTime": "HH:MM-HH:MM",
+        "maPeriod": "8:20"
+      },
+      "helper": {
+        "maPeriod": "Format: short:long (e.g. 8:20)",
+        "dcaGrid": "Example: 0.008 equals 0.8%"
+      },
+      "units": {
+        "seconds": "seconds"
+      },
+      "tradeModes": {
+        "shortOnly": "Short only",
+        "both": "Both sides",
+        "longOnly": "Long only"
+      },
+      "options": {
+        "allExchanges": "All exchanges"
+      },
+      "states": {
+        "loadingAccounts": "Loading accounts..."
+      },
+      "errors": {
+        "loadAccounts": "Failed to load accounts: {{message}}"
+      },
+      "tooltips": {
+        "refreshAccounts": "Refresh account list"
+      }
+    },
+    "detail": {
+      "errors": {
+        "performance": "Failed to load performance data",
+        "notificationStatus": "Failed to load notification status",
+        "combineBalanceStatus": "Failed to load combine balance status",
+        "updateNotificationStatus": "Failed to update notification status",
+        "updateCombineBalanceStatus": "Failed to update combine balance status"
+      },
+      "notifications": {
+        "refreshSuccess": "Data updated",
+        "startSuccess": "Trading process started",
+        "stopSuccess": "Trading process stopped",
+        "stopWithCloseSuccess": "Trading process stopped and all orders were closed",
+        "enabled": "Bot activity will be sent to your chat",
+        "disabled": "Message notifications disabled",
+        "combineBalanceEnabled": "Combine balance mode enabled",
+        "combineBalanceDisabled": "Combine balance mode disabled"
+      },
+      "status": {
+        "running": "Running",
+        "stopped": "Stopped",
+        "paused": "Paused",
+        "created": "Created",
+        "queued": "Queued",
+        "failed": "Failed"
+      },
+      "empty": "Trading process not found",
+      "actions": {
+        "back": "Go back",
+        "stop": "Stop",
+        "start": "Start",
+        "refresh": "Refresh"
+      },
+      "controls": {
+        "notifications": "Notifications",
+        "combineBalance": "Combine balance"
+      },
+      "header": {
+        "title": "Trading process details"
+      },
+      "runningDays": {
+        "none": "Days running: -",
+        "value": "Days running: {{count}} days"
+      },
+      "metrics": {
+        "roi": "ROI",
+        "pnl": "PnL",
+        "winRate": "Win rate",
+        "totalTrades": "Total trades",
+        "ordersLabel": "orders",
+        "totalVolume": "Total volume",
+        "volumeUnit": "USDT"
+      }
     }
   },
   "backtest": {
@@ -564,6 +696,286 @@
       "friday": "Friday",
       "saturday": "Saturday",
       "sunday": "Sunday"
+    }
+  },
+  "tradingAccount": {
+    "pageTitle": "Trading account management",
+    "create": {
+      "button": "Create new account",
+      "aria": "Create a new trading account"
+    },
+    "tabs": {
+      "ariaLabel": "trading account tabs",
+      "all": "All"
+    },
+    "searchPlaceholder": "Search trading accounts...",
+    "tooltips": {
+      "refreshList": "Refresh list"
+    },
+    "dialog": {
+      "createTitle": "Create trading account",
+      "viewTitle": "Trading account details",
+      "editTitle": "Edit trading account"
+    },
+    "notifications": {
+      "createSuccess": "Trading account created successfully",
+      "updateSuccess": "Trading account updated successfully",
+      "deleteSuccess": "Trading account deleted successfully",
+      "refreshSuccess": "Trading account list refreshed"
+    },
+    "confirmDelete": {
+      "title": "Delete trading account",
+      "message": "Are you sure you want to delete the trading account \"{{name}}\"? This action cannot be undone."
+    },
+    "status": {
+      "valid": "Valid",
+      "invalid": "Invalid",
+      "pending": "Verifying",
+      "error": "Error",
+      "unsupported": "Unsupported"
+    },
+    "list": {
+      "empty": "No trading accounts found",
+      "headers": {
+        "accountName": "Account name",
+        "exchange": "Exchange",
+        "apiKey": "API key",
+        "status": "Status",
+        "balance": "Balance",
+        "chatIds": "Chat IDs",
+        "createdAt": "Created at",
+        "actions": "Actions"
+      },
+      "balance": {
+        "available": "Available",
+        "noData": "No balance data"
+      },
+      "chatIds": {
+        "count_one": "{{count}} chat ID",
+        "count_other": "{{count}} chat IDs",
+        "empty": "None"
+      },
+      "tooltips": {
+        "view": "View details",
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "pagination": {
+        "rowsPerPage": "Rows per page:",
+        "displayedRows": "{{from}}–{{to}} of {{count}}",
+        "moreThan": "more than {{value}}"
+      }
+    },
+    "form": {
+      "fields": {
+        "accountName": "Account name",
+        "exchange": "Exchange",
+        "apiKey": "API key",
+        "apiKeyNew": "New API key (leave blank to keep current)",
+        "apiKeyCurrent": "Current API key",
+        "secretKey": "Secret key",
+        "secretKeyNew": "New secret key (leave blank to keep current)",
+        "chatIds": "Telegram chat IDs",
+        "addChatId": "Add chat ID"
+      },
+      "sections": {
+        "api": "API credentials",
+        "notifications": "Notification settings"
+      },
+      "placeholders": {
+        "selectExchange": "Select an exchange"
+      },
+      "validation": {
+        "accountNameRequired": "Account name is required",
+        "exchangeRequired": "Exchange is required",
+        "apiKeyRequired": "API key is required",
+        "secretKeyRequired": "Secret key is required"
+      },
+      "helper": {
+        "keepCurrentApiKey": "Leave blank to keep the current API key",
+        "keepEmptyIfUnchanged": "Leave blank if you do not want to change",
+        "chatId": "Enter a Telegram chat ID to receive notifications"
+      },
+      "empty": {
+        "chatIds": "No chat IDs yet"
+      }
+    },
+    "detail": {
+      "errors": {
+        "dashboard": "Failed to load dashboard data",
+        "positions": "Failed to load positions",
+        "refresh": "Failed to refresh data",
+        "openPosition": "Failed to open position",
+        "closePosition": "Failed to close position",
+        "closePartialPosition": "Failed to close partial position"
+      },
+      "notifications": {
+        "refreshSuccess": "Data refreshed",
+        "openPosition": "Position opened successfully",
+        "closePosition": "Position closed successfully",
+        "closePartialPosition": "Partial close completed"
+      },
+      "actions": {
+        "back": "Go back",
+        "refresh": "Refresh"
+      },
+      "tabs": {
+        "balance": "Balance",
+        "positions": "Open positions"
+      },
+      "header": {
+        "title": "Trading account details"
+      },
+      "summary": {
+        "totalBalance": "Total balance",
+        "unrealizedPnl": "Unrealized PnL",
+        "openPositions": "Open positions"
+      },
+      "balance": {
+        "title": "Balance details",
+        "totalWallet": "Total wallet balance",
+        "available": "Available balance",
+        "unrealizedPnl": "Unrealized PnL",
+        "maxWithdraw": "Withdrawable amount",
+        "assetsTitle": "Asset details",
+        "marginAvailable": "Margin available",
+        "marginUnavailable": "Margin unavailable",
+        "asset": {
+          "wallet": "Wallet balance",
+          "available": "Available balance",
+          "margin": "Margin balance",
+          "unrealizedPnl": "Unrealized PnL",
+          "crossWallet": "Cross wallet balance",
+          "updatedAt": "Last updated"
+        },
+        "noData": "No balance data"
+      },
+      "positions": {
+        "title": "Open positions ({{count}})",
+        "actions": {
+          "refresh": "Refresh",
+          "openLong": "Open LONG {{symbol}}",
+          "openShort": "Open SHORT {{symbol}}",
+          "closePartial": "Close partially",
+          "closeAll": "Close position"
+        },
+        "empty": "No open positions",
+        "openNew": "Open new position",
+        "tableHeaders": {
+          "orderId": "Order ID",
+          "symbol": "Symbol",
+          "type": "Type",
+          "quantity": "Quantity",
+          "entryPrice": "Entry price",
+          "currentPrice": "Current price",
+          "liquidationPrice": "Liquidation price",
+          "pnl": "PnL",
+          "time": "Time",
+          "actions": "Actions"
+        },
+        "tooltips": {
+          "close": "Close position",
+          "moreActions": "More actions"
+        },
+        "fabAria": "Open new position"
+      },
+      "openDialog": {
+        "title": "Open position",
+        "validation": {
+          "symbol": "Please enter a symbol",
+          "quantity": "Quantity must be greater than 0",
+          "limitPrice": "Please enter a valid price for a LIMIT order",
+          "generic": "An error occurred while opening the position"
+        },
+        "fields": {
+          "symbol": "Symbol",
+          "side": "Order direction",
+          "positionSide": "Position side",
+          "quantity": "Quantity",
+          "orderType": "Order type",
+          "price": "Price",
+          "timeInForce": "Time in force"
+        },
+        "side": {
+          "buy": "BUY (Buy)",
+          "sell": "SELL (Sell)"
+        },
+        "positionSides": {
+          "long": "LONG",
+          "short": "SHORT",
+          "both": "BOTH"
+        },
+        "orderTypes": {
+          "market": "MARKET",
+          "limit": "LIMIT"
+        },
+        "timeInForce": {
+          "gtc": "GTC (Good Till Cancel)",
+          "ioc": "IOC (Immediate or Cancel)",
+          "fok": "FOK (Fill or Kill)"
+        },
+        "summary": {
+          "title": "Order summary",
+          "line1": "{{side}} {{quantity}} {{symbol}} {{positionSide}}",
+          "orderType": "Type: {{orderType}}",
+          "limitPrice": "at price {{price}}"
+        },
+        "actions": {
+          "submit": "Open position",
+          "submitting": "Submitting..."
+        }
+      },
+      "closeDialog": {
+        "title": "Close position",
+        "warning": "Are you sure you want to close this entire position? This action cannot be undone.",
+        "detailsTitle": "Position details",
+        "fields": {
+          "symbol": "Symbol:",
+          "type": "Type:",
+          "quantity": "Quantity:",
+          "entryPrice": "Entry price:",
+          "currentPrice": "Current price:",
+          "unrealizedPnl": "Unrealized PnL:"
+        },
+        "error": "An error occurred while closing the position",
+        "actions": {
+          "submit": "Close position",
+          "submitting": "Closing..."
+        }
+      },
+      "closePartialDialog": {
+        "title": "Close position partially",
+        "detailsTitle": "Current position",
+        "fields": {
+          "symbol": "Symbol:",
+          "type": "Type:",
+          "currentQuantity": "Current quantity:",
+          "currentPnl": "Current PnL:",
+          "closeQuantity": "Quantity to close",
+          "maxQuantity": "Maximum: {{value}}"
+        },
+        "validation": {
+          "quantity": "Quantity must be greater than 0",
+          "maxQuantity": "Close quantity cannot be greater than or equal to the current quantity",
+          "generic": "An error occurred while partially closing the position"
+        },
+        "quickSelect": {
+          "twentyFive": "25%",
+          "fifty": "50%",
+          "seventyFive": "75%"
+        },
+        "preview": {
+          "title": "Preview",
+          "closeQuantity": "Quantity to close:",
+          "remainingQuantity": "Remaining quantity:",
+          "estimatedPnl": "Estimated PnL on close:"
+        },
+        "actions": {
+          "submit": "Close partially",
+          "submitting": "Closing..."
+        }
+      },
+      "empty": "Trading account not found"
     }
   }
 }

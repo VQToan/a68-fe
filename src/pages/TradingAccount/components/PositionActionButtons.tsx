@@ -14,6 +14,7 @@ import {
   Remove as PartialCloseIcon,
 } from "@mui/icons-material";
 import type { PositionSummary } from "@/types/trading.types";
+import { useTranslation } from "react-i18next";
 
 interface PositionActionButtonsProps {
   position: PositionSummary;
@@ -28,6 +29,7 @@ const PositionActionButtons = ({
   onClosePosition,
   onPartialClosePosition,
 }: PositionActionButtonsProps) => {
+  const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -62,7 +64,7 @@ const PositionActionButtons = ({
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       {/* Quick Close Button */}
-      <Tooltip title="Đóng lệnh">
+      <Tooltip title={t("tradingAccount.detail.positions.tooltips.close")}>
         <IconButton
           size="small"
           color="error"
@@ -73,7 +75,7 @@ const PositionActionButtons = ({
       </Tooltip>
 
       {/* More Actions Menu */}
-      <Tooltip title="Thêm hành động">
+      <Tooltip title={t("tradingAccount.detail.positions.tooltips.moreActions")}>
         <IconButton
           size="small"
           onClick={handleClick}
@@ -98,19 +100,19 @@ const PositionActionButtons = ({
       >
         <MenuItem onClick={handleOpenLong}>
           <OpenLongIcon sx={{ mr: 1 }} color="success" />
-          Mở Long {position.symbol}
+          {t("tradingAccount.detail.positions.actions.openLong", { symbol: position.symbol })}
         </MenuItem>
         <MenuItem onClick={handleOpenShort}>
           <OpenShortIcon sx={{ mr: 1 }} color="error" />
-          Mở Short {position.symbol}
+          {t("tradingAccount.detail.positions.actions.openShort", { symbol: position.symbol })}
         </MenuItem>
         <MenuItem onClick={handlePartialClose}>
           <PartialCloseIcon sx={{ mr: 1 }} color="warning" />
-          Đóng một phần
+          {t("tradingAccount.detail.positions.actions.closePartial")}
         </MenuItem>
         <MenuItem onClick={handleClosePosition}>
           <CloseIcon sx={{ mr: 1 }} color="error" />
-          Đóng toàn bộ lệnh
+          {t("tradingAccount.detail.positions.actions.closeAll")}
         </MenuItem>
       </Menu>
     </Box>

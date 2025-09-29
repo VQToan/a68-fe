@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -13,6 +13,7 @@ import {
 } from "@mui/icons-material";
 import type { TradingAccount, AccountStatusType } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 // Status chip color mapping
 const getStatusColor = (status: AccountStatusType): "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" => {
@@ -29,23 +30,6 @@ const getStatusColor = (status: AccountStatusType): "default" | "primary" | "sec
       return "default";
     default:
       return "default";
-  }
-};
-
-const getStatusLabel = (status: AccountStatusType): string => {
-  switch (status) {
-    case "valid":
-      return "Hợp lệ";
-    case "invalid":
-      return "Không hợp lệ";
-    case "pending":
-      return "Đang xác thực";
-    case "error":
-      return "Lỗi";
-    case "unsupported":
-      return "Không hỗ trợ";
-    default:
-      return String(status).toUpperCase();
   }
 };
 
@@ -72,17 +56,28 @@ const TradingAccountHeader = ({
   onRefresh,
   isRefreshing,
 }: TradingAccountHeaderProps) => {
+  const { t } = useTranslation();
+  const statusLabels = useMemo(
+    () => ({
+      valid: t("tradingAccount.status.valid"),
+      invalid: t("tradingAccount.status.invalid"),
+      pending: t("tradingAccount.status.pending"),
+      error: t("tradingAccount.status.error"),
+      unsupported: t("tradingAccount.status.unsupported"),
+    }),
+    [t]
+  );
   return (
     <Paper elevation={3} sx={{ p: { xs: 1.5, sm: 2.5, md: 3 }, mb: 3, overflow: 'hidden', borderRadius: { xs: 1.5, md: 2 } }}>
       <Grid container spacing={2} alignItems="center" justifyContent="space-between">
         <Grid size={{ xs: 12, md: 'auto' }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: 'wrap' }}>
             <Typography variant="h5" component="h1">
-              Chi tiết Tài khoản Trading
+              {t("tradingAccount.detail.header.title")}
             </Typography>
             {account && (
               <Chip 
-                label={getStatusLabel(account.status)}
+                label={statusLabels[account.status] ?? account.status.toUpperCase()}
                 color={getStatusColor(account.status)}
                 size="small"
               />
@@ -101,7 +96,7 @@ const TradingAccountHeader = ({
               startIcon={<ArrowBackIcon />}
               onClick={onBack}
             >
-              Quay lại
+              {t("tradingAccount.detail.actions.back")}
             </Button>
             <Button
               variant="contained"
@@ -109,7 +104,7 @@ const TradingAccountHeader = ({
               onClick={onRefresh}
               disabled={isRefreshing}
             >
-              {isRefreshing ? "Đang làm mới..." : "Làm mới"}
+              {isRefreshing ? t("tradingAccount.detail.actions.refreshing") : t("tradingAccount.detail.actions.refresh")}
             </Button>
           </Box>
         </Grid>

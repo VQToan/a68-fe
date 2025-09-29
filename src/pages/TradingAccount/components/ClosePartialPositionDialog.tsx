@@ -14,6 +14,7 @@ import {
   Chip,
 } from "@mui/material";
 import type { PositionSummary, ClosePartialPositionRequest } from "@/types/trading.types";
+import { useTranslation } from "react-i18next";
 
 interface ClosePartialPositionDialogProps {
   open: boolean;
@@ -28,6 +29,7 @@ const ClosePartialPositionDialog = ({
   onSubmit,
   position,
 }: ClosePartialPositionDialogProps) => {
+  const { t } = useTranslation();
   const [quantity, setQuantity] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,12 +51,12 @@ const ClosePartialPositionDialog = ({
     if (!position) return;
 
     if (quantity <= 0) {
-      setError("Số lượng phải lớn hơn 0");
+      setError(t("tradingAccount.detail.closePartialDialog.validation.quantity"));
       return;
     }
 
     if (quantity >= Number(position.quantity)) {
-      setError("Số lượng đóng không thể lớn hơn hoặc bằng số lượng hiện tại");
+      setError(t("tradingAccount.detail.closePartialDialog.validation.maxQuantity"));
       return;
     }
 
@@ -72,7 +74,7 @@ const ClosePartialPositionDialog = ({
       await onSubmit(closeData);
       onClose();
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Có lỗi xảy ra khi đóng một phần lệnh");
+      setError(error instanceof Error ? error.message : t("tradingAccount.detail.closePartialDialog.validation.generic"));
     } finally {
       setIsSubmitting(false);
     }
@@ -93,7 +95,7 @@ const ClosePartialPositionDialog = ({
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>
-        Đóng một phần lệnh
+        {t("tradingAccount.detail.closePartialDialog.title")}
       </DialogTitle>
       <DialogContent>
         <Box sx={{ pt: 2 }}>
@@ -106,13 +108,13 @@ const ClosePartialPositionDialog = ({
           {/* Position Info */}
           <Box sx={{ p: 2, bgcolor: "grey.50", borderRadius: 1, mb: 3 }}>
             <Typography variant="subtitle2" sx={{ mb: 2 }}>
-              Thông tin lệnh hiện tại:
+              {t("tradingAccount.detail.closePartialDialog.detailsTitle")}
             </Typography>
             
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="textSecondary">
-                  Symbol:
+                  {t("tradingAccount.detail.closePartialDialog.fields.symbol")}
                 </Typography>
                 <Typography variant="body2" fontWeight="medium">
                   {position.symbol}
@@ -121,7 +123,7 @@ const ClosePartialPositionDialog = ({
 
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="textSecondary">
-                  Loại:
+                  {t("tradingAccount.detail.closePartialDialog.fields.type")}
                 </Typography>
                 <Chip
                   label={`${position.side} ${position.position_side}`}
@@ -132,7 +134,7 @@ const ClosePartialPositionDialog = ({
 
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="textSecondary">
-                  Số lượng hiện tại:
+                  {t("tradingAccount.detail.closePartialDialog.fields.currentQuantity")}
                 </Typography>
                 <Typography variant="body2" fontWeight="medium">
                   {position.quantity}
@@ -141,7 +143,7 @@ const ClosePartialPositionDialog = ({
 
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2" color="textSecondary">
-                  PnL hiện tại:
+                  {t("tradingAccount.detail.closePartialDialog.fields.currentPnl")}
                 </Typography>
                 <Typography 
                   variant="body2" 
@@ -159,7 +161,7 @@ const ClosePartialPositionDialog = ({
             <Grid size={{ xs: 12 }}>
               <TextField
                 fullWidth
-                label="Số lượng muốn đóng"
+                label={t("tradingAccount.detail.closePartialDialog.fields.closeQuantity")}
                 type="number"
                 value={quantity}
                 onChange={handleQuantityChange}
@@ -169,7 +171,7 @@ const ClosePartialPositionDialog = ({
                   step: "any" 
                 }}
                 disabled={isSubmitting}
-                helperText={`Tối đa: ${position.quantity}`}
+                helperText={t("tradingAccount.detail.closePartialDialog.fields.maxQuantity", { value: position.quantity })}
               />
             </Grid>
 
@@ -182,7 +184,7 @@ const ClosePartialPositionDialog = ({
                   onClick={() => setQuantity(Number(position.quantity) * 0.25)}
                   disabled={isSubmitting}
                 >
-                  25%
+                  {t("tradingAccount.detail.closePartialDialog.quickSelect.twentyFive")}
                 </Button>
                 <Button
                   size="small"
@@ -190,7 +192,7 @@ const ClosePartialPositionDialog = ({
                   onClick={() => setQuantity(Number(position.quantity) * 0.5)}
                   disabled={isSubmitting}
                 >
-                  50%
+                  {t("tradingAccount.detail.closePartialDialog.quickSelect.fifty")}
                 </Button>
                 <Button
                   size="small"
@@ -198,7 +200,7 @@ const ClosePartialPositionDialog = ({
                   onClick={() => setQuantity(Number(position.quantity) * 0.75)}
                   disabled={isSubmitting}
                 >
-                  75%
+                  {t("tradingAccount.detail.closePartialDialog.quickSelect.seventyFive")}
                 </Button>
               </Box>
             </Grid>
@@ -208,11 +210,11 @@ const ClosePartialPositionDialog = ({
           {quantity > 0 && (
             <Box sx={{ mt: 3, p: 2, bgcolor: "info.light", borderRadius: 1 }}>
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                Xem trước:
+                {t("tradingAccount.detail.closePartialDialog.preview.title")}
               </Typography>
               <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
                 <Typography variant="body2">
-                  Số lượng đóng:
+                  {t("tradingAccount.detail.closePartialDialog.preview.closeQuantity")}
                 </Typography>
                 <Typography variant="body2" fontWeight="medium">
                   {quantity}
@@ -220,7 +222,7 @@ const ClosePartialPositionDialog = ({
               </Box>
               <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
                 <Typography variant="body2">
-                  Số lượng còn lại:
+                  {t("tradingAccount.detail.closePartialDialog.preview.remainingQuantity")}
                 </Typography>
                 <Typography variant="body2" fontWeight="medium">
                   {remainingQuantity.toFixed(8)}
@@ -228,7 +230,7 @@ const ClosePartialPositionDialog = ({
               </Box>
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body2">
-                  PnL ước tính khi đóng:
+                  {t("tradingAccount.detail.closePartialDialog.preview.estimatedPnl")}
                 </Typography>
                 <Typography 
                   variant="body2" 
@@ -244,7 +246,7 @@ const ClosePartialPositionDialog = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} disabled={isSubmitting}>
-          Hủy
+          {t("common.cancel")}
         </Button>
         <Button
           onClick={handleSubmit}
@@ -253,7 +255,7 @@ const ClosePartialPositionDialog = ({
           disabled={isSubmitting || quantity <= 0}
           startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
         >
-          {isSubmitting ? "Đang đóng..." : "Đóng một phần"}
+          {isSubmitting ? t("tradingAccount.detail.closePartialDialog.actions.submitting") : t("tradingAccount.detail.closePartialDialog.actions.submit")}
         </Button>
       </DialogActions>
     </Dialog>
