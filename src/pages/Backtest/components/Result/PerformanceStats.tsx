@@ -10,17 +10,19 @@ import {
 import { formatNumber } from "@utils/common";
 import { areEqual } from "@/utils/common";
 import type { BacktestResultMetrics } from "@/types/backtestResult.type";
+import { useTranslation } from "react-i18next";
 
 interface PerformanceStatsProps {
   metrics: BacktestResultMetrics;
 }
 
 const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          Thống kê hiệu suất
+          {t("backtest.results.performance.title")}
         </Typography>
         <Divider sx={{ mb: 2 }} />
 
@@ -35,29 +37,30 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
             textAlign: "center",
           }}
         >
-          <Typography variant="body2">Tổng lợi nhuận (PnL)</Typography>
+          <Typography variant="body2">
+            {t("backtest.results.performance.totalPnl")}
+          </Typography>
           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
             {formatNumber(metrics.total_pnl || 0)} USDT
           </Typography>
         </Box>
 
-        {/* Thống kê giao dịch */}
         <Typography
           variant="subtitle2"
           sx={{ mt: 2, mb: 1, fontWeight: "bold" }}
         >
-          Thống kê giao dịch
+          {t("backtest.results.performance.tradeStats.title")}
         </Typography>
         <Grid container spacing={2}>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Tổng số giao dịch
+              {t("backtest.results.performance.tradeStats.totalTrades")}
             </Typography>
             <Typography variant="h6">{metrics.total_trades || 0}</Typography>
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              GD/tháng
+              {t("backtest.results.performance.tradeStats.monthlyTrades")}
             </Typography>
             <Typography variant="h6">
               {formatNumber(metrics.monthly_trades || 0)}
@@ -65,27 +68,27 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Giao dịch LONG
+              {t("backtest.results.performance.tradeStats.longTrades")}
             </Typography>
             <Typography variant="h6">{metrics.long_trades || 0}</Typography>
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Giao dịch SHORT
+              {t("backtest.results.performance.tradeStats.shortTrades")}
             </Typography>
             <Typography variant="h6">{metrics.short_trades || 0}</Typography>
           </Grid>
           {/* total_orders */}
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Tổng lệnh
+              {t("backtest.results.performance.tradeStats.totalOrders")}
             </Typography>
             <Typography variant="h6">{metrics.total_orders || 0}</Typography>
           </Grid>
           {/* volume_orders */}
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Tổng khối lượng lệnh
+              {t("backtest.results.performance.tradeStats.orderVolume")}
             </Typography>
             <Typography variant="h6">
               {formatNumber(metrics.volume_orders || 0)}
@@ -93,17 +96,16 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
         </Grid>
 
-        {/* Tỉ lệ thắng/thua */}
         <Typography
           variant="subtitle2"
           sx={{ mt: 2, mb: 1, fontWeight: "bold" }}
         >
-          Tỉ lệ thắng/thua
+          {t("backtest.results.performance.winLoss.title")}
         </Typography>
         <Grid container spacing={2}>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Tỷ lệ thắng
+              {t("backtest.results.performance.winLoss.winRate")}
             </Typography>
             <Typography variant="h6">
               {formatNumber(metrics.win_rate || 0)}%
@@ -111,7 +113,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Tỷ lệ thắng LONG
+              {t("backtest.results.performance.winLoss.longWinRate")}
             </Typography>
             <Typography variant="h6">
               {formatNumber(metrics.long_win_rate || 0)}%
@@ -119,7 +121,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Giao dịch thắng
+              {t("backtest.results.performance.winLoss.winningTrades")}
             </Typography>
             <Typography variant="h6" color="success.main">
               {metrics.winning_trades || 0}
@@ -127,7 +129,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Tỷ lệ thắng SHORT
+              {t("backtest.results.performance.winLoss.shortWinRate")}
             </Typography>
             <Typography variant="h6">
               {formatNumber(metrics.short_win_rate || 0)}%
@@ -135,7 +137,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Giao dịch thua
+              {t("backtest.results.performance.winLoss.losingTrades")}
             </Typography>
             <Typography variant="h6" color="error.main">
               {metrics.losing_trades || 0}
@@ -143,17 +145,16 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
         </Grid>
 
-        {/* Metrics PnL */}
         <Typography
           variant="subtitle2"
           sx={{ mt: 2, mb: 1, fontWeight: "bold" }}
         >
-          Metrics PnL
+          {t("backtest.results.performance.pnl.title")}
         </Typography>
         <Grid container spacing={2}>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              PnL/tháng
+              {t("backtest.results.performance.pnl.monthlyPnl")}
             </Typography>
             <Typography
               variant="h6"
@@ -166,7 +167,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              PnL/giao dịch
+              {t("backtest.results.performance.pnl.perTrade")}
             </Typography>
             <Typography
               variant="h6"
@@ -181,7 +182,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              PnL LONG TB
+              {t("backtest.results.performance.pnl.avgLong")}
             </Typography>
             <Typography
               variant="h6"
@@ -194,7 +195,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              PnL SHORT TB
+              {t("backtest.results.performance.pnl.avgShort")}
             </Typography>
             <Typography
               variant="h6"
@@ -209,17 +210,16 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
         </Grid>
 
-        {/* Metrics ROI */}
         <Typography
           variant="subtitle2"
           sx={{ mt: 2, mb: 1, fontWeight: "bold" }}
         >
-          Metrics ROI
+          {t("backtest.results.performance.roi.title")}
         </Typography>
         <Grid container spacing={2}>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Tổng ROI
+              {t("backtest.results.performance.roi.total")}
             </Typography>
             <Typography
               variant="h6"
@@ -232,7 +232,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              ROI/tháng
+              {t("backtest.results.performance.roi.monthly")}
             </Typography>
             <Typography
               variant="h6"
@@ -245,7 +245,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              ROI LONG TB
+              {t("backtest.results.performance.roi.avgLong")}
             </Typography>
             <Typography
               variant="h6"
@@ -258,7 +258,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              ROI SHORT TB
+              {t("backtest.results.performance.roi.avgShort")}
             </Typography>
             <Typography
               variant="h6"
@@ -273,17 +273,16 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
         </Grid>
 
-        {/* Chỉ số rủi ro */}
         <Typography
           variant="subtitle2"
           sx={{ mt: 2, mb: 1, fontWeight: "bold" }}
         >
-          Chỉ số rủi ro
+          {t("backtest.results.performance.risk.title")}
         </Typography>
         <Grid container spacing={2}>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Max Drawdown
+              {t("backtest.results.performance.risk.maxDrawdown")}
             </Typography>
             <Typography variant="h6" color="error.main">
               {formatNumber(metrics.mdd || 0)}%
@@ -291,7 +290,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Sharpe Ratio
+              {t("backtest.results.performance.risk.sharpeRatio")}
             </Typography>
             <Typography variant="h6">
               {formatNumber(metrics.sharpe_ratio || 0)}
@@ -299,7 +298,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Profit Factor
+              {t("backtest.results.performance.risk.profitFactor")}
             </Typography>
             <Typography variant="h6">
               {formatNumber(metrics.profit_factor || 0)}
@@ -307,7 +306,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           </Grid>
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              Max Loss
+              {t("backtest.results.performance.risk.maxLoss")}
             </Typography>
             <Typography variant="h6">
               {metrics.max_loss_occurrences || 0}
@@ -316,7 +315,7 @@ const PerformanceStats: React.FC<PerformanceStatsProps> = ({ metrics }) => {
           {/* mdd_org_balance */}
           <Grid size={6}>
             <Typography variant="body2" color="text.secondary">
-              MDD so với số dư ban đầu
+              {t("backtest.results.performance.risk.mddOriginalBalance")}
             </Typography>
             <Typography variant="h6" color="error.main">
               {formatNumber(metrics.mdd_org_balance || 0)}%

@@ -130,6 +130,259 @@
       }
     }
   },
+  "backtest": {
+    "management": {
+      "pageTitle": "Quản lý Backtest",
+      "optimize": {
+        "ariaLabel": "Tối ưu hóa với LLM",
+        "button": "Tối ưu hóa với LLM"
+      },
+      "create": {
+        "ariaLabel": "Tạo backtest mới",
+        "button": "Tạo backtest"
+      },
+      "searchPlaceholder": "Tìm kiếm backtest...",
+      "refreshTooltip": "Làm mới danh sách",
+      "tabs": {
+        "ariaLabel": "tab trạng thái backtest",
+        "all": "Tất cả",
+        "created": "Đang chờ",
+        "running": "Đang chạy",
+        "completed": "Hoàn thành",
+        "failed": "Thất bại",
+        "stopped": "Đã dừng"
+      },
+      "dialog": {
+        "createTitle": "Tạo Backtest",
+        "viewTitle": "Chi tiết Backtest",
+        "editTitle": "Chỉnh sửa Backtest"
+      },
+      "confirmDelete": {
+        "title": "Xóa backtest",
+        "message": "Bạn có chắc chắn muốn xóa backtest \"{{name}}\"? Hành động này không thể hoàn tác."
+      },
+      "notifications": {
+        "createSuccess": "Backtest đã được tạo thành công",
+        "updateSuccess": "Backtest đã được cập nhật thành công",
+        "deleteSuccess": "Backtest đã được xóa thành công",
+        "stopSuccess": "Backtest đã được dừng",
+        "refreshSuccess": "Danh sách backtest đã được cập nhật",
+        "runSuccess": "Backtest đã bắt đầu chạy"
+      }
+    },
+    "list": {
+      "status": {
+        "created": "Đang chờ",
+        "queued": "Trong hàng đợi",
+        "running": "Đang chạy",
+        "completed": "Hoàn thành",
+        "failed": "Thất bại",
+        "stopped": "Đã dừng"
+      },
+      "empty": "Không có backtest nào",
+      "headers": {
+        "name": "Tên",
+        "description": "Mô tả",
+        "status": "Trạng thái",
+        "result": "Kết quả",
+        "createdAt": "Ngày tạo",
+        "actions": "Thao tác"
+      },
+      "noSummary": "Không có thông tin",
+      "pagination": {
+        "rowsPerPage": "Số dòng:",
+        "displayedRows": "{{from}}-{{to}}/{{count}}"
+      },
+      "menu": {
+        "view": "Xem chi tiết",
+        "run": "Chạy backtest",
+        "stop": "Dừng backtest"
+      }
+    },
+    "runDialog": {
+      "title": "Chạy backtest",
+      "backtestLabel": "Backtest: {{name}}",
+      "description": "Vui lòng chọn khoảng thời gian chạy.",
+      "startDate": "Thời gian bắt đầu",
+      "endDate": "Thời gian kết thúc",
+      "combineBalance": "Gộp số dư",
+      "validation": {
+        "missing": "Vui lòng nhập đầy đủ thời gian bắt đầu và kết thúc.",
+        "invalidRange": "Thời gian kết thúc phải sau thời gian bắt đầu."
+      },
+      "running": "Đang chạy...",
+      "confirm": "Chạy backtest"
+    },
+    "summary": {
+      "error": "Lỗi khi tải dữ liệu: {{message}}",
+      "noData": "Không tìm thấy dữ liệu backtest",
+      "symbolChip": "Cặp giao dịch: {{symbol}}",
+      "createdAtChip": "Tạo lúc: {{value}}",
+      "statusChip": "Trạng thái: {{status}}",
+      "viewParameters": "Xem thông số backtest",
+      "tradeInterval": "Khung trade: {{value}}",
+      "trendInterval": "Khung trend: {{value}}",
+      "quantity": "Tỷ lệ vào lệnh: {{value}}",
+      "parametersTitle": "Thông số Backtest",
+      "parameterColumn": "Tham số",
+      "valueColumn": "Giá trị"
+    },
+    "form": {
+      "sections": {
+        "configuration": "Cấu hình Backtest",
+        "basic": "Thiết lập cơ bản",
+        "trading": "Tham số giao dịch",
+        "profitMargin": "Cài đặt lợi nhuận & biên độ",
+        "indicators": "Chỉ báo kỹ thuật",
+        "dca": "Cài đặt DCA",
+        "rsi": "Cài đặt RSI"
+      },
+      "fields": {
+        "name": "Tên backtest",
+        "description": "Mô tả",
+        "botTemplate": "Bot Template",
+        "symbol": "Cặp giao dịch",
+        "interval1": "Interval 1",
+        "interval2": "Interval 2",
+        "tradeMode": "Chế độ giao dịch",
+        "entryPercentage": "Tỷ lệ vào lệnh",
+        "leverage": "Đòn bẩy",
+        "funds": "Vốn ban đầu",
+        "timeBetweenOrders": "Thời gian nghỉ giữa các lệnh",
+        "pauseTime": "Thời gian tạm dừng",
+        "pauseDay": "Tạm dừng theo ngày",
+        "minRoi": "ROI tối thiểu",
+        "riskToReward": "Tỷ lệ rủi ro/lợi nhuận",
+        "minMargin": "Biên độ tối thiểu",
+        "maxMarginPercentage": "Biên độ tối đa (%)",
+        "maxLoss": "Lỗ tối đa",
+        "maPeriod": "Chu kỳ MA",
+        "rsiEntryLong": "RSI Long Entry",
+        "rsiEntryLongCandle": "RSI Long Entry (candle)",
+        "rsiExitLong": "RSI Long Exit",
+        "rsiExitLongCandle": "RSI Long Exit (candle)",
+        "rsiEntryShort": "RSI Short Entry",
+        "rsiEntryShortCandle": "RSI Short Entry (candle)",
+        "rsiExitShort": "RSI Short Exit",
+        "rsiExitShortCandle": "RSI Short Exit (candle)",
+        "dcaGrid": "Lưới DCA",
+        "gridMultiplier": "Hệ số lưới",
+        "dcaMultiplier": "Hệ số DCA"
+      },
+      "validation": {
+        "nameRequired": "Tên backtest là bắt buộc",
+        "descriptionRequired": "Mô tả là bắt buộc",
+        "botTemplateRequired": "Bot Template là bắt buộc"
+      },
+      "helper": {
+        "description": "Hỗ trợ định dạng Markdown",
+        "dcaGrid": "Ví dụ: 0.008 tương ứng 0.8%",
+        "maPeriod": "Định dạng: ngắn:dài (ví dụ: 8:20)"
+      },
+      "placeholders": {
+        "pauseTime": "HH:MM-HH:MM",
+        "maPeriod": "8:20"
+      },
+      "units": {
+        "seconds": "giây"
+      },
+      "tradeModes": {
+        "shortOnly": "Chỉ SHORT",
+        "both": "Cả hai chiều",
+        "longOnly": "Chỉ LONG"
+      }
+    },
+    "results": {
+      "title": "Kết quả Backtest",
+      "list": {
+        "title": "Danh sách kết quả backtest",
+        "roi": "ROI: {{value}}%",
+        "pnl": "PnL: {{value}}",
+        "mdd": "MDD: {{value}}",
+        "combineBalance": "Gộp số dư: {{status}}",
+        "downloadTooltip": "Tải về",
+        "viewTooltip": "Xem chi tiết",
+        "deleteTooltip": "Xóa kết quả",
+        "empty": "Không có kết quả backtest cho quá trình này",
+        "confirmDeleteTitle": "Xóa kết quả backtest",
+        "confirmDeleteMessage": "Bạn có chắc chắn muốn xóa kết quả backtest này? Hành động này không thể hoàn tác."
+      },
+      "view": {
+        "tradeListTitle": "Danh sách giao dịch",
+        "tradeCount": "Tổng cộng: {{count}} giao dịch",
+        "tradeDetails": "Chi tiết giao dịch",
+        "longTrades": "LONG: {{count}}",
+        "shortTrades": "SHORT: {{count}}",
+        "tableHeaders": {
+          "time": "Thời gian",
+          "type": "Loại",
+          "price": "Giá",
+          "quantity": "Số lượng",
+          "reason": "Lý do",
+          "orderPnl": "PnL lệnh",
+          "transactionPnl": "PnL giao dịch",
+          "balance": "Số dư"
+        },
+        "noTradeData": "Không có dữ liệu giao dịch",
+        "chartTitle": "Biểu đồ giao dịch",
+        "intervalLabel": "Khung thời gian"
+      },
+      "performance": {
+        "title": "Thống kê hiệu suất",
+        "totalPnl": "Tổng lợi nhuận (PnL)",
+        "tradeStats": {
+          "title": "Thống kê giao dịch",
+          "totalTrades": "Tổng số giao dịch",
+          "monthlyTrades": "Giao dịch/tháng",
+          "longTrades": "Giao dịch LONG",
+          "shortTrades": "Giao dịch SHORT",
+          "totalOrders": "Tổng lệnh",
+          "orderVolume": "Tổng khối lượng lệnh"
+        },
+        "winLoss": {
+          "title": "Tỉ lệ thắng/thua",
+          "winRate": "Tỷ lệ thắng",
+          "longWinRate": "Tỷ lệ thắng LONG",
+          "winningTrades": "Giao dịch thắng",
+          "shortWinRate": "Tỷ lệ thắng SHORT",
+          "losingTrades": "Giao dịch thua"
+        },
+        "pnl": {
+          "title": "Chỉ số PnL",
+          "monthlyPnl": "PnL/tháng",
+          "perTrade": "PnL/giao dịch",
+          "avgLong": "PnL LONG trung bình",
+          "avgShort": "PnL SHORT trung bình"
+        },
+        "roi": {
+          "title": "Chỉ số ROI",
+          "total": "ROI tổng",
+          "monthly": "ROI/tháng",
+          "avgLong": "ROI LONG trung bình",
+          "avgShort": "ROI SHORT trung bình"
+        },
+        "risk": {
+          "title": "Chỉ số rủi ro",
+          "maxDrawdown": "Mức sụt giảm tối đa",
+          "sharpeRatio": "Sharpe Ratio",
+          "profitFactor": "Profit Factor",
+          "maxLoss": "Số lần lỗ tối đa",
+          "mddOriginalBalance": "MDD so với số dư ban đầu"
+        }
+      },
+      "chart": {
+        "loadError": "Không thể tải dữ liệu biểu đồ",
+        "empty": "Không có dữ liệu biểu đồ",
+        "legend": {
+          "title": "Chú thích giao dịch",
+          "longOpen": "B Long mở lệnh (màu tím)",
+          "longClose": "S Long đóng lệnh (màu tím)",
+          "shortOpen": "S Short mở lệnh (vàng đậm)",
+          "shortClose": "B Short đóng lệnh (vàng đậm)"
+        }
+      }
+    }
+  },
   "common": {
     "user": "Người dùng",
     "profile": "Hồ sơ",
@@ -142,6 +395,19 @@
     "delete": "Xóa",
     "edit": "Chỉnh sửa",
     "create": "Tạo mới",
-    "loading": "Đang tải..."
+    "update": "Cập nhật",
+    "loading": "Đang tải...",
+    "on": "Bật",
+    "off": "Tắt",
+    "notAvailable": "N/A",
+    "weekdays": {
+      "monday": "Thứ hai",
+      "tuesday": "Thứ ba",
+      "wednesday": "Thứ tư",
+      "thursday": "Thứ năm",
+      "friday": "Thứ sáu",
+      "saturday": "Thứ bảy",
+      "sunday": "Chủ nhật"
+    }
   }
 }

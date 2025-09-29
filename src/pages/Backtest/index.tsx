@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo } from "react";
+import { useState, useEffect, useCallback, memo, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -29,6 +29,7 @@ import Modal from "@components/Modal";
 import type { BacktestStatus, BacktestProcessCreate, BacktestProcessUpdate } from "@/types/backtest.type";
 import { areEqual } from "@/utils/common";
 import FilterTabs from "@components/FilterTabs";
+import { useTranslation } from "react-i18next";
 
 export type FormMode = "create" | "view" | "edit";
 
@@ -101,7 +102,7 @@ const Backtest = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
-  const [dialogTitle, setDialogTitle] = useState("Tạo Backtest Mới");
+  const { t } = useTranslation();
   
   // Thêm state để quản lý hiển thị component
   const [currentView, setCurrentView] = useState<BacktestView>(BacktestView.LIST);
@@ -218,20 +219,6 @@ const Backtest = () => {
   // Handle dialog open/close
   const handleOpenDialog = useCallback((mode: FormMode = "create") => {
     setDialogMode(mode);
-
-    // Set dialog title based on mode
-    switch (mode) {
-      case "create":
-        setDialogTitle("Tạo Backtest Mới");
-        break;
-      case "view":
-        setDialogTitle("Chi Tiết Backtest");
-        break;
-      case "edit":
-        setDialogTitle("Chỉnh Sửa Backtest");
-        break;
-    }
-
     setOpenDialog(true);
   }, []);
 
@@ -248,11 +235,11 @@ const Backtest = () => {
         if (dialogMode === "create") {
           // Create new backtest
           await createProcess(formData as BacktestProcessCreate);
-          showNotification("Backtest đã được tạo thành công", "success");
+          showNotification(t("backtest.management.notifications.createSuccess"), "success");
         } else if (dialogMode === "edit" && currentProcess) {
           // Update existing backtest
           await updateProcess(currentProcess._id, formData as BacktestProcessUpdate);
-          showNotification("Backtest đã được cập nhật thành công", "success");
+          showNotification(t("backtest.management.notifications.updateSuccess"), "success");
         }
         handleCloseDialog();
         // Re-fetch the list with latest data
@@ -261,13 +248,12 @@ const Backtest = () => {
         console.error("Error submitting backtest:", error);
       }
     },
-    [dialogMode, currentProcess, createProcess, updateProcess, showNotification, handleCloseDialog, fetchBacktests]
+    [createProcess, currentProcess, dialogMode, fetchBacktests, handleCloseDialog, showNotification, t, updateProcess]
   );
 
   // Handle edit mode toggle from view mode
   const handleSwitchToEditMode = useCallback(() => {
     setDialogMode("edit");
-    setDialogTitle("Chỉnh Sửa Backtest");
   }, []);
 
   // Hàm xử lý hiển thị kết quả backtest (thay vì navigate)
@@ -319,32 +305,32 @@ const Backtest = () => {
 
     try {
       await deleteProcess(confirmDelete.id);
-      showNotification("Backtest đã được xóa thành công", "success");
+      showNotification(t("backtest.management.notifications.deleteSuccess"), "success");
       handleCloseDeleteConfirm();
       // Re-fetch the list with latest data
       fetchBacktests();
     } catch (error) {
       console.error("Error deleting backtest:", error);
     }
-  }, [confirmDelete.id, deleteProcess, showNotification, handleCloseDeleteConfirm, fetchBacktests]);
+  }, [confirmDelete.id, deleteProcess, fetchBacktests, handleCloseDeleteConfirm, showNotification, t]);
 
   // Handle stop backtest
   const handleStopBacktest = useCallback(async (id: string) => {
     try {
       await stopProcess(id);
-      showNotification("Backtest đã được dừng lại", "success");
+      showNotification(t("backtest.management.notifications.stopSuccess"), "success");
       // Re-fetch the list with latest data
       fetchBacktests();
     } catch (error) {
       console.error("Error stopping backtest:", error);
     }
-  }, [stopProcess, showNotification, fetchBacktests]);
+  }, [fetchBacktests, showNotification, stopProcess, t]);
 
   // Handle refreshing the backtest list
   const handleRefreshBacktests = useCallback(() => {
     fetchBacktests();
-    showNotification("Danh sách backtest đã được cập nhật", "success");
-  }, [fetchBacktests, showNotification]);
+    showNotification(t("backtest.management.notifications.refreshSuccess"), "success");
+  }, [fetchBacktests, showNotification, t]);
 
   // Handle opening run backtest dialog
   const handleOpenRunBacktestDialog = useCallback((id: string, name: string) => {
@@ -379,14 +365,14 @@ const Backtest = () => {
 
     try {
       await runProcess(runBacktestDialog.id, startDate, endDate, combineBalance);
-      showNotification("Backtest đã được bắt đầu chạy", "success");
+      showNotification(t("backtest.management.notifications.runSuccess"), "success");
       handleCloseRunBacktestDialog();
       // Re-fetch the list with latest data
       fetchBacktests();
     } catch (error) {
       console.error("Error running backtest:", error);
     }
-  }, [runBacktestDialog.id, runProcess, showNotification, handleCloseRunBacktestDialog, fetchBacktests]);
+  }, [fetchBacktests, handleCloseRunBacktestDialog, runBacktestDialog.id, runProcess, showNotification, t]);
 
   // Handle opening optimization dialog
   const handleOpenOptimizationDialog = useCallback(() => {
@@ -441,10 +427,10 @@ const Backtest = () => {
             variant="outlined"
             color="primary"
           >
-            Chỉnh sửa
+            {t("common.edit")}
           </Button>
           <Button onClick={handleCloseDialog} variant="contained">
-            Đóng
+            {t("common.close")}
           </Button>
         </>
       );
@@ -453,7 +439,7 @@ const Backtest = () => {
     return (
       <>
         <Button onClick={handleCloseDialog} variant="outlined">
-          Hủy
+          {t("common.cancel")}
         </Button>
         <Button
           onClick={() => {
@@ -463,11 +449,34 @@ const Backtest = () => {
           variant="contained"
           disabled={isLoading}
         >
-          {dialogMode === "edit" ? "Cập nhật" : "Tạo"}
+          {dialogMode === "edit" ? t("common.update") : t("common.create")}
         </Button>
       </>
     );
-  }, [dialogMode, handleCloseDialog, handleSwitchToEditMode, isLoading]);
+  }, [dialogMode, handleCloseDialog, handleSwitchToEditMode, isLoading, t]);
+
+  const dialogTitleKey = useMemo(() => {
+    switch (dialogMode) {
+      case "view":
+        return "backtest.management.dialog.viewTitle";
+      case "edit":
+        return "backtest.management.dialog.editTitle";
+      default:
+        return "backtest.management.dialog.createTitle";
+    }
+  }, [dialogMode]);
+
+  const tabItems = useMemo(
+    () => [
+      { label: t("backtest.management.tabs.all"), value: "all" },
+      { label: t("backtest.management.tabs.created"), value: "created" },
+      { label: t("backtest.management.tabs.running"), value: "running" },
+      { label: t("backtest.management.tabs.completed"), value: "completed" },
+      { label: t("backtest.management.tabs.failed"), value: "failed" },
+      { label: t("backtest.management.tabs.stopped"), value: "stopped" },
+    ],
+    [t]
+  );
 
   // Render dựa vào currentView
   if (currentView === BacktestView.RESULT && selectedBacktestId) {
@@ -477,56 +486,56 @@ const Backtest = () => {
   return (
     <Box>
       <Paper elevation={3} sx={{ p: { xs: 1.5, sm: 2.5, md: 3 }, mb: 3, overflow: 'hidden', borderRadius: { xs: 1.5, md: 2 } }}>
-        <Grid
-          container
-          spacing={2}
-          alignItems="center"
-          wrap="wrap"
-        >
-          <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ flexGrow: 1, minWidth: 0 }}>
-            <Typography variant="h5" component="h1" gutterBottom>
-              Quản lý Backtest
-            </Typography>
-          </Grid>
-          <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ ml: { xs: 'auto', md: 0 } }}>
-            <Box sx={{ display: "flex", gap: 1.5, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-              <Button
-                variant="outlined"
-                color="secondary"
-                startIcon={<OptimizeIcon />}
-                onClick={handleOpenOptimizationDialog}
-                aria-label="Tối ưu hóa với LLM"
-                sx={{
-                  px: { xs: 1.25, sm: 2 },
-                  minHeight: 40,
-                  minWidth: { xs: 44, sm: 'auto' },
-                  '& .MuiButton-startIcon': {
-                    mr: { xs: 0, sm: 1 },
-                  },
-                }}
-              >
-                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                  Tối ưu hóa với LLM
-                </Box>
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={() => handleOpenDialog("create")}
-                aria-label="Tạo backtest mới"
-                sx={{
-                  px: { xs: 1.25, sm: 2 },
-                  minHeight: 40,
-                  minWidth: { xs: 44, sm: 'auto' },
-                  '& .MuiButton-startIcon': {
-                    mr: { xs: 0, sm: 1 },
-                  },
-                }}
-              >
-                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                  Tạo backtest mới
-                </Box>
-              </Button>
+      <Grid
+        container
+        spacing={2}
+        alignItems="center"
+        wrap="wrap"
+      >
+        <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ flexGrow: 1, minWidth: 0 }}>
+          <Typography variant="h5" component="h1" gutterBottom>
+            {t("backtest.management.pageTitle")}
+          </Typography>
+        </Grid>
+        <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ ml: { xs: 'auto', md: 0 } }}>
+          <Box sx={{ display: "flex", gap: 1.5, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              startIcon={<OptimizeIcon />}
+              onClick={handleOpenOptimizationDialog}
+              aria-label={t("backtest.management.optimize.ariaLabel")}
+              sx={{
+                px: { xs: 1.25, sm: 2 },
+                minHeight: 40,
+                minWidth: { xs: 44, sm: 'auto' },
+                '& .MuiButton-startIcon': {
+                  mr: { xs: 0, sm: 1 },
+                },
+              }}
+            >
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                {t("backtest.management.optimize.button")}
+              </Box>
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => handleOpenDialog("create")}
+              aria-label={t("backtest.management.create.ariaLabel")}
+              sx={{
+                px: { xs: 1.25, sm: 2 },
+                minHeight: 40,
+                minWidth: { xs: 44, sm: 'auto' },
+                '& .MuiButton-startIcon': {
+                  mr: { xs: 0, sm: 1 },
+                },
+              }}
+            >
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                {t("backtest.management.create.button")}
+              </Box>
+            </Button>
             </Box>
           </Grid>
         </Grid>
@@ -534,23 +543,16 @@ const Backtest = () => {
         <Divider sx={{ my: 2 }} />
 
         <FilterTabs
-          ariaLabel="backtest tabs"
+          ariaLabel={t("backtest.management.tabs.ariaLabel")}
           value={currentTab}
           onChange={(v) => handleTabChange({} as any, v)}
-          items={[
-            { label: 'Tất cả', value: 'all' },
-            { label: 'Đang chờ', value: 'created' },
-            { label: 'Đang chạy', value: 'running' },
-            { label: 'Hoàn thành', value: 'completed' },
-            { label: 'Thất bại', value: 'failed' },
-            { label: 'Đã dừng', value: 'stopped' },
-          ]}
+          items={tabItems}
         />
 
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Tìm kiếm backtest..."
+          placeholder={t("backtest.management.searchPlaceholder")}
           value={searchTerm}
           onChange={handleSearch}
           sx={{ mb: 3 }}
@@ -562,7 +564,7 @@ const Backtest = () => {
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <Tooltip title="Làm mới danh sách">
+                <Tooltip title={t("backtest.management.refreshTooltip")}>
                   <IconButton 
                     onClick={handleRefreshBacktests}
                     disabled={isLoading}
@@ -597,7 +599,7 @@ const Backtest = () => {
       <Modal
         open={openDialog}
         onClose={handleCloseDialog}
-        title={dialogTitle}
+        title={t(dialogTitleKey)}
         maxWidth="sm"
         footer={getModalFooter()}
       >
@@ -619,9 +621,9 @@ const Backtest = () => {
       {/* Confirm Delete Dialog */}
       <ConfirmDialog
         open={confirmDelete.open}
-        title="Xác nhận xóa"
-        message={`Bạn có chắc chắn muốn xóa backtest "${confirmDelete.name}"? Hành động này không thể hoàn tác.`}
-        confirmLabel="Xóa"
+        title={t("backtest.management.confirmDelete.title")}
+        message={t("backtest.management.confirmDelete.message", { name: confirmDelete.name })}
+        confirmLabel={t("common.delete")}
         confirmColor="error"
         onConfirm={handleDeleteBacktest}
         onCancel={handleCloseDeleteConfirm}

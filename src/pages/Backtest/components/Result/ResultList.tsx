@@ -25,6 +25,7 @@ import {
 } from "@/utils/common";
 import { useBacktestResult } from "@/hooks/useBacktestResult";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { useTranslation } from "react-i18next";
 
 interface ResultListProps {
   processId?: string;
@@ -39,6 +40,7 @@ const ResultList: React.FC<ResultListProps> = ({
   onViewResult,
   symbol,
 }) => {
+  const { t } = useTranslation();
   const {
     resultsByProcess,
     getBacktestResultsByProcessId,
@@ -138,7 +140,7 @@ const ResultList: React.FC<ResultListProps> = ({
             alignItems="center"
             mb={2}
           >
-            <Typography variant="h6">Danh sách kết quả backtest</Typography>
+            <Typography variant="h6">{t("backtest.results.list.title")}</Typography>
           </Box>
 
           {loading ? (
@@ -164,9 +166,9 @@ const ResultList: React.FC<ResultListProps> = ({
                       <Box mt={1}>
                         <Chip
                           size="small"
-                          label={`ROI: ${resultItem.metrics.total_roi.toFixed(
-                            2
-                          )}%`}
+                          label={t("backtest.results.list.roi", {
+                            value: resultItem.metrics.total_roi.toFixed(2),
+                          })}
                           color={
                             resultItem.metrics.total_roi > 10
                               ? "success"
@@ -176,9 +178,9 @@ const ResultList: React.FC<ResultListProps> = ({
                         />
                         <Chip
                           size="small"
-                          label={`PnL: ${formatNumber(
-                            resultItem.metrics.total_pnl
-                          )}`}
+                          label={t("backtest.results.list.pnl", {
+                            value: formatNumber(resultItem.metrics.total_pnl),
+                          })}
                           color={
                             resultItem.metrics.total_pnl > 0
                               ? "success"
@@ -187,16 +189,20 @@ const ResultList: React.FC<ResultListProps> = ({
                         />
                         <Chip
                           size="small"
-                          label={`MDD: ${resultItem.metrics.mdd}`}
+                          label={t("backtest.results.list.mdd", {
+                            value: resultItem.metrics.mdd,
+                          })}
                           color="info"
                           sx={{ ml: 1 }}
                         />
                         {typeof resultItem.combine_balance === "boolean" && (
                           <Chip
                             size="small"
-                            label={`Combine balance: ${
-                              resultItem.combine_balance ? "Bật" : "Tắt"
-                            }`}
+                            label={t("backtest.results.list.combineBalance", {
+                              status: resultItem.combine_balance
+                                ? t("common.on")
+                                : t("common.off"),
+                            })}
                             color={
                               resultItem.combine_balance ? "primary" : "default"
                             }
@@ -207,7 +213,7 @@ const ResultList: React.FC<ResultListProps> = ({
                     }
                   />
                   <ListItemSecondaryAction>
-                    <Tooltip title="Tải về">
+                    <Tooltip title={t("backtest.results.list.downloadTooltip")}>
                       <IconButton
                         edge="end"
                         onClick={() => handleDownloadResult(resultItem._id)}
@@ -216,7 +222,7 @@ const ResultList: React.FC<ResultListProps> = ({
                         <DownloadIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Xem chi tiết">
+                    <Tooltip title={t("backtest.results.list.viewTooltip")}>
                       <IconButton
                         edge="end"
                         onClick={() => handleViewResult(resultItem._id)}
@@ -231,7 +237,7 @@ const ResultList: React.FC<ResultListProps> = ({
                         <VisibilityIcon />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Xóa kết quả">
+                    <Tooltip title={t("backtest.results.list.deleteTooltip")}>
                       <IconButton
                         edge="end"
                         onClick={() => handleOpenDeleteConfirm(resultItem._id)}
@@ -247,7 +253,7 @@ const ResultList: React.FC<ResultListProps> = ({
             </List>
           ) : (
             <Alert severity="info">
-              Không có kết quả backtest nào cho quá trình này
+              {t("backtest.results.list.empty")}
             </Alert>
           )}
         </CardContent>
@@ -256,10 +262,10 @@ const ResultList: React.FC<ResultListProps> = ({
       {/* Delete confirmation dialog */}
       <ConfirmDialog
         open={deleteConfirmOpen}
-        title="Xóa kết quả backtest"
-        message="Bạn có chắc chắn muốn xóa kết quả backtest này? Hành động này không thể hoàn tác."
-        confirmLabel="Xóa"
-        cancelLabel="Hủy"
+        title={t("backtest.results.list.confirmDeleteTitle")}
+        message={t("backtest.results.list.confirmDeleteMessage")}
+        confirmLabel={t("common.delete")}
+        cancelLabel={t("common.cancel")}
         confirmColor="error"
         onConfirm={handleConfirmDelete}
         onCancel={handleCloseDeleteConfirm}

@@ -27,6 +27,7 @@ import type {
   BacktestProcessUpdate,
 } from "@/types/backtest.type";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 interface BacktestFormProps {
   initialData?: BacktestProcessUpdate & {
@@ -79,9 +80,9 @@ const defaultBotParams: Partial<BacktestParameter> = {
 
 // Trade mode options
 const tradeModeOptions = [
-  { value: -1, label: "SHORT ONLY" },
-  { value: 0, label: "BOTH" },
-  { value: 1, label: "LONG ONLY" },
+  { value: -1, labelKey: "backtest.form.tradeModes.shortOnly" },
+  { value: 0, labelKey: "backtest.form.tradeModes.both" },
+  { value: 1, labelKey: "backtest.form.tradeModes.longOnly" },
 ];
 
 // Time interval options
@@ -105,13 +106,13 @@ const timeIntervalOptions = [
 
 // Pause day options
 const pauseDayOptions = [
-  { value: "0", label: "Monday" },
-  { value: "1", label: "Tuesday" },
-  { value: "2", label: "Wednesday" },
-  { value: "3", label: "Thursday" },
-  { value: "4", label: "Friday" },
-  { value: "5", label: "Saturday" },
-  { value: "6", label: "Sunday" },
+  { value: "0", labelKey: "common.weekdays.monday" },
+  { value: "1", labelKey: "common.weekdays.tuesday" },
+  { value: "2", labelKey: "common.weekdays.wednesday" },
+  { value: "3", labelKey: "common.weekdays.thursday" },
+  { value: "4", labelKey: "common.weekdays.friday" },
+  { value: "5", labelKey: "common.weekdays.saturday" },
+  { value: "6", labelKey: "common.weekdays.sunday" },
 ];
 
 const ITEM_HEIGHT = 48;
@@ -131,6 +132,7 @@ const BacktestForm = ({
   isSubmitting,
   formId = "backtest-form",
 }: BacktestFormProps) => {
+  const { t } = useTranslation();
   // Get bot templates from the store
   const {
     templates,
@@ -254,13 +256,17 @@ const BacktestForm = ({
 
   // Render pause day display labels
   const pauseDayLabels = useMemo(() => {
+    if (selectedPauseDays.length === 0) {
+      return "";
+    }
+
     return selectedPauseDays
       .map((dayValue) => {
         const day = pauseDayOptions.find((opt) => opt.value === dayValue);
-        return day ? day.label : dayValue;
+        return day ? t(day.labelKey) : dayValue;
       })
       .join(", ");
-  }, [selectedPauseDays]);
+  }, [selectedPauseDays, t]);
 
   return (
     <Box
@@ -275,11 +281,11 @@ const BacktestForm = ({
             <Controller
               name="name"
               control={control}
-              rules={{ required: "Tên backtest là bắt buộc" }}
+              rules={{ required: t("backtest.form.validation.nameRequired") }}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Tên Backtest"
+                  label={t("backtest.form.fields.name")}
                   fullWidth
                   error={!!errors.name}
                   helperText={errors.name?.message as string}
@@ -292,16 +298,19 @@ const BacktestForm = ({
             <Controller
               name="description"
               control={control}
-              rules={{ required: "Mô tả là bắt buộc" }}
+              rules={{ required: t("backtest.form.validation.descriptionRequired") }}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Mô tả"
+                  label={t("backtest.form.fields.description")}
                   fullWidth
                   multiline
                   rows={3}
                   error={!!errors.description}
-                  helperText={errors.description?.message as string}
+                  helperText={
+                    errors.description?.message as string ||
+                    t("backtest.form.helper.description")
+                  }
                 />
               )}
             />
@@ -309,7 +318,7 @@ const BacktestForm = ({
 
           <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle1" gutterBottom>
-              Cấu hình Backtest
+              {t("backtest.form.sections.configuration")}
             </Typography>
 
             <FormControl
@@ -318,17 +327,17 @@ const BacktestForm = ({
               error={!!errors.bot_template_id}
             >
               <InputLabel id="bot-template-select-label">
-                Bot Template
+                {t("backtest.form.fields.botTemplate")}
               </InputLabel>
               <Controller
                 name="bot_template_id"
                 control={control}
-                rules={{ required: "Bot Template là bắt buộc" }}
+                rules={{ required: t("backtest.form.validation.botTemplateRequired") }}
                 render={({ field }) => (
                   <Select
                     {...field}
                     labelId="bot-template-select-label"
-                    label="Bot Template"
+                    label={t("backtest.form.fields.botTemplate")}
                     onChange={(e) => {
                       field.onChange(e);
                     }}
@@ -358,16 +367,16 @@ const BacktestForm = ({
             {/* Basic configuration */}
             <Accordion defaultExpanded>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Cấu hình cơ bản</Typography>
+                <Typography>{t("backtest.form.sections.basic")}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="SYMBOL"
-                      label="Cặp giao dịch"
-                      fullWidth
-                    />
+                  <ParameterTextField
+                    paramName="SYMBOL"
+                    label={t("backtest.form.fields.symbol")}
+                    fullWidth
+                  />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Controller
@@ -375,10 +384,10 @@ const BacktestForm = ({
                       name="parameters.INTERVAL_1"
                       render={({ field }) => (
                         <FormControl fullWidth>
-                          <InputLabel>Interval 1</InputLabel>
+                          <InputLabel>{t("backtest.form.fields.interval1")}</InputLabel>
                           <Select
                             {...field}
-                            label="Interval 1"
+                            label={t("backtest.form.fields.interval1")}
                             value={
                               field.value ?? defaultBotParams.INTERVAL_1
                             }
@@ -402,10 +411,10 @@ const BacktestForm = ({
                       name="parameters.INTERVAL_2"
                       render={({ field }) => (
                         <FormControl fullWidth>
-                          <InputLabel>Interval 2</InputLabel>
+                          <InputLabel>{t("backtest.form.fields.interval2")}</InputLabel>
                           <Select
                             {...field}
-                            label="Interval 2"
+                            label={t("backtest.form.fields.interval2")}
                             value={
                               field.value ?? defaultBotParams.INTERVAL_2
                             }
@@ -429,10 +438,10 @@ const BacktestForm = ({
                       name="parameters.TRADE_MODE"
                       render={({ field }) => (
                         <FormControl fullWidth>
-                          <InputLabel>Trade Mode</InputLabel>
+                          <InputLabel>{t("backtest.form.fields.tradeMode")}</InputLabel>
                           <Select
                             {...field}
-                            label="Trade Mode"
+                            label={t("backtest.form.fields.tradeMode")}
                             value={
                               field.value ?? defaultBotParams.TRADE_MODE
                             }
@@ -442,7 +451,7 @@ const BacktestForm = ({
                           >
                             {tradeModeOptions.map((option) => (
                               <MenuItem key={option.value} value={option.value}>
-                                {option.label}
+                                {t(option.labelKey)}
                               </MenuItem>
                             ))}
                           </Select>
@@ -458,19 +467,19 @@ const BacktestForm = ({
             {/* Trading parameters */}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Tham số giao dịch</Typography>
+                <Typography>{t("backtest.form.sections.trading")}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="ENTRY_PERCENTAGE"
-                      label="Tỷ lệ vào lệnh (ENTRY_PERCENTAGE)"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                      inputProps={{ step: "0.001" }}
-                      slotProps={{
+                  <ParameterTextField
+                    paramName="ENTRY_PERCENTAGE"
+                    label={t("backtest.form.fields.entryPercentage")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                    inputProps={{ step: "0.001" }}
+                    slotProps={{
                         input: {
                           endAdornment: (
                             <InputAdornment position="end">%</InputAdornment>
@@ -480,22 +489,22 @@ const BacktestForm = ({
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="LEVERAGE"
-                      label="Đòn bẩy (LEVERAGE)"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                    />
+                  <ParameterTextField
+                    paramName="LEVERAGE"
+                    label={t("backtest.form.fields.leverage")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                  />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="FUNDS"
-                      label="Vốn ban đầu (FUNDS)"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                      slotProps={{
+                  <ParameterTextField
+                    paramName="FUNDS"
+                    label={t("backtest.form.fields.funds")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                    slotProps={{
                         input: {
                           endAdornment: (
                             <InputAdornment position="end">USDT</InputAdornment>
@@ -505,29 +514,31 @@ const BacktestForm = ({
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="TIME_BETWEEN_ORDERS"
-                      label="Thời gian nghỉ giữa các lệnh (giây)"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                      inputProps={{ step: "1" }}
-                      slotProps={{
+                  <ParameterTextField
+                    paramName="TIME_BETWEEN_ORDERS"
+                    label={t("backtest.form.fields.timeBetweenOrders")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                    inputProps={{ step: "1" }}
+                    slotProps={{
                         input: {
                           endAdornment: (
-                            <InputAdornment position="end">giây</InputAdornment>
+                            <InputAdornment position="end">
+                              {t("backtest.form.units.seconds")}
+                            </InputAdornment>
                           ),
                         },
                       }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="PAUSE_TIME"
-                      label="Thời gian tạm dừng (PAUSE_TIME)"
-                      fullWidth
-                      placeholder="HH:MM-HH:MM"
-                    />
+                  <ParameterTextField
+                    paramName="PAUSE_TIME"
+                    label={t("backtest.form.fields.pauseTime")}
+                    fullWidth
+                    placeholder={t("backtest.form.placeholders.pauseTime")}
+                  />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Controller
@@ -536,7 +547,7 @@ const BacktestForm = ({
                       render={({ field }) => (
                         <FormControl fullWidth>
                           <InputLabel id="pause-day-select-label">
-                            Tạm dừng theo ngày
+                            {t("backtest.form.fields.pauseDay")}
                           </InputLabel>
                           <Select
                             labelId="pause-day-select-label"
@@ -561,7 +572,11 @@ const BacktestForm = ({
                             inputRef={field.ref}
                             onBlur={field.onBlur}
                             name={field.name}
-                            input={<OutlinedInput label="Tạm dừng theo ngày" />}
+                            input={
+                              <OutlinedInput
+                                label={t("backtest.form.fields.pauseDay")}
+                              />
+                            }
                             renderValue={() => pauseDayLabels}
                             MenuProps={MenuProps}
                           >
@@ -572,7 +587,7 @@ const BacktestForm = ({
                                     selectedPauseDays.indexOf(day.value) > -1
                                   }
                                 />
-                                <ListItemText primary={day.label} />
+                                <ListItemText primary={t(day.labelKey)} />
                               </MenuItem>
                             ))}
                           </Select>
@@ -587,16 +602,16 @@ const BacktestForm = ({
             {/* Profit and Margin Settings */}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Cài đặt lợi nhuận và biên độ</Typography>
+                <Typography>{t("backtest.form.sections.profitMargin")}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="MIN_ROI"
-                      label="Lợi nhuận tối thiểu (MIN_ROI)"
-                      type="number"
-                      fullWidth
+                  <ParameterTextField
+                    paramName="MIN_ROI"
+                    label={t("backtest.form.fields.minRoi")}
+                    type="number"
+                    fullWidth
                       parseValue={toNumber}
                       inputProps={{ step: "0.1" }}
                       slotProps={{
@@ -609,19 +624,19 @@ const BacktestForm = ({
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="R2R"
-                      label="Risk to Reward Ratio (R2R)"
-                      fullWidth
+                  <ParameterTextField
+                    paramName="R2R"
+                    label={t("backtest.form.fields.riskToReward")}
+                    fullWidth
                       placeholder="1:2"
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="MIN_MARGIN"
-                      label="Biên độ tối thiểu (MIN_MARGIN)"
-                      type="number"
-                      fullWidth
+                  <ParameterTextField
+                    paramName="MIN_MARGIN"
+                    label={t("backtest.form.fields.minMargin")}
+                    type="number"
+                    fullWidth
                       parseValue={toNumber}
                       inputProps={{ step: "0.1" }}
                       slotProps={{
@@ -634,11 +649,11 @@ const BacktestForm = ({
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="MAX_MARGIN_PERCENTAGE"
-                      label="Biên độ tối đa (MAX_MARGIN_PERCENTAGE)"
-                      type="number"
-                      fullWidth
+                  <ParameterTextField
+                    paramName="MAX_MARGIN_PERCENTAGE"
+                    label={t("backtest.form.fields.maxMarginPercentage")}
+                    type="number"
+                    fullWidth
                       parseValue={toNumber}
                       inputProps={{ step: "0.1" }}
                       slotProps={{
@@ -651,11 +666,11 @@ const BacktestForm = ({
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="MAX_LOSS"
-                      label="Lỗ tối đa (MAX_LOSS)"
-                      type="number"
-                      fullWidth
+                  <ParameterTextField
+                    paramName="MAX_LOSS"
+                    label={t("backtest.form.fields.maxLoss")}
+                    type="number"
+                    fullWidth
                       parseValue={toNumber}
                       inputProps={{ step: "0.1" }}
                       slotProps={{
@@ -674,99 +689,99 @@ const BacktestForm = ({
             {/* Technical indicators */}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Chỉ báo kỹ thuật</Typography>
+                <Typography>{t("backtest.form.sections.indicators")}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="MA_PERIOD"
-                      label="Chu kỳ MA (MA_PERIOD)"
-                      fullWidth
-                      placeholder="8:20"
-                      helperText="Định dạng: 'chu kỳ ngắn:chu kỳ dài' (vd: 8:20)"
-                    />
+                  <ParameterTextField
+                    paramName="MA_PERIOD"
+                    label={t("backtest.form.fields.maPeriod")}
+                    fullWidth
+                    placeholder={t("backtest.form.placeholders.maPeriod")}
+                    helperText={t("backtest.form.helper.maPeriod")}
+                  />
                   </Grid>
 
                   {/* RSI Settings */}
                   <Grid size={{ xs: 12 }}>
                     <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
-                      Cài đặt RSI
+                      {t("backtest.form.sections.rsi")}
                     </Typography>
                   </Grid>
 
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="RSI_ENTRY_LONG"
-                      label="RSI Long Entry"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                    />
+                  <ParameterTextField
+                    paramName="RSI_ENTRY_LONG"
+                    label={t("backtest.form.fields.rsiEntryLong")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                  />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="RSI_ENTRY_LONG_CANDLE"
-                      label="RSI Long Entry Candle"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                    />
+                  <ParameterTextField
+                    paramName="RSI_ENTRY_LONG_CANDLE"
+                    label={t("backtest.form.fields.rsiEntryLongCandle")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                  />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="RSI_EXIT_LONG"
-                      label="RSI Long Exit"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                    />
+                  <ParameterTextField
+                    paramName="RSI_EXIT_LONG"
+                    label={t("backtest.form.fields.rsiExitLong")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                  />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="RSI_EXIT_LONG_CANDLE"
-                      label="RSI Long Exit Candle"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                    />
+                  <ParameterTextField
+                    paramName="RSI_EXIT_LONG_CANDLE"
+                    label={t("backtest.form.fields.rsiExitLongCandle")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                  />
                   </Grid>
 
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="RSI_ENTRY_SHORT"
-                      label="RSI Short Entry"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                    />
+                  <ParameterTextField
+                    paramName="RSI_ENTRY_SHORT"
+                    label={t("backtest.form.fields.rsiEntryShort")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                  />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="RSI_ENTRY_SHORT_CANDLE"
-                      label="RSI Short Entry Candle"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                    />
+                  <ParameterTextField
+                    paramName="RSI_ENTRY_SHORT_CANDLE"
+                    label={t("backtest.form.fields.rsiEntryShortCandle")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                  />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="RSI_EXIT_SHORT"
-                      label="RSI Short Exit"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                    />
+                  <ParameterTextField
+                    paramName="RSI_EXIT_SHORT"
+                    label={t("backtest.form.fields.rsiExitShort")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                  />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="RSI_EXIT_SHORT_CANDLE"
-                      label="RSI Short Exit Candle"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                    />
+                  <ParameterTextField
+                    paramName="RSI_EXIT_SHORT_CANDLE"
+                    label={t("backtest.form.fields.rsiExitShortCandle")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                  />
                   </Grid>
                 </Grid>
               </AccordionDetails>
@@ -775,40 +790,40 @@ const BacktestForm = ({
             {/* DCA Settings */}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Cài đặt DCA (Dollar-Cost Averaging)</Typography>
+                <Typography>{t("backtest.form.sections.dca")}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="DCA_GRID"
-                      label="Lưới DCA (DCA_GRID)"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                      inputProps={{ step: "0.001" }}
-                      helperText="Ví dụ: 0.008 là 0.8%"
-                    />
+                  <ParameterTextField
+                    paramName="DCA_GRID"
+                    label={t("backtest.form.fields.dcaGrid")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                    inputProps={{ step: "0.001" }}
+                    helperText={t("backtest.form.helper.dcaGrid")}
+                  />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="GRID_MULTIPLIER"
-                      label="Hệ số lưới (GRID_MULTIPLIER)"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                      inputProps={{ step: "0.01" }}
-                    />
+                  <ParameterTextField
+                    paramName="GRID_MULTIPLIER"
+                    label={t("backtest.form.fields.gridMultiplier")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                    inputProps={{ step: "0.01" }}
+                  />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                    <ParameterTextField
-                      paramName="DCA_MULTIPLIER"
-                      label="Hệ số DCA (DCA_MULTIPLIER)"
-                      type="number"
-                      fullWidth
-                      parseValue={toNumber}
-                      inputProps={{ step: "0.01" }}
-                    />
+                  <ParameterTextField
+                    paramName="DCA_MULTIPLIER"
+                    label={t("backtest.form.fields.dcaMultiplier")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                    inputProps={{ step: "0.01" }}
+                  />
                   </Grid>
                 </Grid>
               </AccordionDetails>

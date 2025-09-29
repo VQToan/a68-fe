@@ -12,6 +12,7 @@ import { areEqual } from "@/utils/common";
 import ResultList from "./ResultList";
 import ResultView from "./ResultView";
 import Summary from "./Summary";
+import { useTranslation } from "react-i18next";
 
 interface BacktestResultProps {
   id?: string;
@@ -29,6 +30,7 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
   const [selectedResultId, setSelectedResultId] = useState<
     string | undefined
   >();
+  const { t } = useTranslation();
 
   const handleBackToList = useCallback(() => {
     if (onBack) {
@@ -45,7 +47,7 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h4" component="h1">
-          Kết quả Backtest
+          {t("backtest.results.title")}
         </Typography>
       </Box>
 

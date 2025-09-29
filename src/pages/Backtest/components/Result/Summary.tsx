@@ -21,6 +21,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import CloseIcon from "@mui/icons-material/Close";
 import { useBacktest } from "@/hooks/useBacktest";
 import { areEqual, formatDate } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 interface SummaryProps {
   id?: string;
@@ -30,6 +31,7 @@ interface SummaryProps {
 const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
   const { isLoading, error, currentProcess, getProcessById } = useBacktest();
   const [parametersOpen, setParametersOpen] = useState<boolean>(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (id) {
@@ -70,6 +72,11 @@ const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
       }));
   }, [currentProcess]);
 
+  const statusLabel = useMemo(
+    () => t(`backtest.list.status.${currentProcess?.status ?? "created"}`),
+    [currentProcess?.status, t]
+  );
+
   if (isLoading) {
     return (
       <Paper
@@ -108,7 +115,7 @@ const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
         }}
       >
         <Typography color="error" variant="body1">
-          Lỗi khi tải dữ liệu: {error}
+          {t("backtest.summary.error", { message: error })}
         </Typography>
       </Paper>
     );
@@ -125,7 +132,9 @@ const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
           justifyItems: "start",
         }}
       >
-        <Typography variant="body1">Không tìm thấy dữ liệu backtest</Typography>
+        <Typography variant="body1">
+          {t("backtest.summary.noData")}
+        </Typography>
       </Paper>
     );
   }
@@ -147,19 +156,22 @@ const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
 
       <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
         <Chip
-          label={`Symbol: ${
-            currentProcess.parameters?.SYMBOL?.toUpperCase() || "N/A"
-          }`}
+          label={t("backtest.summary.symbolChip", {
+            symbol: currentProcess.parameters?.SYMBOL?.toUpperCase() ||
+              t("common.notAvailable"),
+          })}
           color="primary"
           variant="outlined"
         />
         <Chip
-          label={`Tạo lúc: ${formatDate(currentProcess.created_at)}`}
+          label={t("backtest.summary.createdAtChip", {
+            value: formatDate(currentProcess.created_at),
+          })}
           color="info"
           variant="outlined"
         />
         <Chip
-          label={`Trạng thái: ${currentProcess.status}`}
+          label={t("backtest.summary.statusChip", { status: statusLabel })}
           color={
             currentProcess.status === "completed"
               ? "success"
@@ -178,25 +190,29 @@ const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
         onClick={handleOpenParameters}
         sx={{ alignSelf: "flex-start", mt: 1 }}
       >
-        Xem thông số backtest
+        {t("backtest.summary.viewParameters")}
       </Button>
       <Chip
-        label={`Khung Trade: ${currentProcess.parameters?.INTERVAL_1 || "N/A"}`}
+        label={t("backtest.summary.tradeInterval", {
+          value: currentProcess.parameters?.INTERVAL_1 || t("common.notAvailable"),
+        })}
         color="secondary"
         variant="outlined"
         sx={{ mt: 1 }}
       />
       <Chip
-        label={`Khung Trend: ${currentProcess.parameters?.INTERVAL_2 || "N/A"}`}
+        label={t("backtest.summary.trendInterval", {
+          value: currentProcess.parameters?.INTERVAL_2 || t("common.notAvailable"),
+        })}
         color="secondary"
         variant="outlined"
         sx={{ mt: 1 }}
       />
       {/* quantity */}
       <Chip
-        label={`Số lượng: ${
-          currentProcess.parameters?.ENTRY_PERCENTAGE || "N/A"
-        }`}
+        label={t("backtest.summary.quantity", {
+          value: currentProcess.parameters?.ENTRY_PERCENTAGE || t("common.notAvailable"),
+        })}
         color="secondary"
         variant="outlined"
         sx={{ mt: 1 }}
@@ -216,11 +232,14 @@ const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
             alignItems: "center",
           }}
         >
-          <Typography variant="h6">Thông số Backtest</Typography>
+          <Typography variant="h6">
+            {t("backtest.summary.parametersTitle")}
+          </Typography>
           <Button
             onClick={handleCloseParameters}
             color="inherit"
             sx={{ minWidth: "auto", p: 0.5 }}
+            aria-label={t("common.close")}
           >
             <CloseIcon />
           </Button>
@@ -231,10 +250,10 @@ const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: "bold", width: "40%" }}>
-                    Tham số
+                    {t("backtest.summary.parameterColumn")}
                   </TableCell>
                   <TableCell sx={{ fontWeight: "bold", width: "60%" }}>
-                    Giá trị
+                    {t("backtest.summary.valueColumn")}
                   </TableCell>
                 </TableRow>
               </TableHead>

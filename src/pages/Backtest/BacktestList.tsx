@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo } from "react";
+import React, { useState, useCallback, memo, useMemo } from "react";
 import {
   Box,
   TableBody,
@@ -27,6 +27,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { areEqual, formatDate } from "@utils/common";
 import type { BacktestProcess, BacktestStatus } from "@/types/backtest.type";
+import { useTranslation } from "react-i18next";
 
 // Pagination metadata interface
 interface PaginationMetadata {
@@ -77,16 +78,6 @@ const statusColors: Record<BacktestStatus, string> = {
   stopped: "warning",
 };
 
-// Status labels in Vietnamese
-const statusLabels: Record<BacktestStatus, string> = {
-  created: "Đã tạo",
-  queued: "Đang chờ",
-  running: "Đang chạy",
-  completed: "Hoàn thành",
-  failed: "Lỗi",
-  stopped: "Đã dừng",
-};
-
 const BacktestList = ({
   processes,
   isLoading,
@@ -99,10 +90,23 @@ const BacktestList = ({
   onPageChange,
   onRowsPerPageChange,
 }: BacktestListProps) => {
+  const { t } = useTranslation();
   // Menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const open = Boolean(anchorEl);
+
+  const statusLabels = useMemo(
+    () => ({
+      created: t("backtest.list.status.created"),
+      queued: t("backtest.list.status.queued"),
+      running: t("backtest.list.status.running"),
+      completed: t("backtest.list.status.completed"),
+      failed: t("backtest.list.status.failed"),
+      stopped: t("backtest.list.status.stopped"),
+    }),
+    [t]
+  ) as Record<BacktestStatus, string>;
 
   // Handle opening the menu
   const handleMenuClick = useCallback(
@@ -209,7 +213,7 @@ const BacktestList = ({
         }}
       >
         <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-          Không có backtest nào được tìm thấy
+          {t("backtest.list.empty")}
         </Typography>
       </Box>
     );
@@ -226,12 +230,12 @@ const BacktestList = ({
         head={
           <TableHead>
             <TableRow>
-              <TableCell>Tên</TableCell>
-              <TableCell>Mô tả</TableCell>
-              <TableCell>Trạng thái</TableCell>
-              <TableCell>Kết quả</TableCell>
-              <TableCell>Ngày tạo</TableCell>
-              <TableCell>Thao tác</TableCell>
+              <TableCell>{t("backtest.list.headers.name")}</TableCell>
+              <TableCell>{t("backtest.list.headers.description")}</TableCell>
+              <TableCell>{t("backtest.list.headers.status")}</TableCell>
+              <TableCell>{t("backtest.list.headers.result")}</TableCell>
+              <TableCell>{t("backtest.list.headers.createdAt")}</TableCell>
+              <TableCell>{t("backtest.list.headers.actions")}</TableCell>
             </TableRow>
           </TableHead>
         }
@@ -271,7 +275,7 @@ const BacktestList = ({
                 >
                   {process.status === "completed" ? (
                     <Tooltip
-                      title={process.summary || "Không có thông tin"}
+                      title={process.summary || t("backtest.list.noSummary")}
                       arrow
                     >
                       <Typography
@@ -283,7 +287,7 @@ const BacktestList = ({
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {process.summary || "Không có thông tin"}
+                        {process.summary || t("backtest.list.noSummary")}
                       </Typography>
                     </Tooltip>
                   ) : (
@@ -314,9 +318,9 @@ const BacktestList = ({
         page={pagination.page - 1} // Convert from 1-based to 0-based for Material-UI
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        labelRowsPerPage="Số dòng:"
+        labelRowsPerPage={t("backtest.list.pagination.rowsPerPage")}
         labelDisplayedRows={({ from, to, count }) =>
-          `${from}-${to}/ ${count}`
+          t("backtest.list.pagination.displayedRows", { from, to, count })
         }
       />
 
@@ -350,14 +354,14 @@ const BacktestList = ({
               <ListItemIcon>
                 <VisibilityIcon fontSize="small" />
               </ListItemIcon>
-              <ListItemText primary="Xem chi tiết" />
+              <ListItemText primary={t("backtest.list.menu.view")} />
             </MenuItem>
           )}
         <MenuItem onClick={handleEdit}>
           <ListItemIcon>
             <EditIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="Chỉnh sửa" />
+          <ListItemText primary={t("common.edit")} />
         </MenuItem>
         {selectedId && (
           <>
@@ -368,14 +372,14 @@ const BacktestList = ({
                 <ListItemIcon>
                   <PlayArrowIcon fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="Chạy backtest" />
+                <ListItemText primary={t("backtest.list.menu.run")} />
               </MenuItem>
             ) : (
               <MenuItem onClick={handleStop}>
                 <ListItemIcon>
                   <StopIcon fontSize="small" />
                 </ListItemIcon>
-                <ListItemText primary="Dừng backtest" />
+                <ListItemText primary={t("backtest.list.menu.stop")} />
               </MenuItem>
             )}
           </>
@@ -385,7 +389,7 @@ const BacktestList = ({
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>
           <ListItemText
-            primary="Xóa"
+            primary={t("common.delete")}
             primaryTypographyProps={{ color: "error" }}
           />
         </MenuItem>

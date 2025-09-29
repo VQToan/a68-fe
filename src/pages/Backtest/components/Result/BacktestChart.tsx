@@ -25,6 +25,7 @@ import type { BacktestTrade } from "@/services/backtest.service";
 import { getFormattedSymbol, getIntervalInMs } from "@/utils/chartUtils";
 import moment from "moment";
 import { useDebounce } from "@/utils/debounceUtils";
+import { useTranslation } from "react-i18next";
 
 interface BacktestChartProps {
   trades: BacktestTrade[];
@@ -37,6 +38,7 @@ const BacktestChart: React.FC<BacktestChartProps> = ({
   symbol,
   interval,
 }) => {
+  const { t } = useTranslation();
   const { fetchCandles, error: apiError } = useChart();
   const [chartData, setChartData] = useState<any[]>([]);
   const [visibleBars, setVisibleBars] = useState<number>(100);
@@ -452,7 +454,7 @@ Quantity: ${info.quantity.toFixed(3)}${info.pnl ? `\nPnL: ${info.pnl.toFixed(3)}
         setLoading(false);
       } catch (err: any) {
         console.error("Error loading chart data:", err);
-        setError(err.message || "Không thể tải dữ liệu biểu đồ");
+        setError(err.message || t("backtest.results.chart.loadError"));
         setLoading(false);
       }
     };
@@ -493,7 +495,7 @@ Quantity: ${info.quantity.toFixed(3)}${info.pnl ? `\nPnL: ${info.pnl.toFixed(3)}
         }}
       >
         <Typography variant="body1" color="text.secondary">
-          Không có dữ liệu biểu đồ
+          {t("backtest.results.chart.empty")}
         </Typography>
       </Box>
     );
@@ -517,20 +519,20 @@ Quantity: ${info.quantity.toFixed(3)}${info.pnl ? `\nPnL: ${info.pnl.toFixed(3)}
         }}
       >
         <Typography variant="caption" sx={{ fontWeight: "bold", display: "block" }}>
-          Trade Markers:
+          {t("backtest.results.chart.legend.title")}
         </Typography>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
           <Typography variant="caption" sx={{ color: "#9c27b0" }}>
-            B Long Open (Purple)
+            {t("backtest.results.chart.legend.longOpen")}
           </Typography>
           <Typography variant="caption" sx={{ color: "#9c27b0" }}>
-            S Long Close (Purple)
+            {t("backtest.results.chart.legend.longClose")}
           </Typography>
           <Typography variant="caption" sx={{ color: "#f57f17" }}>
-            S Short Open (Dark Yellow)
+            {t("backtest.results.chart.legend.shortOpen")}
           </Typography>
           <Typography variant="caption" sx={{ color: "#f57f17" }}>
-            B Short Close (Dark Yellow)
+            {t("backtest.results.chart.legend.shortClose")}
           </Typography>
         </Box>
       </Box>

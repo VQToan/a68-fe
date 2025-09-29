@@ -32,6 +32,7 @@ import { formatDate, formatNumber, areEqual } from "@/utils/common";
 import type { BacktestTrade } from "@/services/backtest.service";
 import { useBacktestResult } from "@/hooks/useBacktestResult";
 import BacktestChart from "./BacktestChart";
+import { useTranslation } from "react-i18next";
 
 const INTERVALS = ["1m", "5m", "15m", "30m", "1h", "4h", "1d"];
 
@@ -54,6 +55,7 @@ const ResultView: React.FC<ResultViewProps> = ({
     loading: loadingDetail,
     resultDetails,
   } = useBacktestResult();
+  const { t } = useTranslation();
 
   const resultDetail = useMemo(
     () => resultDetails[selectedResultId],
@@ -125,12 +127,14 @@ const ResultView: React.FC<ResultViewProps> = ({
                 alignItems="center"
                 mb={2}
               >
-                <Typography variant="h6">Danh sách giao dịch</Typography>
+                <Typography variant="h6">
+                  {t("backtest.results.view.tradeListTitle")}
+                </Typography>
                 {loadingDetail ? (
                   <Skeleton variant="text" width={100} />
                 ) : (
                   <Typography variant="subtitle1" fontWeight="medium">
-                    Tổng số: <strong>{trades.length}</strong> giao dịch
+                    {t("backtest.results.view.tradeCount", { count: trades.length })}
                   </Typography>
                 )}
               </Box>
@@ -153,7 +157,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                           alignItems="center"
                         >
                           <Typography variant="body2" fontWeight="bold">
-                            Chi tiết giao dịch
+                            {t("backtest.results.view.tradeDetails")}
                           </Typography>
                           <Box>
                             {loadingDetail ? (
@@ -175,20 +179,20 @@ const ResultView: React.FC<ResultViewProps> = ({
                                   size="small"
                                   color="success"
                                   sx={{ mr: 1 }}
-                                  label={`LONG: ${
-                                    trades.filter((t) =>
+                                  label={t("backtest.results.view.longTrades", {
+                                    count: trades.filter((t) =>
                                       t.side.includes("LONG")
-                                    ).length
-                                  }`}
+                                    ).length,
+                                  })}
                                 />
                                 <Chip
                                   size="small"
                                   color="error"
-                                  label={`SHORT: ${
-                                    trades.filter((t) =>
+                                  label={t("backtest.results.view.shortTrades", {
+                                    count: trades.filter((t) =>
                                       t.side.includes("SHORT")
-                                    ).length
-                                  }`}
+                                    ).length,
+                                  })}
                                 />
                               </>
                             )}
@@ -197,14 +201,14 @@ const ResultView: React.FC<ResultViewProps> = ({
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Thời gian</TableCell>
-                      <TableCell>Loại</TableCell>
-                      <TableCell>Giá</TableCell>
-                      <TableCell>Số lượng</TableCell>
-                      <TableCell>Lý do</TableCell>
-                      <TableCell>Order PnL</TableCell>
-                      <TableCell>Transaction PnL</TableCell>
-                      <TableCell>Balance</TableCell>
+                      <TableCell>{t("backtest.results.view.tableHeaders.time")}</TableCell>
+                      <TableCell>{t("backtest.results.view.tableHeaders.type")}</TableCell>
+                      <TableCell>{t("backtest.results.view.tableHeaders.price")}</TableCell>
+                      <TableCell>{t("backtest.results.view.tableHeaders.quantity")}</TableCell>
+                      <TableCell>{t("backtest.results.view.tableHeaders.reason")}</TableCell>
+                      <TableCell>{t("backtest.results.view.tableHeaders.orderPnl")}</TableCell>
+                      <TableCell>{t("backtest.results.view.tableHeaders.transactionPnl")}</TableCell>
+                      <TableCell>{t("backtest.results.view.tableHeaders.balance")}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -305,7 +309,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                     ) : (
                       <TableRow>
                         <TableCell colSpan={7} align="center">
-                          Không có dữ liệu giao dịch
+                          {t("backtest.results.view.noTradeData")}
                         </TableCell>
                       </TableRow>
                     )}
@@ -326,21 +330,23 @@ const ResultView: React.FC<ResultViewProps> = ({
                 alignItems="center"
                 mb={2}
               >
-                <Typography variant="h6">Biểu đồ giao dịch</Typography>
+                <Typography variant="h6">
+                  {t("backtest.results.view.chartTitle")}
+                </Typography>
                 <FormControl
                   variant="outlined"
                   size="small"
                   sx={{ minWidth: 120 }}
                 >
                   <InputLabel id="interval-select-label">
-                    Khung thời gian
+                    {t("backtest.results.view.intervalLabel")}
                   </InputLabel>
                   <Select
                     labelId="interval-select-label"
                     id="interval-select"
                     value={selectedInterval}
                     onChange={handleIntervalChange}
-                    label="Khung thời gian"
+                    label={t("backtest.results.view.intervalLabel")}
                   >
                     {INTERVALS.map((interval) => (
                       <MenuItem key={interval} value={interval}>

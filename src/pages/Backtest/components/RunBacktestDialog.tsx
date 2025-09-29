@@ -13,6 +13,7 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 interface RunBacktestDialogProps {
   open: boolean;
@@ -33,11 +34,12 @@ const RunBacktestDialog: React.FC<RunBacktestDialogProps> = ({
   const [endDate, setEndDate] = useState<string>("");
   const [combineBalance, setCombineBalance] = useState<boolean>(false);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const handleConfirm = useCallback(() => {
     // Validate dates
     if (!startDate || !endDate) {
-      setValidationError("Vui lòng nhập đầy đủ thời gian bắt đầu và kết thúc");
+      setValidationError(t("backtest.runDialog.validation.missing"));
       return;
     }
 
@@ -45,28 +47,28 @@ const RunBacktestDialog: React.FC<RunBacktestDialogProps> = ({
     const end = new Date(endDate);
 
     if (start >= end) {
-      setValidationError("Thời gian kết thúc phải sau thời gian bắt đầu");
+      setValidationError(t("backtest.runDialog.validation.invalidRange"));
       return;
     }
 
     setValidationError(null);
     onConfirm(new Date(startDate).getTime(), new Date(endDate).getTime(), combineBalance);
-  }, [startDate, endDate, combineBalance, onConfirm]);
+  }, [combineBalance, endDate, onConfirm, startDate, t]);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Chạy Backtest</DialogTitle>
+      <DialogTitle>{t("backtest.runDialog.title")}</DialogTitle>
       <DialogContent>
         <Box sx={{ mb: 2, mt: 1 }}>
           <Typography variant="body1" gutterBottom>
-            Backtest: <strong>{backtestName}</strong>
+            {t("backtest.runDialog.backtestLabel", { name: backtestName })}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Vui lòng nhập khoảng thời gian để chạy backtest
+            {t("backtest.runDialog.description")}
           </Typography>
 
           <TextField
-            label="Thời gian bắt đầu"
+            label={t("backtest.runDialog.startDate")}
             type="datetime-local"
             fullWidth
             value={startDate}
@@ -76,7 +78,7 @@ const RunBacktestDialog: React.FC<RunBacktestDialogProps> = ({
           />
 
           <TextField
-            label="Thời gian kết thúc"
+            label={t("backtest.runDialog.endDate")}
             type="datetime-local"
             fullWidth
             value={endDate}
@@ -93,7 +95,7 @@ const RunBacktestDialog: React.FC<RunBacktestDialogProps> = ({
                   color="primary"
                 />
               }
-              label="Combine balance"
+              label={t("backtest.runDialog.combineBalance")}
             />
           </Box>
 
@@ -106,7 +108,7 @@ const RunBacktestDialog: React.FC<RunBacktestDialogProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={isLoading}>
-          Hủy
+          {t("common.cancel")}
         </Button>
         <Button
           onClick={handleConfirm}
@@ -117,10 +119,10 @@ const RunBacktestDialog: React.FC<RunBacktestDialogProps> = ({
           {isLoading ? (
             <>
               <CircularProgress size={20} sx={{ mr: 1 }} />
-              Đang chạy...
+              {t("backtest.runDialog.running")}
             </>
           ) : (
-            "Chạy Backtest"
+            t("backtest.runDialog.confirm")
           )}
         </Button>
       </DialogActions>
