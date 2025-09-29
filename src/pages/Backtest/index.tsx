@@ -374,11 +374,11 @@ const Backtest = () => {
   }, [processes, handleOpenRunBacktestDialog]);
 
   // Handle run backtest with date parameters
-  const handleRunBacktestWithDates = useCallback(async (startDate: number, endDate: number, combieBalance: boolean) => {
+  const handleRunBacktestWithDates = useCallback(async (startDate: number, endDate: number, combineBalance: boolean) => {
     if (!runBacktestDialog.id) return;
 
     try {
-      await runProcess(runBacktestDialog.id, startDate, endDate, combieBalance);
+      await runProcess(runBacktestDialog.id, startDate, endDate, combineBalance);
       showNotification("Backtest đã được bắt đầu chạy", "success");
       handleCloseRunBacktestDialog();
       // Re-fetch the list with latest data

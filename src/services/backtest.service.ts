@@ -82,7 +82,7 @@ export const runBacktestProcess = async (
   params: {
     start_date: number;
     end_date: number;
-    combie_balance: boolean;
+    combine_balance: boolean;
   }
 ): Promise<BacktestProcess> => {
   const response = await apiClient.post(`${API_BASE_PATH}/${id}/run`, params);

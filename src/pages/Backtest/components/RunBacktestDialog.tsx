@@ -17,7 +17,7 @@ import { areEqual } from "@/utils/common";
 interface RunBacktestDialogProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: (startDate: number, endDate: number, combieBalance: boolean) => void;
+  onConfirm: (startDate: number, endDate: number, combineBalance: boolean) => void;
   isLoading: boolean;
   backtestName: string;
 }
@@ -31,7 +31,7 @@ const RunBacktestDialog: React.FC<RunBacktestDialogProps> = ({
 }) => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const [combieBalance, setCombieBalance] = useState<boolean>(false);
+  const [combineBalance, setCombineBalance] = useState<boolean>(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const handleConfirm = useCallback(() => {
@@ -50,8 +50,8 @@ const RunBacktestDialog: React.FC<RunBacktestDialogProps> = ({
     }
 
     setValidationError(null);
-    onConfirm(new Date(startDate).getTime(), new Date(endDate).getTime(), combieBalance);
-  }, [startDate, endDate, combieBalance, onConfirm]);
+    onConfirm(new Date(startDate).getTime(), new Date(endDate).getTime(), combineBalance);
+  }, [startDate, endDate, combineBalance, onConfirm]);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -88,12 +88,12 @@ const RunBacktestDialog: React.FC<RunBacktestDialogProps> = ({
             <FormControlLabel
               control={
                 <Switch
-                  checked={combieBalance}
-                  onChange={(_, checked) => setCombieBalance(checked)}
+                  checked={combineBalance}
+                  onChange={(_, checked) => setCombineBalance(checked)}
                   color="primary"
                 />
               }
-              label="Combie balance"
+              label="Combine balance"
             />
           </Box>
 
