@@ -227,7 +227,7 @@ const TradingList = ({
                     )}
 
                     {/* Stop button - only show if running */}
-                    {process.status === "running" && (
+                    {process.status in ["running", "queued"] && (
                       <Tooltip title={t("trading.list.tooltips.stop")}>
                         <IconButton
                           size="small"
