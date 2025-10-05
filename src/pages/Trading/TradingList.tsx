@@ -86,7 +86,6 @@ const TradingList = ({
     }),
     [t]
   );
-
   const handlePageChange = (_event: unknown, newPage: number) => {
     onPageChange(newPage + 1); // MUI uses 0-based indexing, our API uses 1-based
   };
@@ -213,8 +212,8 @@ const TradingList = ({
                       </IconButton>
                     </Tooltip>
 
-                    {/* Start button - only show if not running */}
-                    {!(process.status in ["running", "queued"]) && (
+                    {/* Start button - only show if not running or queued */}
+                    {(process.status !== "running" && process.status !== "queued") && (
                       <Tooltip title={t("trading.list.tooltips.start")}>
                         <IconButton
                           size="small"
@@ -226,8 +225,8 @@ const TradingList = ({
                       </Tooltip>
                     )}
 
-                    {/* Stop button - only show if running */}
-                    {(process.status in ["running", "queued"]) && (
+                    {/* Stop button - only show if running or queued */}
+                    {(process.status === "running" || process.status === "queued") && (
                       <Tooltip title={t("trading.list.tooltips.stop")}>
                         <IconButton
                           size="small"
@@ -250,8 +249,8 @@ const TradingList = ({
                       </IconButton>
                     </Tooltip>
 
-                    {/* Delete button - only show if not running */}
-                    {process.status !== "running" && (
+                    {/* Delete button - only show if not running or queued */}
+                    {(process.status !== "running" && process.status !== "queued") && (
                       <Tooltip title={t("common.delete")}>
                         <IconButton
                           size="small"

@@ -171,7 +171,7 @@ const TradingProcessDetail = () => {
     if (!currentProcess) return;
 
     try {
-      if (currentProcess.status === "running") {
+      if (currentProcess.status === "running" || currentProcess.status === "queued") {
         // Ask for confirmation before stopping
         setConfirmStopOpen(true);
         return;
@@ -376,9 +376,9 @@ const TradingProcessDetail = () => {
               {/* Start/Stop Button */}
               {currentProcess && (
                 <Button
-                  variant={currentProcess.status === "running" ? "outlined" : "contained"}
-                  color={currentProcess.status === "running" ? "error" : "success"}
-                  startIcon={currentProcess.status === "running" ? <StopIcon /> : <PlayIcon />}
+                  variant={currentProcess.status === "running" || currentProcess.status === "queued" ? "outlined" : "contained"}
+                  color={currentProcess.status === "running" || currentProcess.status === "queued" ? "error" : "success"}
+                  startIcon={currentProcess.status === "running" || currentProcess.status === "queued" ? <StopIcon /> : <PlayIcon />}
                   onClick={handleToggleProcess}
                   disabled={isLoading}
                 >
