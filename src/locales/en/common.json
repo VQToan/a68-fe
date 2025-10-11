@@ -273,6 +273,7 @@
         "status": "Status",
         "daysRunning": "Days running",
         "account": "Trading account",
+        "isFuture": "Trading Type",
         "template": "Bot template",
         "createdAt": "Created at",
         "actions": "Actions"
@@ -304,6 +305,7 @@
         "botTemplate": "Bot template",
         "exchangeFilter": "Filter by exchange",
         "tradingAccount": "Trading account",
+        "isFuture": "Futures Trading",
         "symbol": "Trading pair (SYMBOL)",
         "interval1": "Interval 1",
         "interval2": "Interval 2",
@@ -338,6 +340,7 @@
         "botTemplateRequired": "Bot template is required",
         "tradingAccountRequired": "Trading account is required"
       },
+      "noTemplatesAvailable": "No templates available for this trading type",
       "placeholders": {
         "pauseTime": "HH:MM-HH:MM",
         "maPeriod": "8:20"

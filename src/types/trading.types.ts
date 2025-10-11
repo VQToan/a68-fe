@@ -193,6 +193,7 @@ export interface TradingProcess {
   bot_template_id: string;
   trading_account_id: string;
   parameters: Record<keyof BacktestParameter, any>;
+  is_future: boolean;
   created_at: string;
   updated_at: string;
   status: TradingStatusType;
@@ -263,6 +264,7 @@ export interface TradingProcessCreate {
   description: string;
   bot_template_id: string;
   trading_account_id: string;
+  is_future?: boolean;
   parameters?: Record<keyof BacktestParameter, any>;
 }
 
@@ -271,6 +273,7 @@ export interface TradingProcessUpdate {
   description?: string;
   parameters?: Record<keyof BacktestParameter, any>;
   trading_account_id?: string;
+  is_future?: boolean;
 }
 
 export interface TradingProcessPaginatedResponse {

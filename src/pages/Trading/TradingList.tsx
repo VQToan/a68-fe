@@ -135,6 +135,7 @@ const TradingList = ({
               <TableCell>{t("trading.list.headers.status")}</TableCell>
               <TableCell>{t("trading.list.headers.daysRunning")}</TableCell>
               <TableCell>{t("trading.list.headers.account")}</TableCell>
+              <TableCell>{t("trading.list.headers.isFuture")}</TableCell>
               <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>{t("trading.list.headers.template")}</TableCell>
               <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>{t("trading.list.headers.createdAt")}</TableCell>
               <TableCell align="right">{t("trading.list.headers.actions")}</TableCell>
@@ -188,6 +189,13 @@ const TradingList = ({
                   <Typography variant="body2">
                     {process.trading_account_name || t("common.notAvailable")}
                   </Typography>
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    label={process.is_future ? t("common.futures") : t("common.spot")}
+                    color={process.is_future ? "warning" : "info"}
+                    size="small"
+                  />
                 </TableCell>
                 <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>
                   <Typography variant="body2">

@@ -273,6 +273,7 @@
         "status": "Trạng thái",
         "daysRunning": "Số ngày chạy",
         "account": "Tài khoản trading",
+        "isFuture": "Loại giao dịch",
         "template": "Bot template",
         "createdAt": "Ngày tạo",
         "actions": "Thao tác"
@@ -303,6 +304,7 @@
         "botTemplate": "Bot Template",
         "exchangeFilter": "Lọc theo sàn giao dịch",
         "tradingAccount": "Tài khoản trading",
+        "isFuture": "Giao dịch Futures",
         "symbol": "Cặp giao dịch (SYMBOL)",
         "interval1": "Khung thời gian 1",
         "interval2": "Khung thời gian 2",
@@ -337,6 +339,7 @@
         "botTemplateRequired": "Bot Template là bắt buộc",
         "tradingAccountRequired": "Tài khoản trading là bắt buộc"
       },
+      "noTemplatesAvailable": "Không có template nào cho loại giao dịch này",
       "placeholders": {
         "pauseTime": "HH:MM-HH:MM",
         "maPeriod": "8:20"

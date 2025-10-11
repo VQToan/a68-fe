@@ -15,6 +15,8 @@ import {
   CircularProgress,
   IconButton,
   Tooltip,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -48,6 +50,7 @@ type TradingFormValues = {
   description: string;
   bot_template_id: string;
   trading_account_id: string;
+  is_future: boolean;
   parameters: Record<keyof BacktestParameter, any>;
 };
 
@@ -168,6 +171,7 @@ const TradingForm = ({
       description: initialData?.description || "",
       bot_template_id: initialData?.bot_template_id || "",
       trading_account_id: initialData?.trading_account_id || "",
+      is_future: initialData?.is_future || false,
       parameters: initialParameters,
     }),
     [initialData, initialParameters]
@@ -182,6 +186,9 @@ const TradingForm = ({
   } = useForm<TradingFormValues>({
     defaultValues: defaultFormValues,
   });
+
+  // Watch is_future value to filter templates
+  const isFutureValue = watch("is_future");
 
   interface ParameterTextFieldProps
     extends Omit<TextFieldProps, "name" | "defaultValue" | "onChange"> {
@@ -227,6 +234,10 @@ const TradingForm = ({
     return [];
   }, [pauseDayValue, initialParameters.PAUSE_DAY]);
 
+  // Filter templates based on is_future value
+  const filteredTemplates = useMemo(() => {
+    return templates.filter(template => template.is_future === isFutureValue);
+  }, [templates, isFutureValue]);
 
   useEffect(() => {
     reset(defaultFormValues);
@@ -241,6 +252,18 @@ const TradingForm = ({
   useEffect(() => {
     getActiveAccounts(exchangeFilter as any);
   }, [exchangeFilter]);
+
+  // Reset bot_template_id when is_future changes
+  useEffect(() => {
+    // Only reset if not initial data load and value has changed
+    if (initialData && initialData.is_future !== isFutureValue) {
+      reset({
+        ...defaultFormValues,
+        bot_template_id: "",
+        is_future: isFutureValue,
+      });
+    }
+  }, [isFutureValue]);
 
   const handleRefreshAccounts = useCallback(() => {
     getActiveAccounts(exchangeFilter as any);
@@ -359,8 +382,12 @@ const TradingForm = ({
                       <MenuItem value="">
                         <CircularProgress size={24} />
                       </MenuItem>
+                    ) : filteredTemplates.length === 0 ? (
+                      <MenuItem value="" disabled>
+                        {t("trading.form.noTemplatesAvailable")}
+                      </MenuItem>
                     ) : (
-                      templates.map((template) => (
+                      filteredTemplates.map((template) => (
                         <MenuItem key={template._id} value={template._id}>
                           {template.name}
                         </MenuItem>
@@ -468,6 +495,27 @@ const TradingForm = ({
                 </IconButton>
               </Tooltip>
             </Box>
+
+            {/* Futures Trading Switch */}
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <Controller
+                name="is_future"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={value}
+                        onChange={onChange}
+                        disabled={isSubmitting}
+                      />
+                    }
+                    label={t("trading.form.fields.isFuture")}
+                    sx={{ gap: 1 }}
+                  />
+                )}
+              />
+            </FormControl>
 
             {/* Basic configuration */}
             <Accordion defaultExpanded>
