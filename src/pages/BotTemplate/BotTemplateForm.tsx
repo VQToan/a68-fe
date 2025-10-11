@@ -9,6 +9,8 @@ import {
   Select,
   MenuItem,
   CircularProgress,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useModule } from "@hooks/useModule";
@@ -73,6 +75,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -84,8 +87,12 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
       entry_hedge_module: initialData?.entry_hedge_module || "",
       after_hedge_module: initialData?.after_hedge_module || "",
       stop_loss_module: initialData?.stop_loss_module || "",
+      is_future: initialData?.is_future || false,
     },
   });
+
+  // Watch is_future value to filter modules
+  const isFutureValue = watch("is_future");
 
   // Fetch modules on component mount
   useEffect(() => {
@@ -106,9 +113,11 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
 
       modules.forEach((module: IModuleBot) => {
         // Check if module.type is a valid ModuleType
+        // Filter by is_future value
         if (
           module.type &&
-          Object.values(ModuleType).includes(module.type as ModuleType)
+          Object.values(ModuleType).includes(module.type as ModuleType) &&
+          module.is_future === isFutureValue
         ) {
           grouped[module.type as ModuleType].push({
             id: module._id,
@@ -120,7 +129,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
 
       setModuleOptions(grouped);
     }
-  }, [modules]);
+  }, [modules, isFutureValue]);
 
   // Reset form when initialData changes
   useEffect(() => {
@@ -134,9 +143,28 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
         entry_hedge_module: initialData.entry_hedge_module || "",
         after_hedge_module: initialData.after_hedge_module || "",
         stop_loss_module: initialData.stop_loss_module || "",
+        is_future: initialData.is_future || false,
       });
     }
   }, [initialData, reset]);
+
+  // Reset module selections when is_future changes (except on initial load)
+  useEffect(() => {
+    // Only reset if not initial data load
+    if (initialData && initialData.is_future !== isFutureValue) {
+      reset({
+        name: initialData.name || "",
+        description: initialData.description || "",
+        entry_module: "",
+        exit_module: "",
+        dca_cutloss_module: "",
+        entry_hedge_module: "",
+        after_hedge_module: "",
+        stop_loss_module: "",
+        is_future: isFutureValue,
+      });
+    }
+  }, [isFutureValue]);
 
   // Handle form submission
   const onFormSubmit = useCallback(
@@ -161,7 +189,9 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="name"
               control={control}
-              rules={{ required: t("botTemplate.form.validation.nameRequired") }}
+              rules={{
+                required: t("botTemplate.form.validation.nameRequired"),
+              }}
               render={({ field }) => (
                 <TextField
                   {...field}
@@ -184,7 +214,9 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="description"
               control={control}
-              rules={{ required: t("botTemplate.form.validation.descriptionRequired") }}
+              rules={{
+                required: t("botTemplate.form.validation.descriptionRequired"),
+              }}
               render={({ field }) => (
                 <TextField
                   {...field}
@@ -196,6 +228,28 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                   error={!!errors.description}
                   helperText={errors.description?.message}
                   disabled={isSubmitting}
+                />
+              )}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, lg: 6 }}>
+            <Controller
+              name="is_future"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={value}
+                      onChange={onChange}
+                      disabled={isSubmitting}
+                    />
+                  }
+                  label={
+                    t("botTemplate.form.fields.isFuture") || "Futures Trading"
+                  }
+                  sx={{ gap: 1 }}
                 />
               )}
             />
@@ -215,7 +269,9 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="entry_module"
               control={control}
-              rules={{ required: t("botTemplate.form.validation.entryRequired") }}
+              rules={{
+                required: t("botTemplate.form.validation.entryRequired"),
+              }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
@@ -244,7 +300,11 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                     ))}
                   </Select>
                   {errors.entry_module && (
-                    <Typography color="error" variant="caption" sx={{ mt: 0.5, ml: 1.5 }}>
+                    <Typography
+                      color="error"
+                      variant="caption"
+                      sx={{ mt: 0.5, ml: 1.5 }}
+                    >
                       {errors.entry_module.message}
                     </Typography>
                   )}
@@ -257,7 +317,9 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="exit_module"
               control={control}
-              rules={{ required: t("botTemplate.form.validation.exitRequired") }}
+              rules={{
+                required: t("botTemplate.form.validation.exitRequired"),
+              }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
@@ -286,7 +348,11 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                     ))}
                   </Select>
                   {errors.exit_module && (
-                    <Typography color="error" variant="caption" sx={{ mt: 0.5, ml: 1.5 }}>
+                    <Typography
+                      color="error"
+                      variant="caption"
+                      sx={{ mt: 0.5, ml: 1.5 }}
+                    >
                       {errors.exit_module.message}
                     </Typography>
                   )}
@@ -329,7 +395,11 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                     ))}
                   </Select>
                   {errors.dca_cutloss_module && (
-                    <Typography color="error" variant="caption" sx={{ mt: 0.5, ml: 1.5 }}>
+                    <Typography
+                      color="error"
+                      variant="caption"
+                      sx={{ mt: 0.5, ml: 1.5 }}
+                    >
                       {errors.dca_cutloss_module.message}
                     </Typography>
                   )}
@@ -342,7 +412,9 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="stop_loss_module"
               control={control}
-              rules={{ required: t("botTemplate.form.validation.stopLossRequired") }}
+              rules={{
+                required: t("botTemplate.form.validation.stopLossRequired"),
+              }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
@@ -371,7 +443,11 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                     ))}
                   </Select>
                   {errors.stop_loss_module && (
-                    <Typography color="error" variant="caption" sx={{ mt: 0.5, ml: 1.5 }}>
+                    <Typography
+                      color="error"
+                      variant="caption"
+                      sx={{ mt: 0.5, ml: 1.5 }}
+                    >
                       {errors.stop_loss_module.message}
                     </Typography>
                   )}
@@ -385,7 +461,9 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="entry_hedge_module"
               control={control}
-              rules={{ required: t("botTemplate.form.validation.entryHedgeRequired") }}
+              rules={{
+                required: t("botTemplate.form.validation.entryHedgeRequired"),
+              }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
@@ -414,7 +492,11 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                     ))}
                   </Select>
                   {errors.entry_hedge_module && (
-                    <Typography color="error" variant="caption" sx={{ mt: 0.5, ml: 1.5 }}>
+                    <Typography
+                      color="error"
+                      variant="caption"
+                      sx={{ mt: 0.5, ml: 1.5 }}
+                    >
                       {errors.entry_hedge_module.message}
                     </Typography>
                   )}
@@ -427,7 +509,9 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="after_hedge_module"
               control={control}
-              rules={{ required: t("botTemplate.form.validation.afterHedgeRequired") }}
+              rules={{
+                required: t("botTemplate.form.validation.afterHedgeRequired"),
+              }}
               render={({ field }) => (
                 <FormControl
                   fullWidth
@@ -456,7 +540,11 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
                     ))}
                   </Select>
                   {errors.after_hedge_module && (
-                    <Typography color="error" variant="caption" sx={{ mt: 0.5, ml: 1.5 }}>
+                    <Typography
+                      color="error"
+                      variant="caption"
+                      sx={{ mt: 0.5, ml: 1.5 }}
+                    >
                       {errors.after_hedge_module.message}
                     </Typography>
                   )}
@@ -469,7 +557,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
 
       {/* Loading indicator when submitting */}
       {isSubmitting && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
           <CircularProgress size={24} />
         </Box>
       )}

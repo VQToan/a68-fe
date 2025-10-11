@@ -232,6 +232,7 @@ const BacktestList = ({
             <TableRow>
               <TableCell>{t("backtest.list.headers.name")}</TableCell>
               <TableCell>{t("backtest.list.headers.description")}</TableCell>
+              <TableCell>{t("backtest.list.headers.isFuture")}</TableCell>
               <TableCell>{t("backtest.list.headers.status")}</TableCell>
               <TableCell>{t("backtest.list.headers.result")}</TableCell>
               <TableCell>{t("backtest.list.headers.createdAt")}</TableCell>
@@ -260,6 +261,14 @@ const BacktestList = ({
                       {process.description}
                     </Typography>
                   </Tooltip>
+                </TableCell>
+                <TableCell>
+                  <Chip 
+                    label={process.is_future ? t('common.futures') : t('common.spot')}
+                    size="small" 
+                    color={process.is_future ? "warning" : "info"}
+                    variant="outlined" 
+                  />
                 </TableCell>
                 <TableCell>
                   <Chip

@@ -50,6 +50,7 @@ export interface BacktestProcess {
   user_id: string;
   bot_template_id: string;
   parameters: Record<keyof BacktestParameter, any>;
+  is_future: boolean;
   created_at: number;
   status: BacktestStatus;
   summary?: string;
@@ -65,6 +66,7 @@ export interface BacktestProcessCreate {
   description: string;
   bot_template_id: string;
   parameters: Record<keyof BacktestParameter, any>;
+  is_future?: boolean;
 }
 
 // Update Backtest Process Type
@@ -72,6 +74,7 @@ export interface BacktestProcessUpdate {
   name?: string | null;
   description?: string | null;
   parameters: Record<keyof BacktestParameter, any>;
+  is_future?: boolean | null;
 }
 
 // Backtest Process Action Type

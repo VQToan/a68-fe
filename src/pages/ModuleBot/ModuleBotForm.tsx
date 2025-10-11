@@ -10,6 +10,8 @@ import {
   Paper,
   Typography,
   Grid,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import ReactMarkdown from "react-markdown";
@@ -35,6 +37,7 @@ type FormFields = {
   name_in_source: string;
   description: string;
   type: ModuleBotType;
+  is_future: boolean;
 };
 
 const ModuleBotForm: React.FC<ModuleBotFormProps> = ({
@@ -56,6 +59,7 @@ const ModuleBotForm: React.FC<ModuleBotFormProps> = ({
       name_in_source: initialData.name_in_source || "",
       description: initialData.description || "",
       type: initialData.type || "entry",
+      is_future: initialData.is_future || false,
     },
     mode: "onBlur", // Validate on blur
   });
@@ -67,6 +71,7 @@ const ModuleBotForm: React.FC<ModuleBotFormProps> = ({
       name_in_source: initialData.name_in_source || "",
       description: initialData.description || "",
       type: initialData.type || "entry",
+      is_future: initialData.is_future || false,
     });
   }, [initialData, reset]);
 
@@ -235,6 +240,25 @@ const ModuleBotForm: React.FC<ModuleBotFormProps> = ({
               </FormControl>
             )}
           />
+
+          <Controller
+            name="is_future"
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={value}
+                    onChange={onChange}
+                    disabled={mode === "view"}
+                  />
+                }
+                label={t("moduleBot.form.fields.isFuture") || "Futures Trading"}
+                sx={{ gap: 1 }}
+              />
+            )}
+          />
+          
         </Grid>
 
         {/* Right Column - Description */}

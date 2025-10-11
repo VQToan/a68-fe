@@ -10,6 +10,7 @@ export interface IModuleBot {
   name_in_source: string;
   description: string;
   type: ModuleBotType;
+  is_future: boolean;
   created_at: string;
 }
 
@@ -18,6 +19,7 @@ export interface ModuleBotCreate {
   name_in_source: string;
   description: string;
   type: ModuleBotType;
+  is_future?: boolean;
 }
 
 export interface ModuleBotUpdate {
@@ -25,6 +27,7 @@ export interface ModuleBotUpdate {
   name_in_source?: string | null;
   description?: string | null;
   type?: ModuleBotType | null;
+  is_future?: boolean | null;
 }
 
 // Get all module bots (with optional search)

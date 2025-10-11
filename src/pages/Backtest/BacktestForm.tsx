@@ -16,6 +16,8 @@ import {
   ListItemText,
   OutlinedInput,
   InputAdornment,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useForm, Controller } from "react-hook-form";
@@ -45,6 +47,7 @@ type BacktestFormValues = {
   description: string;
   bot_template_id: string;
   parameters: Record<keyof BacktestParameter, any>;
+  is_future: boolean;
 };
 
 // Default bot parameters based on the BacktestParameter type
@@ -154,6 +157,7 @@ const BacktestForm = ({
       description: initialData?.description || "",
       bot_template_id: initialData?.bot_template_id || "",
       parameters: initialParameters,
+      is_future: initialData?.is_future || false,
     }),
     [initialData, initialParameters]
   );
@@ -200,6 +204,7 @@ const BacktestForm = ({
   );
 
   const pauseDayValue = watch("parameters.PAUSE_DAY");
+  const isFutureValue = watch("is_future");
 
   const selectedPauseDays = useMemo(() => {
     const pauseDay = pauseDayValue ?? initialParameters.PAUSE_DAY;
@@ -212,6 +217,10 @@ const BacktestForm = ({
     return [];
   }, [pauseDayValue, initialParameters.PAUSE_DAY]);
 
+  // Filter templates based on is_future value
+  const filteredTemplates = useMemo(() => {
+    return templates.filter(template => template.is_future === isFutureValue);
+  }, [templates, isFutureValue]);
 
   useEffect(() => {
     reset(defaultFormValues);
@@ -221,6 +230,18 @@ const BacktestForm = ({
   useEffect(() => {
     getBotTemplates();
   }, []);
+
+  // Reset bot_template_id when is_future changes
+  useEffect(() => {
+    // Only reset if not initial data load and value has changed
+    if (initialData && initialData.is_future !== isFutureValue) {
+      reset({
+        ...defaultFormValues,
+        bot_template_id: "",
+        is_future: isFutureValue,
+      });
+    }
+  }, [isFutureValue]);
 
   // Format parameters before submission
   const formatParameters = useCallback(
@@ -347,8 +368,12 @@ const BacktestForm = ({
                       <MenuItem value="">
                         <CircularProgress size={24} />
                       </MenuItem>
+                    ) : filteredTemplates.length === 0 ? (
+                      <MenuItem value="" disabled>
+                        {t("backtest.form.noTemplatesAvailable") || "No templates available for this trading type"}
+                      </MenuItem>
                     ) : (
-                      templates.map((template) => (
+                      filteredTemplates.map((template) => (
                         <MenuItem key={template._id} value={template._id}>
                           {template.name}
                         </MenuItem>
@@ -363,6 +388,24 @@ const BacktestForm = ({
                 </Typography>
               )}
             </FormControl>
+
+            <Controller
+              name="is_future"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={value}
+                      onChange={onChange}
+                      disabled={isSubmitting}
+                    />
+                  }
+                  label={t("backtest.form.fields.isFuture") || "Futures Trading"}
+                  sx={{ gap: 1 }}
+                />
+              )}
+            />
 
             {/* Basic configuration */}
             <Accordion defaultExpanded>

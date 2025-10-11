@@ -100,6 +100,7 @@
         "name": "Tên",
         "nameInSource": "Name in Source",
         "type": "Loại",
+        "isFuture": "Loại giao dịch",
         "description": "Mô tả",
         "createdAt": "Ngày tạo",
         "actions": "Thao tác"
@@ -115,7 +116,8 @@
         "name": "Tên",
         "nameInSource": "Name in Source",
         "description": "Mô tả",
-        "type": "Loại Module Bot"
+        "type": "Loại Module Bot",
+        "isFuture": "Giao dịch Futures"
       },
       "validation": {
         "nameRequired": "Tên không được để trống",
@@ -156,6 +158,7 @@
       "headers": {
         "name": "Tên",
         "description": "Mô tả",
+        "isFuture": "Loại giao dịch",
         "createdAt": "Ngày tạo",
         "actions": "Thao tác"
       },
@@ -178,7 +181,8 @@
         "dca": "Module DCA/Cutloss",
         "entryHedge": "Module Entry Hedge",
         "afterHedge": "Module After Hedge",
-        "stopLoss": "Module Stop Loss"
+        "stopLoss": "Module Stop Loss",
+        "isFuture": "Giao dịch Futures"
       },
       "placeholders": {
         "name": "Nhập tên template",
@@ -529,6 +533,7 @@
       "headers": {
         "name": "Tên",
         "description": "Mô tả",
+        "isFuture": "Loại giao dịch",
         "status": "Trạng thái",
         "result": "Kết quả",
         "createdAt": "Ngày tạo",
@@ -587,6 +592,7 @@
         "name": "Tên backtest",
         "description": "Mô tả",
         "botTemplate": "Bot Template",
+        "isFuture": "Giao dịch Futures",
         "symbol": "Cặp giao dịch",
         "interval1": "Interval 1",
         "interval2": "Interval 2",
@@ -625,6 +631,7 @@
         "dcaGrid": "Ví dụ: 0.008 tương ứng 0.8%",
         "maPeriod": "Định dạng: ngắn:dài (ví dụ: 8:20)"
       },
+      "noTemplatesAvailable": "Không có template nào cho loại giao dịch này",
       "placeholders": {
         "pauseTime": "HH:MM-HH:MM",
         "maPeriod": "8:20"
@@ -746,6 +753,8 @@
     "on": "Bật",
     "off": "Tắt",
     "notAvailable": "N/A",
+    "futures": "Futures",
+    "spot": "Spot",
     "weekdays": {
       "monday": "Thứ hai",
       "tuesday": "Thứ ba",

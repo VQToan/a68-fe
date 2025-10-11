@@ -9,6 +9,7 @@ export interface BotTemplate {
   entry_hedge_module: string;
   after_hedge_module: string;
   stop_loss_module: string;
+  is_future: boolean;
   created_at: string;
   updated_at: string;
   parameters?: Record<string, any>;
@@ -24,6 +25,7 @@ export interface BotTemplateCreate {
   entry_hedge_module: string;
   after_hedge_module: string;
   stop_loss_module: string;
+  is_future?: boolean;
 }
 
 // Interface for updating a bot template
@@ -36,6 +38,7 @@ export interface BotTemplateUpdate {
   entry_hedge_module: string;
   after_hedge_module: string;
   stop_loss_module: string;
+  is_future?: boolean;
 }
 
 // Module type enum to match backend

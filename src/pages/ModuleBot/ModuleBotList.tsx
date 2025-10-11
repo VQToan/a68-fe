@@ -72,6 +72,7 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
               <TableCell><strong>{t('moduleBot.list.headers.name')}</strong></TableCell>
               <TableCell><strong>{t('moduleBot.list.headers.nameInSource')}</strong></TableCell>
               <TableCell><strong>{t('moduleBot.list.headers.type')}</strong></TableCell>
+              <TableCell><strong>{t('moduleBot.list.headers.isFuture')}</strong></TableCell>
               <TableCell><strong>{t('moduleBot.list.headers.description')}</strong></TableCell>
               <TableCell><strong>{t('moduleBot.list.headers.createdAt')}</strong></TableCell>
               <TableCell><strong>{t('moduleBot.list.headers.actions')}</strong></TableCell>
@@ -98,6 +99,14 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
                     })}
                     size="small" 
                     color="secondary" 
+                    variant="outlined" 
+                  />
+                </TableCell>
+                <TableCell>
+                  <Chip 
+                    label={module.is_future ? t('common.futures') : t('common.spot')}
+                    size="small" 
+                    color={module.is_future ? "warning" : "info"}
                     variant="outlined" 
                   />
                 </TableCell>

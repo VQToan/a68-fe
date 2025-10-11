@@ -10,6 +10,7 @@ import {
   IconButton,
   Tooltip,
   CircularProgress,
+  Chip,
 } from "@mui/material";
 import StickyTable from "@components/StickyTable";
 import EditIcon from "@mui/icons-material/Edit";
@@ -63,6 +64,7 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
             <TableRow>
               <TableCell>{t("botTemplate.list.headers.name")}</TableCell>
               <TableCell>{t("botTemplate.list.headers.description")}</TableCell>
+              <TableCell>{t("botTemplate.list.headers.isFuture")}</TableCell>
               <TableCell>{t("botTemplate.list.headers.createdAt")}</TableCell>
               <TableCell>{t("botTemplate.list.headers.actions")}</TableCell>
             </TableRow>
@@ -93,6 +95,14 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
                       {template.description}
                     </Typography>
                   </Tooltip>
+                </TableCell>
+                <TableCell>
+                  <Chip 
+                    label={template.is_future ? t('common.futures') : t('common.spot')}
+                    size="small" 
+                    color={template.is_future ? "warning" : "info"}
+                    variant="outlined" 
+                  />
                 </TableCell>
                 <TableCell>{formatDate(template.created_at)}</TableCell>
                 <TableCell>
