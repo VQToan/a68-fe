@@ -874,11 +874,12 @@
     "detail": {
       "errors": {
         "dashboard": "Failed to load dashboard data",
-        "positions": "Failed to load positions",
-        "refresh": "Failed to refresh data",
-        "openPosition": "Failed to open position",
-        "closePosition": "Failed to close position",
-        "closePartialPosition": "Failed to close partial position"
+      "positions": "Failed to load positions",
+      "spotBalance": "Failed to load spot balances",
+      "refresh": "Failed to refresh data",
+      "openPosition": "Failed to open position",
+      "closePosition": "Failed to close position",
+      "closePartialPosition": "Failed to close partial position"
       },
       "notifications": {
         "refreshSuccess": "Data refreshed",
@@ -892,6 +893,7 @@
       },
       "tabs": {
         "balance": "Balance",
+        "spot": "Spot wallet",
         "positions": "Open positions"
       },
       "header": {
@@ -920,6 +922,21 @@
           "updatedAt": "Last updated"
         },
         "noData": "No balance data"
+      },
+      "spot": {
+        "title": "Spot wallet",
+        "totalUsdt": "Total in USDT",
+        "totalBtc": "Total in BTC",
+        "updatedAt": "Last updated",
+        "never": "No data received yet",
+        "noData": "No spot balances",
+        "retry": "Try again",
+        "table": {
+          "asset": "Asset",
+          "free": "Available",
+          "locked": "In orders",
+          "total": "Total"
+        }
       },
       "positions": {
         "title": "Open positions ({{count}})",

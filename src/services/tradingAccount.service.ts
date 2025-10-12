@@ -13,7 +13,8 @@ import type {
   ClosePartialPositionRequest,
   OrderResponse,
   ClosePositionResponse,
-  ClosePartialPositionResponse
+  ClosePartialPositionResponse,
+  SpotBalanceResponse
 } from '@/types/trading.types';
 
 // Trading Account API calls
@@ -76,6 +77,11 @@ export const refreshAccountData = async (accountId: string): Promise<TradingAcco
 
 export const getAccountBalance = async (accountId: string): Promise<AccountBalance> => {
   const response = await apiClient.get(`api/v1/trading-accounts/${accountId}/balance`);
+  return response.data;
+};
+
+export const getSpotBalance = async (accountId: string): Promise<SpotBalanceResponse> => {
+  const response = await apiClient.get(`api/v1/trading-accounts/${accountId}/spot/balance`);
   return response.data;
 };
 

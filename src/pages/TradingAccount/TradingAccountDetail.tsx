@@ -15,7 +15,8 @@ import type {
   PositionSummary,
   OpenPositionRequest,
   ClosePositionRequest,
-  ClosePartialPositionRequest
+  ClosePartialPositionRequest,
+  SpotBalanceResponse
 } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
 import * as tradingAccountService from "@services/tradingAccount.service";
@@ -23,6 +24,7 @@ import {
   TradingAccountHeader,
   TradingAccountSummaryCards,
   AccountBalanceTab,
+  SpotBalanceTab,
   PositionsTab,
   TabPanel as CustomTabPanel,
 } from "./components";
@@ -42,6 +44,9 @@ const TradingAccountDetail = () => {
   const [isLoadingPositions, setIsLoadingPositions] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [spotBalance, setSpotBalance] = useState<SpotBalanceResponse | null>(null);
+  const [isLoadingSpot, setIsLoadingSpot] = useState<boolean>(false);
+  const [spotError, setSpotError] = useState<string | null>(null);
 
   // Fetch dashboard data
   const fetchDashboardData = useCallback(async () => {
@@ -81,6 +86,26 @@ const TradingAccountDetail = () => {
     }
   }, [id, showNotification, t]);
 
+  // Fetch spot balance data
+  const fetchSpotBalance = useCallback(async () => {
+    if (!id) return;
+
+    setIsLoadingSpot(true);
+    setSpotError(null);
+
+    try {
+      const data = await tradingAccountService.getSpotBalance(id);
+      setSpotBalance(data);
+    } catch (error) {
+      const fallbackMessage = t("tradingAccount.detail.errors.spotBalance");
+      const errorMessage = error instanceof Error ? error.message : fallbackMessage;
+      setSpotError(errorMessage);
+      showNotification(errorMessage, 'error');
+    } finally {
+      setIsLoadingSpot(false);
+    }
+  }, [id, showNotification, t]);
+
   // Handle refresh functionality
   const handleRefresh = useCallback(async () => {
     if (!id) return;
@@ -88,7 +113,7 @@ const TradingAccountDetail = () => {
     setIsRefreshing(true);
     try {
       await tradingAccountService.refreshAccountData(id);
-      await Promise.all([fetchDashboardData(), fetchPositions()]);
+      await Promise.all([fetchDashboardData(), fetchPositions(), fetchSpotBalance()]);
       showNotification(t("tradingAccount.detail.notifications.refreshSuccess"), 'success');
     } catch (error) {
       const fallbackMessage = t("tradingAccount.detail.errors.refresh");
@@ -97,7 +122,7 @@ const TradingAccountDetail = () => {
     } finally {
       setIsRefreshing(false);
     }
-  }, [id, fetchDashboardData, fetchPositions, showNotification, t]);
+  }, [id, fetchDashboardData, fetchPositions, fetchSpotBalance, showNotification, t]);
 
   // Trading operations
   const handleOpenPosition = useCallback(async (data: OpenPositionRequest) => {
@@ -150,8 +175,9 @@ const TradingAccountDetail = () => {
     if (id) {
       fetchDashboardData();
       fetchPositions();
+      fetchSpotBalance();
     }
-  }, [id, fetchDashboardData, fetchPositions]);
+  }, [id, fetchDashboardData, fetchPositions, fetchSpotBalance]);
 
   // Handle tab change
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
@@ -159,6 +185,9 @@ const TradingAccountDetail = () => {
     // Fetch positions when switching to positions tab
     if (newValue === "positions" && positions.length === 0) {
       fetchPositions();
+    }
+    if (newValue === "spot" && !spotBalance && !isLoadingSpot && !spotError) {
+      fetchSpotBalance();
     }
   };
 
@@ -220,14 +249,25 @@ const TradingAccountDetail = () => {
       <Paper elevation={3}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs value={currentTab} onChange={handleTabChange}>
-            <Tab label={t("tradingAccount.detail.tabs.balance") } value="balance" />
-            <Tab label={t("tradingAccount.detail.tabs.positions") } value="positions" />
+            <Tab label={t("tradingAccount.detail.tabs.balance")} value="balance" />
+            <Tab label={t("tradingAccount.detail.tabs.spot")} value="spot" />
+            <Tab label={t("tradingAccount.detail.tabs.positions")} value="positions" />
           </Tabs>
         </Box>
 
         {/* Balance Tab */}
         <CustomTabPanel value={currentTab} index="balance">
           <AccountBalanceTab account={dashboardData.account_info} />
+        </CustomTabPanel>
+
+        {/* Spot Balance Tab */}
+        <CustomTabPanel value={currentTab} index="spot">
+          <SpotBalanceTab
+            data={spotBalance}
+            isLoading={isLoadingSpot}
+            error={spotError}
+            onRetry={fetchSpotBalance}
+          />
         </CustomTabPanel>
 
         {/* Positions Tab */}

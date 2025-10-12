@@ -1,6 +1,7 @@
 export { default as TradingAccountHeader } from './TradingAccountHeader';
 export { default as TradingAccountSummaryCards } from './TradingAccountSummaryCards';
 export { default as AccountBalanceTab } from './AccountBalanceTab';
+export { default as SpotBalanceTab } from './SpotBalanceTab';
 export { default as PositionsTab } from './PositionsTab';
 export { default as PositionActionButtons } from './PositionActionButtons';
 export { default as OpenPositionDialog } from './OpenPositionDialog';

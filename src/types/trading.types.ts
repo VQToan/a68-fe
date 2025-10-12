@@ -65,6 +65,29 @@ export interface AccountBalance {
   assets: AccountAsset[];
 }
 
+export interface SpotAssetBalance {
+  asset: string;
+  free: number;
+  locked: number;
+  total: number;
+}
+
+export interface SpotBalanceResponse {
+  balances?: SpotAssetBalance[];
+  total_balance_btc?: number;
+  total_balance_usdt?: number;
+  update_time: number;
+}
+
+export interface SpotBalanceSummary {
+  asset: string;
+  available: number;
+  in_order: number;
+  total: number;
+  btc_value?: number;
+  usdt_value?: number;
+}
+
 // New types for dashboard and position management
 export interface BalanceSummary {
   asset: string;

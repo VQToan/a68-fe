@@ -874,6 +874,7 @@
       "errors": {
         "dashboard": "Không thể tải dữ liệu tài khoản",
         "positions": "Không thể tải danh sách lệnh",
+        "spotBalance": "Không thể tải số dư spot",
         "refresh": "Không thể làm mới dữ liệu",
         "openPosition": "Không thể mở lệnh",
         "closePosition": "Không thể đóng lệnh",
@@ -891,6 +892,7 @@
       },
       "tabs": {
         "balance": "Số dư",
+        "spot": "Ví spot",
         "positions": "Lệnh đang mở"
       },
       "header": {
@@ -919,6 +921,21 @@
           "updatedAt": "Cập nhật lần cuối"
         },
         "noData": "Không có dữ liệu balance"
+      },
+      "spot": {
+        "title": "Ví spot",
+        "totalUsdt": "Tổng quy đổi USDT",
+        "totalBtc": "Tổng quy đổi BTC",
+        "updatedAt": "Cập nhật lần cuối",
+        "never": "Chưa có dữ liệu",
+        "noData": "Chưa có số dư spot",
+        "retry": "Thử lại",
+        "table": {
+          "asset": "Tài sản",
+          "free": "Khả dụng",
+          "locked": "Đang khóa",
+          "total": "Tổng"
+        }
       },
       "positions": {
         "title": "Lệnh đang mở ({{count}})",
