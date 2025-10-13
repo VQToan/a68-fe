@@ -457,7 +457,8 @@
       "title": "Danh sách giao dịch ({{total}})",
       "subtitle": "Hiển thị {{count}} mục mỗi trang (tự động điều chỉnh theo màn hình)",
       "actions": {
-        "refresh": "Làm mới"
+        "refresh": "Làm mới",
+        "refreshing": "Đang làm mới..."
       },
       "tooltips": {
         "setup": "Xem thông tin setup"
