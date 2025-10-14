@@ -68,6 +68,8 @@ const defaultBotParams: Partial<BacktestParameter> = {
   DCA_GRID: 0.008,
   GRID_MULTIPLIER: 1.1,
   DCA_MULTIPLIER: 1.1,
+  TRAILING_PERCENTAGE: 1.0,
+  CALLBACK_PERCENTAGE: 0.2,
   RSI_ENTRY_SHORT: 75,
   RSI_EXIT_SHORT: 25,
   RSI_ENTRY_LONG: 19,
@@ -530,6 +532,40 @@ const BacktestForm = ({
                         },
                       }}
                     />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                  <ParameterTextField
+                    paramName="TRAILING_PERCENTAGE"
+                    label={t("backtest.form.fields.trailingPercentage")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                    inputProps={{ step: "0.1" }}
+                    slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">%</InputAdornment>
+                          ),
+                        },
+                      }}
+                  />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                  <ParameterTextField
+                    paramName="CALLBACK_PERCENTAGE"
+                    label={t("backtest.form.fields.callbackPercentage")}
+                    type="number"
+                    fullWidth
+                    parseValue={toNumber}
+                    inputProps={{ step: "0.1" }}
+                    slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">%</InputAdornment>
+                          ),
+                        },
+                      }}
+                  />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                   <ParameterTextField
