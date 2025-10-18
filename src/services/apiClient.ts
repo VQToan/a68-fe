@@ -1,5 +1,6 @@
 import axios from 'axios';
 import type { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
+import { AxiosHeaders } from 'axios';
 import { getAccessToken, getRefreshToken, storeTokens, removeTokens } from '@utils/tokenUtils';
 import { store } from '@features/store';
 import { updateTokens, forceLogout } from '@features/auth/authSlice';
@@ -43,8 +44,16 @@ const createApiClient = (): AxiosInstance => {
     (config) => {
       const accessToken = getAccessToken();
       if (accessToken) {
-        config.headers = config.headers ?? {};
-        config.headers['Authorization'] = `Bearer ${accessToken}`;
+        const headers = config.headers;
+        if (headers instanceof AxiosHeaders) {
+          headers.set('Authorization', `Bearer ${accessToken}`);
+        } else {
+          const plainHeaders = (headers ?? {}) as Record<string, unknown>;
+          config.headers = {
+            ...plainHeaders,
+            Authorization: `Bearer ${accessToken}`,
+          } as AxiosRequestHeaders;
+        }
       }
       return config;
     },
@@ -56,7 +65,7 @@ const createApiClient = (): AxiosInstance => {
     (response) => response,
     async (error) => {
       const status = error.response?.status;
-      const originalRequest = error.config as RetriableRequestConfig | undefined;
+      const originalRequest = error.config as RetriableRequestConfig;
 
       if (status === 401) {
         const refreshToken = getRefreshToken();
@@ -88,10 +97,17 @@ const createApiClient = (): AxiosInstance => {
             );
             store.dispatch(updateTokens(response.data));
 
-            originalRequest.headers = {
-              ...(originalRequest.headers ?? {}),
-              Authorization: `Bearer ${response.data.access_token}`,
-            };
+            const existingHeaders = originalRequest.headers;
+
+            if (existingHeaders instanceof AxiosHeaders) {
+              existingHeaders.set('Authorization', `Bearer ${response.data.access_token}`);
+            } else {
+              const plainHeaders = (existingHeaders ?? {}) as Record<string, unknown>;
+              originalRequest.headers = {
+                ...plainHeaders,
+                Authorization: `Bearer ${response.data.access_token}`,
+              } as AxiosRequestHeaders;
+            }
 
             return api(originalRequest);
           } catch (refreshError) {
