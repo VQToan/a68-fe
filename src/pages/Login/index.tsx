@@ -1,5 +1,10 @@
 import { memo, useCallback, useState } from "react";
-import { useNavigate, Link as RouterLink } from "react-router-dom";
+import {
+  useNavigate,
+  useLocation,
+  Link as RouterLink,
+  type Location,
+} from "react-router-dom";
 import {
   Container,
   Typography,
@@ -18,6 +23,8 @@ import { areEqual } from "@/utils/common";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromLocation = (location.state as { from?: Location } | null)?.from;
   const { login, error, isLoading } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
@@ -38,13 +45,28 @@ const Login = () => {
       try {
         const result = await login(formData);
         if (result.meta.requestStatus === "fulfilled") {
-          navigate("/dashboard");
+          const storedRedirect =
+            typeof window !== "undefined"
+              ? localStorage.getItem("postLoginRedirect")
+              : null;
+          const redirectPath =
+            fromLocation &&
+            fromLocation.pathname &&
+            fromLocation.pathname !== "/login"
+              ? `${fromLocation.pathname}${fromLocation.search ?? ""}${fromLocation.hash ?? ""}`
+              : storedRedirect && storedRedirect !== "/login"
+              ? storedRedirect
+              : "/dashboard";
+          if (storedRedirect) {
+            localStorage.removeItem("postLoginRedirect");
+          }
+          navigate(redirectPath, { replace: true });
         }
       } catch (error) {
         console.error("Login failed:", error);
       }
     },
-    [formData, login, navigate]
+    [formData, login, navigate, fromLocation]
   );
 
   return (

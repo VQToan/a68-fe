@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, memo, useMemo } from "react";
+import { Outlet, useMatch, useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -17,7 +18,6 @@ import AddIcon from "@mui/icons-material/Add";
 import OptimizeIcon from "@mui/icons-material/Psychology";
 import BacktestList from "./BacktestList";
 import BacktestForm from "./BacktestForm";
-import BacktestResult from "./components/Result";
 import RunBacktestDialog from "./components/RunBacktestDialog";
 import OptimizationDialog from "./components/Optimzation/OptimizationDialog";
 import OptimizationResults from "./components/Optimzation/OptimizationResults";
@@ -36,12 +36,6 @@ import FilterTabs from "@components/FilterTabs";
 import { useTranslation } from "react-i18next";
 
 export type FormMode = "create" | "view" | "edit";
-
-// Component state enum để quản lý hiển thị
-enum BacktestView {
-  LIST = "list",
-  RESULT = "result",
-}
 
 // Tab interface
 interface TabPanelProps {
@@ -77,6 +71,9 @@ const tabStatusMap: Record<string, BacktestStatus | undefined> = {
 };
 
 const Backtest = () => {
+  const navigate = useNavigate();
+  const isResultRoute = useMatch("/backtest/:id");
+
   // Use the backtest hook for state management
   const {
     processes,
@@ -107,14 +104,6 @@ const Backtest = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
   const { t } = useTranslation();
-
-  // Thêm state để quản lý hiển thị component
-  const [currentView, setCurrentView] = useState<BacktestView>(
-    BacktestView.LIST
-  );
-  const [selectedBacktestId, setSelectedBacktestId] = useState<string | null>(
-    null
-  );
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -286,17 +275,13 @@ const Backtest = () => {
     setDialogMode("edit");
   }, []);
 
-  // Hàm xử lý hiển thị kết quả backtest (thay vì navigate)
-  const handleShowBacktestResult = useCallback((id: string) => {
-    setSelectedBacktestId(id);
-    setCurrentView(BacktestView.RESULT);
-  }, []);
-
-  // Hàm xử lý quay lại danh sách backtest từ trang kết quả
-  const handleBackToList = useCallback(() => {
-    setCurrentView(BacktestView.LIST);
-    setSelectedBacktestId(null);
-  }, []);
+  // Điều hướng sang trang chi tiết kết quả backtest
+  const handleShowBacktestResult = useCallback(
+    (id: string) => {
+      navigate(`/backtest/${id}`);
+    },
+    [navigate]
+  );
 
   // Handle edit backtest directly
   const handleEditBacktest = useCallback(
@@ -559,9 +544,9 @@ const Backtest = () => {
     [t]
   );
 
-  // Render dựa vào currentView
-  if (currentView === BacktestView.RESULT && selectedBacktestId) {
-    return <BacktestResult id={selectedBacktestId} onBack={handleBackToList} />;
+  // Render detail view when the route targets a specific backtest
+  if (isResultRoute) {
+    return <Outlet />;
   }
 
   return (

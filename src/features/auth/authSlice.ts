@@ -117,6 +117,23 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    updateTokens: (state, action: PayloadAction<Token>) => {
+      state.accessToken = action.payload.access_token;
+      state.refreshToken = action.payload.refresh_token;
+      state.accessTokenExpiresAt = action.payload.access_token_expires_at;
+      state.refreshTokenExpiresAt = action.payload.refresh_token_expires_at;
+      state.isLoggedIn = !!action.payload.access_token;
+    },
+    forceLogout: (state) => {
+      state.isLoading = false;
+      state.isLoggedIn = false;
+      state.user = null;
+      state.accessToken = null;
+      state.refreshToken = null;
+      state.accessTokenExpiresAt = null;
+      state.refreshTokenExpiresAt = null;
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -222,5 +239,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError } = authSlice.actions;
+export const { clearError, updateTokens, forceLogout } = authSlice.actions;
 export default authSlice.reducer;

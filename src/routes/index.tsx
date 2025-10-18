@@ -67,7 +67,7 @@ export const routes: RouteObject[] = [
             element: <Backtest />,
             children: [
               {
-                path: "result/:id",
+                path: ":id",
                 element: <BacktestResult />,
               },
             ],
