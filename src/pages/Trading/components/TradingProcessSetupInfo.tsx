@@ -38,6 +38,8 @@ interface TradingProcessSetupInfoProps {
     MAX_LOSS?: number;
     MIN_MARGIN?: number;
     MAX_MARGIN_PERCENTAGE?: number;
+    DCA_HEDGE?: number;
+    GRID_HEDGE?: number;
   };
 }
 
@@ -177,6 +179,19 @@ const TradingProcessSetupInfo = ({
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
               <strong>{t("trading.form.fields.pauseTime")}:</strong> {formatValue(setupData?.PAUSE_TIME)}
+            </Typography>
+          </Box>
+
+          {/* Hedge Settings */}
+          <Typography variant="h6" gutterBottom color="primary">
+            {t("trading.setupInfo.sections.hedge")}
+          </Typography>
+          <Box sx={{ ml: 2, mb: 3 }}>
+            <Typography variant="body1" sx={{ mb: 1 }}>
+              <strong>{t("trading.form.fields.dcaHedge")}:</strong> {formatValue(setupData?.DCA_HEDGE, '%')}
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 1 }}>
+              <strong>{t("trading.form.fields.gridHedge")}:</strong> {formatValue(setupData?.GRID_HEDGE, '%')}
             </Typography>
           </Box>
         </Box>

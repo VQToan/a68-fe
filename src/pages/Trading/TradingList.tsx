@@ -18,6 +18,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import FileCopyIcon from "@mui/icons-material/FileCopy";
 import type { TradingProcess, TradingStatusType } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
 import StickyTable from "@components/StickyTable";
@@ -32,6 +33,7 @@ interface TradingListProps {
   onStart: (id: string) => void;
   onStop: (process: TradingProcess) => void;
   onRefresh: () => void;
+  onDuplicate: (process: TradingProcess) => void;
   pagination: {
     total: number;
     page: number;
@@ -70,6 +72,7 @@ const TradingList = ({
   onDelete,
   onStart,
   onStop,
+  onDuplicate,
   pagination,
   onPageChange,
   onRowsPerPageChange,
@@ -254,6 +257,17 @@ const TradingList = ({
                         onClick={() => onEdit(process._id)}
                       >
                         <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+
+                    {/* Duplicate button */}
+                    <Tooltip title={t("common.duplicate")}>
+                      <IconButton
+                        size="small"
+                        color="success"
+                        onClick={() => onDuplicate(process)}
+                      >
+                        <FileCopyIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
 

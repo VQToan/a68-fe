@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from './reduxHooks';
 import {
   fetchTradingProcesses,
@@ -24,9 +25,9 @@ export const useTradingProcess = () => {
     error,
   } = useAppSelector((state) => state.tradingProcess);
 
-  const getProcesses = (status?: TradingStatusType, skip?: number, limit?: number) => {
+  const getProcesses = useCallback((status?: TradingStatusType, skip?: number, limit?: number) => {
     return dispatch(fetchTradingProcesses({ status, skip, limit }));
-  };
+  }, [dispatch]);
 
   const getProcessById = (id: string) => {
     return dispatch(fetchTradingProcessById(id));

@@ -296,6 +296,7 @@
         "trading": "Tham số giao dịch",
         "profitMargin": "Cài đặt lợi nhuận và biên độ",
         "indicators": "Chỉ báo kỹ thuật",
+        "hedge": "Cài đặt hedge",
         "dca": "Cài đặt DCA"
       },
       "fields": {
@@ -333,7 +334,9 @@
         "rsiExitShortCandle": "RSI Short Exit (candle)",
         "dcaGrid": "Lưới DCA (DCA_GRID)",
         "gridMultiplier": "Hệ số lưới (GRID_MULTIPLIER)",
-        "dcaMultiplier": "Hệ số DCA (DCA_MULTIPLIER)"
+        "dcaMultiplier": "Hệ số DCA (DCA_MULTIPLIER)",
+        "dcaHedge": "DCA hedge (%) (DCA_HEDGE)",
+        "gridHedge": "Grid hedge (%) (GRID_HEDGE)"
       },
       "validation": {
         "nameRequired": "Tên trading process là bắt buộc",
@@ -452,7 +455,8 @@
         "trading": "Thông số trading",
         "risk": "Quản lý rủi ro",
         "indicators": "Chỉ báo kỹ thuật",
-        "dca": "Cài đặt DCA"
+        "dca": "Cài đặt DCA",
+        "hedge": "Cài đặt hedge"
       }
     },
     "details": {
@@ -591,6 +595,7 @@
         "trading": "Tham số giao dịch",
         "profitMargin": "Cài đặt lợi nhuận & biên độ",
         "indicators": "Chỉ báo kỹ thuật",
+        "hedge": "Cài đặt hedge",
         "dca": "Cài đặt DCA",
         "rsi": "Cài đặt RSI"
       },
@@ -627,7 +632,9 @@
         "rsiExitShortCandle": "RSI Short Exit (candle)",
         "dcaGrid": "Lưới DCA",
         "gridMultiplier": "Hệ số lưới",
-        "dcaMultiplier": "Hệ số DCA"
+        "dcaMultiplier": "Hệ số DCA",
+        "dcaHedge": "DCA hedge (%)",
+        "gridHedge": "Grid hedge (%)"
       },
       "validation": {
         "nameRequired": "Tên backtest là bắt buộc",
@@ -754,6 +761,7 @@
     "cancel": "Hủy",
     "save": "Lưu",
     "delete": "Xóa",
+    "duplicate": "Nhân bản",
     "edit": "Chỉnh sửa",
     "create": "Tạo mới",
     "update": "Cập nhật",

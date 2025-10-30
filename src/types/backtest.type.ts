@@ -30,6 +30,8 @@ export interface BacktestParameter {
   DCA_GRID: number;
   GRID_MULTIPLIER: number;
   DCA_MULTIPLIER: number;
+  DCA_HEDGE: number;
+  GRID_HEDGE: number;
   TRAILING_PERCENTAGE: number;
   CALLBACK_PERCENTAGE: number;
   RSI_ENTRY_SHORT: number;

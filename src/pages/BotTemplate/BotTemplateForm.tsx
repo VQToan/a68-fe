@@ -237,12 +237,15 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
             <Controller
               name="is_future"
               control={control}
-              render={({ field: { value, onChange } }) => (
+              render={({ field }) => (
                 <FormControlLabel
                   control={
                     <Switch
-                      checked={value}
-                      onChange={onChange}
+                      checked={Boolean(field.value)}
+                      onChange={(_, checked) => field.onChange(checked)}
+                      onBlur={field.onBlur}
+                      inputRef={field.ref}
+                      name={field.name}
                       disabled={isSubmitting}
                     />
                   }

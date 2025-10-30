@@ -48,6 +48,9 @@ const ModuleBot = () => {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
+  const [duplicateModuleData, setDuplicateModuleData] = useState<
+    Partial<IModuleBot> | undefined
+  >(undefined);
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -93,16 +96,21 @@ const ModuleBot = () => {
   const handleOpenDialog = useCallback(
     (mode: FormMode = "create") => {
       setDialogMode(mode);
+      if (mode === "create") {
+        setDuplicateModuleData(undefined);
+        clearCurrentModule();
+      }
       setOpenDialog(true);
     },
-    [setDialogMode, setOpenDialog]
+    [clearCurrentModule]
   );
 
   const handleCloseDialog = useCallback(() => {
     setOpenDialog(false);
     // Clear the current module when dialog closes
     clearCurrentModule();
-  }, [clearCurrentModule, setOpenDialog]);
+    setDuplicateModuleData(undefined);
+  }, [clearCurrentModule]);
 
   // Handle form submission (add or update module)
   const handleSubmitModule = useCallback(
@@ -154,6 +162,22 @@ const ModuleBot = () => {
       }
     },
     [getModuleById, handleOpenDialog]
+  );
+
+  const handleDuplicateModule = useCallback(
+    (module: IModuleBot) => {
+      clearCurrentModule();
+      setDuplicateModuleData({
+        name: `${module.name} Copy`,
+        name_in_source: `${module.name_in_source}_copy`,
+        description: module.description,
+        type: module.type,
+        is_future: module.is_future,
+      });
+      setDialogMode("create");
+      setOpenDialog(true);
+    },
+    [clearCurrentModule]
   );
 
   // Handle opening confirm delete dialog
@@ -301,6 +325,7 @@ const ModuleBot = () => {
           onEdit={handleEditModule}
           onDelete={(id, name) => handleOpenDeleteConfirm(id, name)}
           onView={handleViewModule}
+          onDuplicate={handleDuplicateModule}
         />
       </Paper>
 
@@ -313,7 +338,10 @@ const ModuleBot = () => {
         footer={getModalFooter()}
       >
         <ModuleBotForm
-          initialData={currentModule || {}}
+          initialData=
+            {dialogMode === "create"
+              ? duplicateModuleData || {}
+              : currentModule || {}}
           onSubmit={handleSubmitModule}
           mode={dialogMode}
           formId="module-bot-form"

@@ -79,6 +79,8 @@ const defaultBotParams: Partial<BacktestParameter> = {
   RSI_EXIT_SHORT_CANDLE: 40,
   RSI_EXIT_LONG_CANDLE: 60,
   TIME_BETWEEN_ORDERS: 0,
+  DCA_HEDGE: 10,
+  GRID_HEDGE: 1,
   PAUSE_TIME: "00:00-00:00",
   PAUSE_DAY: "",
 };
@@ -394,12 +396,15 @@ const BacktestForm = ({
             <Controller
               name="is_future"
               control={control}
-              render={({ field: { value, onChange } }) => (
+              render={({ field }) => (
                 <FormControlLabel
                   control={
                     <Switch
-                      checked={value}
-                      onChange={onChange}
+                      checked={Boolean(field.value)}
+                      onChange={(_, checked) => field.onChange(checked)}
+                      onBlur={field.onBlur}
+                      inputRef={field.ref}
+                      name={field.name}
                       disabled={isSubmitting}
                     />
                   }
@@ -861,6 +866,51 @@ const BacktestForm = ({
                     fullWidth
                     parseValue={toNumber}
                   />
+                  </Grid>
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+
+            {/* Hedge Settings */}
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>{t("backtest.form.sections.hedge")}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <ParameterTextField
+                      paramName="DCA_HEDGE"
+                      label={t("backtest.form.fields.dcaHedge")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                      inputProps={{ step: "0.1" }}
+                      slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">%</InputAdornment>
+                          ),
+                        },
+                      }}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <ParameterTextField
+                      paramName="GRID_HEDGE"
+                      label={t("backtest.form.fields.gridHedge")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                      inputProps={{ step: "0.1" }}
+                      slotProps={{
+                        input: {
+                          endAdornment: (
+                            <InputAdornment position="end">%</InputAdornment>
+                          ),
+                        },
+                      }}
+                    />
                   </Grid>
                 </Grid>
               </AccordionDetails>

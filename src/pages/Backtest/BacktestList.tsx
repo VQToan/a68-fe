@@ -25,6 +25,7 @@ import StopIcon from "@mui/icons-material/Stop";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import FileCopyIcon from "@mui/icons-material/FileCopy";
 import { areEqual, formatDate } from "@utils/common";
 import type { BacktestProcess, BacktestStatus } from "@/types/backtest.type";
 import { useTranslation } from "react-i18next";
@@ -46,6 +47,7 @@ interface BacktestListProps {
   onRun: (id: string) => void;
   onStop: (id: string) => void;
   onRefresh: () => void;
+  onDuplicate: (process: BacktestProcess) => void;
   // Pagination props
   pagination: PaginationMetadata;
   onPageChange: (page: number) => void;
@@ -86,6 +88,7 @@ const BacktestList = ({
   onDelete,
   onRun,
   onStop,
+  onDuplicate,
   pagination,
   onPageChange,
   onRowsPerPageChange,
@@ -171,6 +174,16 @@ const BacktestList = ({
       handleMenuClose();
     }
   }, [selectedId, processes, onDelete, handleMenuClose]);
+
+  const handleDuplicate = useCallback(() => {
+    if (selectedId) {
+      const process = processes.find((p) => p._id === selectedId);
+      if (process) {
+        onDuplicate(process);
+      }
+      handleMenuClose();
+    }
+  }, [selectedId, processes, onDuplicate, handleMenuClose]);
 
   const handleRun = useCallback(() => {
     if (selectedId) {
@@ -371,6 +384,12 @@ const BacktestList = ({
             <EditIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary={t("common.edit")} />
+        </MenuItem>
+        <MenuItem onClick={handleDuplicate}>
+          <ListItemIcon>
+            <FileCopyIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={t("common.duplicate")} />
         </MenuItem>
         {selectedId && (
           <>

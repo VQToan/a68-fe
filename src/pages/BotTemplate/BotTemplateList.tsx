@@ -16,6 +16,7 @@ import StickyTable from "@components/StickyTable";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import FileCopyIcon from "@mui/icons-material/FileCopy";
 import type { BotTemplate } from "../../types/botTemplate.types";
 import { areEqual, formatDate } from "@/utils/common";
 import { useTranslation } from "react-i18next";
@@ -26,6 +27,7 @@ interface BotTemplateListProps {
   onEdit?: (id: string) => void;
   onDelete?: (id: string, name: string) => void;
   onView?: (id: string) => void;
+  onDuplicate?: (template: BotTemplate) => void;
 }
 
 const BotTemplateList: React.FC<BotTemplateListProps> = ({
@@ -34,6 +36,7 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
   onEdit,
   onDelete,
   onView,
+  onDuplicate,
 }) => {
   const { t } = useTranslation();
   if (isLoading) {
@@ -127,6 +130,18 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
                           onClick={() => onEdit(template._id)}
                         >
                           <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+
+                    {onDuplicate && (
+                      <Tooltip title={t("common.duplicate")}>
+                        <IconButton
+                          size="small"
+                          color="success"
+                          onClick={() => onDuplicate(template)}
+                        >
+                          <FileCopyIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     )}

@@ -16,6 +16,7 @@ import StickyTable from '@components/StickyTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import type { IModuleBot } from "@services/moduleBots.service";
 import { areEqual, formatDate } from "@utils/common";
 import { useTranslation } from 'react-i18next';
@@ -26,6 +27,7 @@ interface ModuleBotListProps {
   onEdit?: (id: string) => void;
   onDelete?: (id: string, name: string) => void;
   onView?: (id: string) => void;
+  onDuplicate?: (module: IModuleBot) => void;
 }
 
 // Helper function to truncate text with ellipsis
@@ -39,7 +41,8 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
   isLoading,
   onEdit,
   onDelete,
-  onView
+  onView,
+  onDuplicate
 }) => {
   const { t } = useTranslation();
 
@@ -143,7 +146,19 @@ const ModuleBotList: React.FC<ModuleBotListProps> = ({
                         </IconButton>
                       </Tooltip>
                     )}
-                    
+
+                    {onDuplicate && (
+                      <Tooltip title={t('common.duplicate')}>
+                        <IconButton 
+                          size="small"
+                          color="success"
+                          onClick={() => onDuplicate(module)}
+                        >
+                          <FileCopyIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+
                     {onDelete && (
                       <Tooltip title={t('moduleBot.list.deleteTooltip')}>
                         <IconButton 

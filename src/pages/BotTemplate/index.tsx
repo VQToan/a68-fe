@@ -23,6 +23,7 @@ import BotTemplateList from "./BotTemplateList";
 import BotTemplateForm from "./BotTemplateForm";
 import BotTemplateDetail from "./BotTemplateDetail";
 import type {
+  BotTemplate,
   BotTemplateCreate,
   BotTemplateUpdate,
 } from "../../types/botTemplate.types";
@@ -64,6 +65,9 @@ const BotTemplate = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
   const { t } = useTranslation();
+  const [duplicateTemplateData, setDuplicateTemplateData] = useState<
+    BotTemplateUpdate | undefined
+  >(undefined);
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -109,6 +113,7 @@ const BotTemplate = () => {
     (mode: FormMode = "create") => {
       setDialogMode(mode);
       if (mode === "create") {
+        setDuplicateTemplateData(undefined);
         clearCurrentTemplate();
       }
       setOpenDialog(true);
@@ -118,6 +123,7 @@ const BotTemplate = () => {
 
   const handleCloseDialog = useCallback(() => {
     setOpenDialog(false);
+    setDuplicateTemplateData(undefined);
     // Delay clearing current template to avoid UI flicker during dialog close animation
     setTimeout(() => {
       if (dialogMode === "create") {
@@ -184,6 +190,26 @@ const BotTemplate = () => {
       }
     },
     [getTemplateById, handleOpenDialog]
+  );
+
+  const handleDuplicateTemplate = useCallback(
+    (template: BotTemplate) => {
+      clearCurrentTemplate();
+      setDuplicateTemplateData({
+        name: `${template.name} Copy`,
+        description: template.description,
+        entry_module: template.entry_module,
+        exit_module: template.exit_module,
+        dca_cutloss_module: template.dca_cutloss_module,
+        entry_hedge_module: template.entry_hedge_module,
+        after_hedge_module: template.after_hedge_module,
+        stop_loss_module: template.stop_loss_module,
+        is_future: template.is_future,
+      });
+      setDialogMode("create");
+      setOpenDialog(true);
+    },
+    [clearCurrentTemplate]
   );
 
   // Handle opening confirm delete dialog
@@ -338,6 +364,7 @@ const BotTemplate = () => {
           onEdit={handleEditTemplate}
           onDelete={(id, name) => handleOpenDeleteConfirm(id, name)}
           onView={handleViewTemplate}
+          onDuplicate={handleDuplicateTemplate}
         />
       </Paper>
 
@@ -357,7 +384,11 @@ const BotTemplate = () => {
           />
         ) : (
           <BotTemplateForm
-            initialData={currentTemplate || undefined}
+            initialData={
+              dialogMode === "create"
+                ? duplicateTemplateData
+                : currentTemplate || undefined
+            }
             onSubmit={handleSubmit}
             isSubmitting={isLoading}
             isEditMode={dialogMode === "edit"}

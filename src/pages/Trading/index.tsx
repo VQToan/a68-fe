@@ -25,6 +25,7 @@ import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
 import type { TradingStatusType, TradingProcess, TradingProcessCreate, TradingProcessUpdate } from "@/types/trading.types";
+import type { BacktestParameter } from "@/types/backtest.type";
 import { areEqual } from "@/utils/common";
 import FilterTabs from "@components/FilterTabs";
 import { useTranslation } from "react-i18next";
@@ -64,6 +65,15 @@ const tabStatusMap: Record<string, TradingStatusType | undefined> = {
   paused: "paused",
 };
 
+type TradingDuplicatePayload = {
+  name: string;
+  description: string;
+  bot_template_id: string;
+  trading_account_id: string;
+  parameters: Record<keyof BacktestParameter, any>;
+  is_future: boolean;
+};
+
 const Trading = () => {
   const navigate = useNavigate();
   
@@ -100,6 +110,7 @@ const Trading = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
   const { t } = useTranslation();
+  const [duplicateProcessData, setDuplicateProcessData] = useState<TradingDuplicatePayload | null>(null);
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -205,6 +216,7 @@ const Trading = () => {
   const handleOpenDialog = useCallback((mode: FormMode = "create") => {
     setDialogMode(mode);
     if (mode === "create") {
+      setDuplicateProcessData(null);
       clearCurrentProcess();
     }
     setOpenDialog(true);
@@ -214,6 +226,7 @@ const Trading = () => {
     setOpenDialog(false);
     // Clear the current process when dialog closes
     clearCurrentProcess();
+    setDuplicateProcessData(null);
   }, [clearCurrentProcess]);
 
   // Handle form submission (add or update trading process)
@@ -253,6 +266,24 @@ const Trading = () => {
       }
     },
     [getProcessById, handleOpenDialog]
+  );
+
+  const handleDuplicateTradingProcess = useCallback(
+    (process: TradingProcess) => {
+      const clonedParameters = { ...process.parameters } as Record<keyof BacktestParameter, any>;
+      setDuplicateProcessData({
+        name: `${process.name} Copy`,
+        description: process.description,
+        bot_template_id: process.bot_template_id,
+        trading_account_id: process.trading_account_id,
+        parameters: clonedParameters,
+        is_future: process.is_future,
+      });
+      setDialogMode("create");
+      clearCurrentProcess();
+      setOpenDialog(true);
+    },
+    [clearCurrentProcess]
   );
 
   // Handle view trading process detail
@@ -478,6 +509,7 @@ const Trading = () => {
             onStart={handleStartTradingProcess}
             onStop={handleOpenStopConfirm}
             onRefresh={handleRefreshTradingProcesses}
+            onDuplicate={handleDuplicateTradingProcess}
             pagination={pagination}
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
@@ -494,14 +526,24 @@ const Trading = () => {
         footer={getModalFooter()}
       >
         <TradingForm
-          initialData={currentProcess ? {
-            _id: currentProcess._id,
-            name: currentProcess.name,
-            description: currentProcess.description,
-            parameters: currentProcess.parameters,
-            bot_template_id: currentProcess.bot_template_id,
-            trading_account_id: currentProcess.trading_account_id,
-          } : undefined}
+          initialData={
+            dialogMode === "edit" && currentProcess
+              ? {
+                  _id: currentProcess._id,
+                  name: currentProcess.name,
+                  description: currentProcess.description,
+                  parameters: currentProcess.parameters,
+                  bot_template_id: currentProcess.bot_template_id,
+                  trading_account_id: currentProcess.trading_account_id,
+                  is_future: currentProcess.is_future,
+                }
+              : dialogMode === "create" && duplicateProcessData
+              ? {
+                  ...duplicateProcessData,
+                  parameters: { ...duplicateProcessData.parameters },
+                }
+              : undefined
+          }
           onSubmit={handleSubmitTradingProcess}
           isSubmitting={isLoading}
           isEditMode={dialogMode === "edit"}

@@ -297,6 +297,7 @@
         "trading": "Trading parameters",
         "profitMargin": "Profit and margin settings",
         "indicators": "Technical indicators",
+        "hedge": "Hedge settings",
         "dca": "DCA settings"
       },
       "fields": {
@@ -334,7 +335,9 @@
         "rsiExitShortCandle": "RSI short exit (candle)",
         "dcaGrid": "DCA grid (DCA_GRID)",
         "gridMultiplier": "Grid multiplier (GRID_MULTIPLIER)",
-        "dcaMultiplier": "DCA multiplier (DCA_MULTIPLIER)"
+        "dcaMultiplier": "DCA multiplier (DCA_MULTIPLIER)",
+        "dcaHedge": "DCA hedge (%) (DCA_HEDGE)",
+        "gridHedge": "Grid hedge (%) (GRID_HEDGE)"
       },
       "validation": {
         "nameRequired": "Trading process name is required",
@@ -453,7 +456,8 @@
         "trading": "Trading parameters",
         "risk": "Risk management",
         "indicators": "Technical indicators",
-        "dca": "DCA settings"
+        "dca": "DCA settings",
+        "hedge": "Hedge settings"
       }
     },
     "details": {
@@ -591,6 +595,7 @@
         "trading": "Trading parameters",
         "profitMargin": "Profit and margin settings",
         "indicators": "Technical indicators",
+        "hedge": "Hedge settings",
         "dca": "DCA settings",
         "rsi": "RSI settings"
       },
@@ -627,7 +632,9 @@
         "rsiExitShortCandle": "RSI short exit (candle)",
         "dcaGrid": "DCA grid",
         "gridMultiplier": "Grid multiplier",
-        "dcaMultiplier": "DCA multiplier"
+        "dcaMultiplier": "DCA multiplier",
+        "dcaHedge": "DCA hedge (%)",
+        "gridHedge": "Grid hedge (%)"
       },
       "validation": {
         "nameRequired": "Backtest name is required",
@@ -754,6 +761,7 @@
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
+    "duplicate": "Duplicate",
     "edit": "Edit",
     "create": "Create",
     "update": "Update",

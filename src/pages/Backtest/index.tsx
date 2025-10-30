@@ -28,8 +28,10 @@ import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
 import type {
   BacktestStatus,
+  BacktestProcess,
   BacktestProcessCreate,
   BacktestProcessUpdate,
+  BacktestParameter,
 } from "@/types/backtest.type";
 import { areEqual } from "@/utils/common";
 import FilterTabs from "@components/FilterTabs";
@@ -70,6 +72,14 @@ const tabStatusMap: Record<string, BacktestStatus | undefined> = {
   stopped: "stopped",
 };
 
+type BacktestDuplicatePayload = {
+  name: string;
+  description: string;
+  bot_template_id: string;
+  parameters: Record<keyof BacktestParameter, any>;
+  is_future: boolean;
+};
+
 const Backtest = () => {
   const navigate = useNavigate();
   const isResultRoute = useMatch("/backtest/:id");
@@ -104,6 +114,7 @@ const Backtest = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
   const { t } = useTranslation();
+  const [duplicateProcessData, setDuplicateProcessData] = useState<BacktestDuplicatePayload | null>(null);
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -218,15 +229,23 @@ const Backtest = () => {
   }, []);
 
   // Handle dialog open/close
-  const handleOpenDialog = useCallback((mode: FormMode = "create") => {
-    setDialogMode(mode);
-    setOpenDialog(true);
-  }, []);
+  const handleOpenDialog = useCallback(
+    (mode: FormMode = "create") => {
+      setDialogMode(mode);
+      if (mode === "create") {
+        setDuplicateProcessData(null);
+        clearCurrentProcess();
+      }
+      setOpenDialog(true);
+    },
+    [clearCurrentProcess]
+  );
 
   const handleCloseDialog = useCallback(() => {
     setOpenDialog(false);
     // Clear the current process when dialog closes
     clearCurrentProcess();
+    setDuplicateProcessData(null);
   }, [clearCurrentProcess]);
 
   // Handle form submission (add or update backtest)
@@ -294,6 +313,23 @@ const Backtest = () => {
       }
     },
     [getProcessById, handleOpenDialog]
+  );
+
+  const handleDuplicateBacktest = useCallback(
+    (process: BacktestProcess) => {
+      const clonedParameters = { ...process.parameters } as Record<keyof BacktestParameter, any>;
+      setDuplicateProcessData({
+        name: `${process.name} Copy`,
+        description: process.description,
+        bot_template_id: process.bot_template_id,
+        parameters: clonedParameters,
+        is_future: process.is_future,
+      });
+      setDialogMode("create");
+      clearCurrentProcess();
+      setOpenDialog(true);
+    },
+    [clearCurrentProcess]
   );
 
   // Handle opening confirm delete dialog
@@ -682,6 +718,7 @@ const Backtest = () => {
             onRun={handleRunBacktest}
             onStop={handleStopBacktest}
             onRefresh={handleRefreshBacktests}
+            onDuplicate={handleDuplicateBacktest}
             pagination={pagination}
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
@@ -694,25 +731,31 @@ const Backtest = () => {
         open={openDialog}
         onClose={handleCloseDialog}
         title={t(dialogTitleKey)}
-        maxWidth="sm"
-        footer={getModalFooter()}
-      >
-        <BacktestForm
-          initialData={
-            currentProcess
+      maxWidth="sm"
+      footer={getModalFooter()}
+    >
+      <BacktestForm
+        initialData={
+            dialogMode === "edit" && currentProcess
               ? {
                   _id: currentProcess._id,
                   name: currentProcess.name,
                   description: currentProcess.description,
                   parameters: currentProcess.parameters,
                   bot_template_id: currentProcess.bot_template_id,
+                  is_future: currentProcess.is_future,
+                }
+              : dialogMode === "create" && duplicateProcessData
+              ? {
+                  ...duplicateProcessData,
+                  parameters: { ...duplicateProcessData.parameters },
                 }
               : undefined
-          }
-          onSubmit={handleSubmitBacktest}
-          isSubmitting={isLoading}
-          isEditMode={dialogMode === "edit"}
-          formId="backtest-form"
+        }
+        onSubmit={handleSubmitBacktest}
+        isSubmitting={isLoading}
+        isEditMode={dialogMode === "edit"}
+        formId="backtest-form"
         />
       </Modal>
 
