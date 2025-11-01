@@ -127,6 +127,7 @@ export interface OpenPositionRequest {
   order_type?: "MARKET" | "LIMIT";
   price?: number;
   time_in_force?: "GTC" | "IOC" | "FOK";
+  leverage?: number;
 }
 
 export interface ClosePositionRequest {

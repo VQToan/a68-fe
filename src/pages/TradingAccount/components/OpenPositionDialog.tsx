@@ -25,7 +25,7 @@ interface OpenPositionDialogProps {
   onSubmit: (data: OpenPositionRequest) => Promise<void>;
   initialSymbol?: string;
   initialSide?: "BUY" | "SELL";
-  initialPositionSide?: "LONG" | "SHORT";
+  initialPositionSide?: "BOTH" | "LONG" | "SHORT";
 }
 
 const OpenPositionDialog = ({
@@ -34,16 +34,17 @@ const OpenPositionDialog = ({
   onSubmit,
   initialSymbol = "",
   initialSide = "BUY",
-  initialPositionSide = "LONG",
+  initialPositionSide = "BOTH",
 }: OpenPositionDialogProps) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState<OpenPositionRequest>({
     symbol: initialSymbol,
     side: initialSide,
     quantity: 0,
-    position_side: initialPositionSide,
+    position_side: initialPositionSide ?? "BOTH",
     order_type: "MARKET",
     time_in_force: "GTC",
+    leverage: undefined,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,9 +56,10 @@ const OpenPositionDialog = ({
         symbol: initialSymbol,
         side: initialSide,
         quantity: 0,
-        position_side: initialPositionSide,
+        position_side: initialPositionSide ?? "BOTH",
         order_type: "MARKET",
         time_in_force: "GTC",
+        leverage: undefined,
       });
       setError(null);
     }
@@ -69,7 +71,14 @@ const OpenPositionDialog = ({
     const value = event.target.value;
     setFormData(prev => ({
       ...prev,
-      [field]: field === 'quantity' || field === 'price' ? Number(value) : value,
+      [field]:
+        field === 'quantity'
+          ? Number(value)
+          : field === 'price'
+          ? Number(value)
+          : field === 'leverage'
+          ? value === "" ? undefined : Number(value)
+          : value,
     }));
   };
 
@@ -175,6 +184,19 @@ const OpenPositionDialog = ({
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label={t("tradingAccount.detail.openDialog.fields.leverage")}
+                type="number"
+                value={formData.leverage ?? ""}
+                onChange={handleInputChange('leverage')}
+                inputProps={{ min: 0, step: "any" }}
+                disabled={isSubmitting}
+                placeholder={t("tradingAccount.detail.openDialog.placeholders.leverage")}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
               <FormControl fullWidth disabled={isSubmitting}>
                 <InputLabel>{t("tradingAccount.detail.openDialog.fields.orderType")}</InputLabel>
                 <Select
@@ -238,6 +260,11 @@ const OpenPositionDialog = ({
               {formData.order_type === "LIMIT" && formData.price
                 ? ` ${t("tradingAccount.detail.openDialog.summary.limitPrice", { price: formData.price })}`
                 : ""}
+            </Typography>
+            <Typography variant="body2">
+              {formData.leverage != null
+                ? t("tradingAccount.detail.openDialog.summary.leverageValue", { leverage: formData.leverage })
+                : t("tradingAccount.detail.openDialog.summary.leverageNone")}
             </Typography>
           </Box>
         </Box>

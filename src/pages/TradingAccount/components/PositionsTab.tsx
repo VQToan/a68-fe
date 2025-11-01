@@ -59,11 +59,11 @@ const PositionsTab = ({
   const [newPositionData, setNewPositionData] = useState<{
     symbol: string;
     side: "BUY" | "SELL";
-    positionSide: "LONG" | "SHORT";
+    positionSide: "BOTH" | "LONG" | "SHORT";
   }>({
     symbol: "",
     side: "BUY",
-    positionSide: "LONG",
+    positionSide: "BOTH",
   });
 
   // Handle opening new position dialog
@@ -71,13 +71,13 @@ const PositionsTab = ({
     setNewPositionData({
       symbol: "",
       side: "BUY",
-      positionSide: "LONG",
+      positionSide: "BOTH",
     });
     setOpenPositionDialog(true);
   };
 
   // Handle opening position with pre-filled data
-  const handleOpenPositionWithSymbol = (symbol: string, side: "BUY" | "SELL", positionSide: "LONG" | "SHORT") => {
+  const handleOpenPositionWithSymbol = (symbol: string, side: "BUY" | "SELL", positionSide: "BOTH" | "LONG" | "SHORT") => {
     setNewPositionData({
       symbol,
       side,

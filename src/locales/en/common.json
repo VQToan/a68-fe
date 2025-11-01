@@ -993,9 +993,13 @@
           "side": "Order direction",
           "positionSide": "Position side",
           "quantity": "Quantity",
+          "leverage": "Leverage",
           "orderType": "Order type",
           "price": "Price",
           "timeInForce": "Time in force"
+        },
+        "placeholders": {
+          "leverage": "None"
         },
         "side": {
           "buy": "BUY (Buy)",
@@ -1004,7 +1008,7 @@
         "positionSides": {
           "long": "LONG",
           "short": "SHORT",
-          "both": "BOTH"
+          "both": "NONE"
         },
         "orderTypes": {
           "market": "MARKET",
@@ -1019,7 +1023,9 @@
           "title": "Order summary",
           "line1": "{{side}} {{quantity}} {{symbol}} {{positionSide}}",
           "orderType": "Type: {{orderType}}",
-          "limitPrice": "at price {{price}}"
+          "limitPrice": "at price {{price}}",
+          "leverageValue": "Leverage: x{{leverage}}",
+          "leverageNone": "Leverage: none"
         },
         "actions": {
           "submit": "Open position",

@@ -992,9 +992,13 @@
           "side": "Hướng",
           "positionSide": "Position Side",
           "quantity": "Số lượng",
+          "leverage": "Đòn bẩy",
           "orderType": "Loại lệnh",
           "price": "Giá",
           "timeInForce": "Time in Force"
+        },
+        "placeholders": {
+          "leverage": "Không"
         },
         "side": {
           "buy": "BUY (Mua)",
@@ -1003,7 +1007,7 @@
         "positionSides": {
           "long": "LONG",
           "short": "SHORT",
-          "both": "BOTH"
+          "both": "NONE"
         },
         "orderTypes": {
           "market": "MARKET",
@@ -1018,7 +1022,9 @@
           "title": "Tóm tắt lệnh",
           "line1": "{{side}} {{quantity}} {{symbol}} {{positionSide}}",
           "orderType": "Loại: {{orderType}}",
-          "limitPrice": "tại giá {{price}}"
+          "limitPrice": "tại giá {{price}}",
+          "leverageValue": "Đòn bẩy: x{{leverage}}",
+          "leverageNone": "Đòn bẩy: Không"
         },
         "actions": {
           "submit": "Mở lệnh",

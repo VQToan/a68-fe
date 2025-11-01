@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 
 interface PositionActionButtonsProps {
   position: PositionSummary;
-  onOpenPosition: (symbol: string, side: "BUY" | "SELL", positionSide: "LONG" | "SHORT") => void;
+  onOpenPosition: (symbol: string, side: "BUY" | "SELL", positionSide: "BOTH" | "LONG" | "SHORT") => void;
   onClosePosition: (symbol: string, positionSide: "LONG" | "SHORT" | "BOTH") => void;
   onPartialClosePosition: (position: PositionSummary) => void;
 }
