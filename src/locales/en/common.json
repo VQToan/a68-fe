@@ -488,6 +488,63 @@
       "pagination": {
         "summary": "Page {{current}} / {{total}} • Showing {{visible}} of {{totalItems}} items"
       }
+    },
+    "control": {
+      "title": "Trading Control",
+      "online": "Online",
+      "offline": "Offline",
+      "active": "Active",
+      "quantityLabel": "Quantity (USDT)",
+      "position": {
+        "long": "LONG Position",
+        "short": "SHORT Position",
+        "quantity": "Quantity",
+        "entryPrice": "Entry Price",
+        "unrealizedPnl": "Unrealized PnL",
+        "roi": "ROI",
+        "margin": "Margin",
+        "realizedPnl": "Realized PnL"
+      },
+      "balance": {
+        "initial": "Initial Balance",
+        "current": "Current Balance",
+        "lowest": "Lowest Balance"
+      },
+      "actions": {
+        "refresh": "Refresh",
+        "open": "Open",
+        "close": "Close",
+        "openLong": "Open Long",
+        "openShort": "Open Short",
+        "closeAll": "Close All"
+      },
+      "history": {
+        "title": "Command History",
+        "empty": "No commands yet",
+        "time": "Time",
+        "action": "Action",
+        "side": "Side",
+        "quantity": "Quantity",
+        "status": "Status",
+        "reason": "Reason"
+      },
+      "notifications": {
+        "commandSent": "Command sent (ID: {{commandId}})"
+      },
+      "errors": {
+        "loadState": "Failed to load trading state",
+        "sendCommand": "Failed to send command",
+        "invalidQuantity": "Invalid quantity"
+      },
+      "commandForm": {
+        "title": "Send Trading Command",
+        "action": "Action",
+        "side": "Side",
+        "quantity": "Quantity",
+        "quantityType": "Qty Type",
+        "reason": "Reason",
+        "send": "Send"
+      }
     }
   },
   "backtest": {
@@ -886,12 +943,12 @@
     "detail": {
       "errors": {
         "dashboard": "Failed to load dashboard data",
-      "positions": "Failed to load positions",
-      "spotBalance": "Failed to load spot balances",
-      "refresh": "Failed to refresh data",
-      "openPosition": "Failed to open position",
-      "closePosition": "Failed to close position",
-      "closePartialPosition": "Failed to close partial position"
+        "positions": "Failed to load positions",
+        "spotBalance": "Failed to load spot balances",
+        "refresh": "Failed to refresh data",
+        "openPosition": "Failed to open position",
+        "closePosition": "Failed to close position",
+        "closePartialPosition": "Failed to close partial position"
       },
       "notifications": {
         "refreshSuccess": "Data refreshed",

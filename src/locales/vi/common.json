@@ -488,6 +488,63 @@
       "pagination": {
         "summary": "Trang {{current}} / {{total}} • Hiển thị {{visible}} / {{totalItems}} mục"
       }
+    },
+    "control": {
+      "title": "Điều khiển giao dịch",
+      "online": "Online",
+      "offline": "Offline",
+      "active": "Đang mở",
+      "quantityLabel": "Số lượng (USDT)",
+      "position": {
+        "long": "Vị thế LONG",
+        "short": "Vị thế SHORT",
+        "quantity": "Số lượng",
+        "entryPrice": "Giá vào",
+        "unrealizedPnl": "PnL chưa thực hiện",
+        "roi": "ROI",
+        "margin": "Margin",
+        "realizedPnl": "PnL đã thực hiện"
+      },
+      "balance": {
+        "initial": "Số dư ban đầu",
+        "current": "Số dư hiện tại",
+        "lowest": "Số dư thấp nhất"
+      },
+      "actions": {
+        "refresh": "Làm mới",
+        "open": "Mở lệnh",
+        "close": "Đóng",
+        "openLong": "Mở Long",
+        "openShort": "Mở Short",
+        "closeAll": "Đóng tất cả"
+      },
+      "history": {
+        "title": "Lịch sử lệnh",
+        "empty": "Chưa có lệnh nào",
+        "time": "Thời gian",
+        "action": "Hành động",
+        "side": "Phía",
+        "quantity": "Số lượng",
+        "status": "Trạng thái",
+        "reason": "Lý do"
+      },
+      "notifications": {
+        "commandSent": "Lệnh đã được gửi (ID: {{commandId}})"
+      },
+      "errors": {
+        "loadState": "Không thể tải trạng thái giao dịch",
+        "sendCommand": "Không thể gửi lệnh",
+        "invalidQuantity": "Số lượng không hợp lệ"
+      },
+      "commandForm": {
+        "title": "Gửi lệnh giao dịch",
+        "action": "Hành động",
+        "side": "Phía",
+        "quantity": "Số lượng",
+        "quantityType": "Loại SL",
+        "reason": "Lý do",
+        "send": "Gửi lệnh"
+      }
     }
   },
   "backtest": {

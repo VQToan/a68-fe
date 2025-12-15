@@ -31,7 +31,13 @@ export interface CombineBalanceRequest {
   status: boolean;
 }
 
-export type TradingStatusType = "created" | "queued" | "running" | "stopped" | "failed" | "paused";
+export type TradingStatusType =
+  | "created"
+  | "queued"
+  | "running"
+  | "stopped"
+  | "failed"
+  | "paused";
 
 export interface TradingExchange {
   BINANCE: "binance";
@@ -42,7 +48,12 @@ export interface TradingExchange {
 
 export type TradingExchangeType = "binance" | "bybit" | "okx" | "bitget";
 
-export type AccountStatusType = "pending" | "valid" | "invalid" | "error" | "unsupported";
+export type AccountStatusType =
+  | "pending"
+  | "valid"
+  | "invalid"
+  | "error"
+  | "unsupported";
 
 export interface AccountAsset {
   asset: string;
@@ -314,4 +325,106 @@ export interface TradingAccountPaginatedResponse {
   page: number;
   page_size: number;
   total_pages: number;
+}
+
+// =====================
+// Trading Control Types
+// =====================
+
+// Position State for Trading Control
+export interface PositionState {
+  quantity: number;
+  avg_price: number;
+  entry_price: number;
+  pnl: number;
+  unrealized_pnl: number;
+  roi: number;
+  margin: number;
+  dca_count: number;
+  is_hedge: boolean;
+}
+
+// Trading State Response
+export interface TradingStateResponse {
+  trading_id: string;
+  symbol: string;
+  current_price: number;
+  updated_at: string;
+  long_position: PositionState;
+  short_position: PositionState;
+  is_online: boolean;
+  balance: number;
+  initial_balance: number;
+  lowest_balance: number;
+  highest_balance: number;
+}
+
+// Trading Command Action type
+export type TradingCommandAction = "OPEN" | "CLOSE" | "CLOSE_ALL";
+
+// Trading Side type
+export type TradingSide = "LONG" | "SHORT" | "BOTH";
+
+// Quantity interpretation type
+export type QuantityType = "USDT" | "QUANTITY" | "USDT_PROFIT";
+
+// Trading Reason type
+export type TradingReason =
+  | "ENTRY"
+  | "ENTRY HEDGE"
+  | "EXIT"
+  | "EXIT TP2"
+  | "EXIT SL BREAKEVEN"
+  | "EXIT SL2"
+  | "EXIT HEDGE"
+  | "DCA"
+  | "CUTLOSS"
+  | "CUT LOSS HEDGE"
+  | "PLUS HEDGE"
+  | "MAX LOSS"
+  | "WIPED OUT";
+
+// Trading Command Request
+export interface TradingCommandRequest {
+  action: TradingCommandAction;
+  side: TradingSide;
+  quantity?: number | null;
+  quantity_type?: QuantityType;
+  reason?: TradingReason;
+}
+
+// Trading Command Response
+export interface TradingCommandResponse {
+  command_id: string;
+  trading_id: string;
+  status: string;
+  message: string;
+}
+
+// Command History Item
+export interface CommandHistoryItem {
+  command_id: string;
+  action: string;
+  side: string;
+  quantity: number | null;
+  quantity_type: string | null;
+  reason: string;
+  status: "PENDING" | "EXECUTED" | "FAILED";
+  result: Record<string, unknown> | null;
+  error: string | null;
+  created_at: number;
+  executed_at: number | null;
+}
+
+// Active Trading State (for dashboard)
+export interface ActiveTradingState {
+  trading_id: string;
+  symbol: string;
+  current_price: number;
+  updated_at: string;
+  long_quantity: number;
+  short_quantity: number;
+  balance: number;
+  lowest_balance: number;
+  is_online: boolean;
 }

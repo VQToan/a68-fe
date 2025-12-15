@@ -1,7 +1,7 @@
-import apiClient from './apiClient';
-import type { 
-  TradingProcess, 
-  TradingProcessCreate, 
+import apiClient from "./apiClient";
+import type {
+  TradingProcess,
+  TradingProcessCreate,
   TradingProcessUpdate,
   TradingProcessPaginatedResponse,
   TradingStatusType,
@@ -10,8 +10,8 @@ import type {
   NotificationSetupRequest,
   NotificationStatusResponse,
   CombineBalanceStatusResponse,
-  CombineBalanceRequest
-} from '@/types/trading.types';
+  CombineBalanceRequest,
+} from "@/types/trading.types";
 
 // Trading Process API calls
 
@@ -21,11 +21,13 @@ export const getAll = async (
   limit: number = 100
 ): Promise<TradingProcessPaginatedResponse> => {
   const params = new URLSearchParams();
-  if (status) params.append('status', status);
-  params.append('skip', skip.toString());
-  params.append('limit', limit.toString());
+  if (status) params.append("status", status);
+  params.append("skip", skip.toString());
+  params.append("limit", limit.toString());
 
-  const response = await apiClient.get(`api/v1/trading-processes?${params.toString()}`);
+  const response = await apiClient.get(
+    `api/v1/trading-processes?${params.toString()}`
+  );
   return response.data;
 };
 
@@ -34,12 +36,17 @@ export const getById = async (id: string): Promise<TradingProcess> => {
   return response.data;
 };
 
-export const create = async (data: TradingProcessCreate): Promise<TradingProcess> => {
+export const create = async (
+  data: TradingProcessCreate
+): Promise<TradingProcess> => {
   const response = await apiClient.post(`api/v1/trading-processes`, data);
   return response.data;
 };
 
-export const update = async (id: string, data: TradingProcessUpdate): Promise<TradingProcess> => {
+export const update = async (
+  id: string,
+  data: TradingProcessUpdate
+): Promise<TradingProcess> => {
   const response = await apiClient.put(`api/v1/trading-processes/${id}`, data);
   return response.data;
 };
@@ -53,14 +60,19 @@ export const start = async (id: string): Promise<TradingProcess> => {
   return response.data;
 };
 
-export const stop = async (id: string, clearPositions?: boolean): Promise<TradingProcess> => {
+export const stop = async (
+  id: string,
+  clearPositions?: boolean
+): Promise<TradingProcess> => {
   const params = new URLSearchParams();
   if (clearPositions !== undefined) {
-    params.append('clear', clearPositions ? 'true' : 'false');
+    params.append("clear", clearPositions ? "true" : "false");
   }
 
   const queryString = params.toString();
-  const url = `api/v1/trading-processes/${id}/stop${queryString ? `?${queryString}` : ''}`;
+  const url = `api/v1/trading-processes/${id}/stop${
+    queryString ? `?${queryString}` : ""
+  }`;
 
   const response = await apiClient.post(url);
   return response.data;
@@ -72,39 +84,58 @@ export const getRunningProcesses = async (): Promise<TradingProcess[]> => {
 };
 
 export const getTradingDetails = async (
-  processId: string, 
-  page: number = 1, 
+  processId: string,
+  page: number = 1,
   pageSize: number = 50
 ): Promise<TradingDetailsResponse> => {
   const params = new URLSearchParams();
-  params.append('page', page.toString());
-  params.append('page_size', pageSize.toString());
+  params.append("page", page.toString());
+  params.append("page_size", pageSize.toString());
 
-  const response = await apiClient.get(`api/v1/trading-processes/${processId}/trading-details?${params.toString()}`);
+  const response = await apiClient.get(
+    `api/v1/trading-processes/${processId}/trading-details?${params.toString()}`
+  );
   return response.data;
 };
 
-export const getTradingPerformance = async (processId: string): Promise<TradingPerformanceResponse> => {
-  const response = await apiClient.get(`api/v1/trading-processes/${processId}/performance`);
+export const getTradingPerformance = async (
+  processId: string
+): Promise<TradingPerformanceResponse> => {
+  const response = await apiClient.get(
+    `api/v1/trading-processes/${processId}/performance`
+  );
   return response.data;
 };
 
 // Notification API calls
 
-export const getNotificationStatus = async (processId: string): Promise<NotificationStatusResponse> => {
-  const response = await apiClient.get(`api/v1/notifications/noti-setup/${processId}`);
+export const getNotificationStatus = async (
+  processId: string
+): Promise<NotificationStatusResponse> => {
+  const response = await apiClient.get(
+    `api/v1/notifications/noti-setup/${processId}`
+  );
   return response.data;
 };
 
-export const updateNotificationStatus = async (data: NotificationSetupRequest): Promise<NotificationStatusResponse> => {
-  const response = await apiClient.post(`api/v1/notifications/noti-setup`, data);
+export const updateNotificationStatus = async (
+  data: NotificationSetupRequest
+): Promise<NotificationStatusResponse> => {
+  const response = await apiClient.post(
+    `api/v1/notifications/noti-setup`,
+    data
+  );
   return response.data;
 };
 
 // Combine balance API calls
 
-export const getCombineBalanceStatus = async (processId: string): Promise<CombineBalanceStatusResponse> => {
-  const response = await apiClient.get(`api/v1/trading-processes/${processId}/combine-balance-status`);
+export const getCombineBalanceStatus = async (
+  processId: string
+): Promise<CombineBalanceStatusResponse> => {
+  const response = await apiClient.get(
+    `api/v1/trading-processes/${processId}/combine-balance-status`
+  );
   return response.data;
 };
 
@@ -112,6 +143,75 @@ export const setCombineBalance = async (
   processId: string,
   data: CombineBalanceRequest
 ): Promise<CombineBalanceStatusResponse> => {
-  const response = await apiClient.post(`api/v1/trading-processes/${processId}/set-combine-balance?status=${data.status}`);
+  const response = await apiClient.post(
+    `api/v1/trading-processes/${processId}/set-combine-balance?status=${data.status}`
+  );
+  return response.data;
+};
+
+// =====================
+// Trading Control API
+// =====================
+
+import type {
+  TradingStateResponse,
+  TradingCommandRequest,
+  TradingCommandResponse,
+  CommandHistoryItem,
+  ActiveTradingState,
+} from "@/types/trading.types";
+
+export const getTradingState = async (
+  tradingId: string
+): Promise<TradingStateResponse> => {
+  const response = await apiClient.get(
+    `api/v1/trading-control/${tradingId}/state`
+  );
+  return response.data;
+};
+
+export const sendTradingCommand = async (
+  tradingId: string,
+  command: TradingCommandRequest
+): Promise<TradingCommandResponse> => {
+  const response = await apiClient.post(
+    `api/v1/trading-control/${tradingId}/command`,
+    command
+  );
+  return response.data;
+};
+
+export const getCommandHistory = async (
+  tradingId: string,
+  limit: number = 20
+): Promise<CommandHistoryItem[]> => {
+  const response = await apiClient.get(
+    `api/v1/trading-control/${tradingId}/commands/history?limit=${limit}`
+  );
+  return response.data;
+};
+
+export const getPendingCommands = async (
+  tradingId: string
+): Promise<{ commands: unknown[]; count: number }> => {
+  const response = await apiClient.get(
+    `api/v1/trading-control/${tradingId}/commands/pending`
+  );
+  return response.data;
+};
+
+export const clearPendingCommands = async (
+  tradingId: string
+): Promise<{ message: string }> => {
+  const response = await apiClient.delete(
+    `api/v1/trading-control/${tradingId}/commands/clear`
+  );
+  return response.data;
+};
+
+export const getActiveTradingStates = async (): Promise<
+  ActiveTradingState[]
+> => {
+  const response = await apiClient.get(`api/v1/trading-control/active`);
   return response.data;
 };
