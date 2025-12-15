@@ -948,13 +948,21 @@
         "refresh": "Failed to refresh data",
         "openPosition": "Failed to open position",
         "closePosition": "Failed to close position",
-        "closePartialPosition": "Failed to close partial position"
+        "closePartialPosition": "Failed to close partial position",
+        "placeTakeProfit": "Failed to place take profit order",
+        "placeStopLoss": "Failed to place stop loss order",
+        "cancelOrder": "Failed to cancel order",
+        "cancelAllOrders": "Failed to cancel orders"
       },
       "notifications": {
         "refreshSuccess": "Data refreshed",
         "openPosition": "Position opened successfully",
         "closePosition": "Position closed successfully",
-        "closePartialPosition": "Partial close completed"
+        "closePartialPosition": "Partial close completed",
+        "takeProfitPlaced": "Take profit order placed",
+        "stopLossPlaced": "Stop loss order placed",
+        "orderCancelled": "Order cancelled successfully",
+        "allOrdersCancelled": "{{count}} orders cancelled"
       },
       "actions": {
         "back": "Go back",
@@ -964,7 +972,8 @@
       "tabs": {
         "balance": "Balance",
         "spot": "Spot wallet",
-        "positions": "Open positions"
+        "positions": "Open positions",
+        "orders": "Open Orders"
       },
       "header": {
         "title": "Trading account details"
@@ -1015,7 +1024,8 @@
           "openLong": "Open LONG {{symbol}}",
           "openShort": "Open SHORT {{symbol}}",
           "closePartial": "Close partially",
-          "closeAll": "Close position"
+          "closeAll": "Close position",
+          "tpsl": "Set TP/SL"
         },
         "empty": "No open positions",
         "openNew": "Open new position",
@@ -1140,6 +1150,56 @@
         }
       },
       "empty": "Trading account not found"
+    },
+    "orders": {
+      "title": "Open Orders",
+      "filterSymbol": "Filter by symbol",
+      "refresh": "Refresh",
+      "empty": "No open orders",
+      "cancelOrder": "Cancel order",
+      "cancelAll": "Cancel All",
+      "table": {
+        "symbol": "Symbol",
+        "type": "Type",
+        "side": "Side",
+        "positionSide": "Position",
+        "quantity": "Quantity",
+        "stopPrice": "Stop Price",
+        "status": "Status",
+        "time": "Time",
+        "actions": "Actions"
+      },
+      "errors": {
+        "load": "Failed to load orders",
+        "cancel": "Failed to cancel order",
+        "cancelAll": "Failed to cancel orders"
+      }
+    },
+    "tpsl": {
+      "title": "Take Profit / Stop Loss",
+      "positionInfo": "Position Information",
+      "side": "Side",
+      "quantity": "Quantity",
+      "entryPrice": "Entry Price",
+      "markPrice": "Mark Price",
+      "takeProfit": "Take Profit",
+      "stopLoss": "Stop Loss",
+      "stopPrice": "Trigger Price",
+      "useSuggested": "Use suggested",
+      "quantityOption": "Quantity Option",
+      "fullPosition": "Full Position",
+      "partialPosition": "Partial Position",
+      "max": "Max",
+      "workingType": "Working Type",
+      "contractPrice": "Contract Price",
+      "markPriceOption": "Mark Price",
+      "placeTakeProfit": "Place Take Profit",
+      "placeStopLoss": "Place Stop Loss",
+      "errors": {
+        "invalidPrice": "Please enter a valid trigger price",
+        "invalidQuantity": "Please enter a valid quantity",
+        "submit": "Failed to place order"
+      }
     }
   }
 }

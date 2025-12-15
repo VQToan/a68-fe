@@ -1,26 +1,29 @@
 import { useState } from "react";
-import {
-  Box,
-  Menu,
-  MenuItem,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
+import { Box, Menu, MenuItem, IconButton, Tooltip } from "@mui/material";
 import {
   MoreVert as MoreVertIcon,
   TrendingUp as OpenLongIcon,
   TrendingDown as OpenShortIcon,
   Close as CloseIcon,
   Remove as PartialCloseIcon,
+  Flag as TPSLIcon,
 } from "@mui/icons-material";
 import type { PositionSummary } from "@/types/trading.types";
 import { useTranslation } from "react-i18next";
 
 interface PositionActionButtonsProps {
   position: PositionSummary;
-  onOpenPosition: (symbol: string, side: "BUY" | "SELL", positionSide: "BOTH" | "LONG" | "SHORT") => void;
-  onClosePosition: (symbol: string, positionSide: "LONG" | "SHORT" | "BOTH") => void;
+  onOpenPosition: (
+    symbol: string,
+    side: "BUY" | "SELL",
+    positionSide: "BOTH" | "LONG" | "SHORT"
+  ) => void;
+  onClosePosition: (
+    symbol: string,
+    positionSide: "LONG" | "SHORT" | "BOTH"
+  ) => void;
   onPartialClosePosition: (position: PositionSummary) => void;
+  onTPSL?: (position: PositionSummary) => void;
 }
 
 const PositionActionButtons = ({
@@ -28,6 +31,7 @@ const PositionActionButtons = ({
   onOpenPosition,
   onClosePosition,
   onPartialClosePosition,
+  onTPSL,
 }: PositionActionButtonsProps) => {
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -52,7 +56,10 @@ const PositionActionButtons = ({
   };
 
   const handleClosePosition = () => {
-    onClosePosition(position.symbol, position.position_side as "LONG" | "SHORT" | "BOTH");
+    onClosePosition(
+      position.symbol,
+      position.position_side as "LONG" | "SHORT" | "BOTH"
+    );
     handleClose();
   };
 
@@ -61,27 +68,32 @@ const PositionActionButtons = ({
     handleClose();
   };
 
+  const handleTPSL = () => {
+    if (onTPSL) {
+      onTPSL(position);
+    }
+    handleClose();
+  };
+
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       {/* Quick Close Button */}
       <Tooltip title={t("tradingAccount.detail.positions.tooltips.close")}>
-        <IconButton
-          size="small"
-          color="error"
-          onClick={handleClosePosition}
-        >
+        <IconButton size="small" color="error" onClick={handleClosePosition}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </Tooltip>
 
       {/* More Actions Menu */}
-      <Tooltip title={t("tradingAccount.detail.positions.tooltips.moreActions")}>
+      <Tooltip
+        title={t("tradingAccount.detail.positions.tooltips.moreActions")}
+      >
         <IconButton
           size="small"
           onClick={handleClick}
-          aria-controls={open ? 'position-actions-menu' : undefined}
+          aria-controls={open ? "position-actions-menu" : undefined}
           aria-haspopup="true"
-          aria-expanded={open ? 'true' : undefined}
+          aria-expanded={open ? "true" : undefined}
         >
           <MoreVertIcon fontSize="small" />
         </IconButton>
@@ -93,18 +105,22 @@ const PositionActionButtons = ({
         open={open}
         onClose={handleClose}
         MenuListProps={{
-          'aria-labelledby': 'position-actions-button',
+          "aria-labelledby": "position-actions-button",
         }}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         <MenuItem onClick={handleOpenLong}>
           <OpenLongIcon sx={{ mr: 1 }} color="success" />
-          {t("tradingAccount.detail.positions.actions.openLong", { symbol: position.symbol })}
+          {t("tradingAccount.detail.positions.actions.openLong", {
+            symbol: position.symbol,
+          })}
         </MenuItem>
         <MenuItem onClick={handleOpenShort}>
           <OpenShortIcon sx={{ mr: 1 }} color="error" />
-          {t("tradingAccount.detail.positions.actions.openShort", { symbol: position.symbol })}
+          {t("tradingAccount.detail.positions.actions.openShort", {
+            symbol: position.symbol,
+          })}
         </MenuItem>
         <MenuItem onClick={handlePartialClose}>
           <PartialCloseIcon sx={{ mr: 1 }} color="warning" />
@@ -114,6 +130,12 @@ const PositionActionButtons = ({
           <CloseIcon sx={{ mr: 1 }} color="error" />
           {t("tradingAccount.detail.positions.actions.closeAll")}
         </MenuItem>
+        {onTPSL && (
+          <MenuItem onClick={handleTPSL}>
+            <TPSLIcon sx={{ mr: 1 }} color="info" />
+            {t("tradingAccount.detail.positions.actions.tpsl")}
+          </MenuItem>
+        )}
       </Menu>
     </Box>
   );

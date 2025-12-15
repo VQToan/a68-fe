@@ -12,15 +12,14 @@ import {
   Fab,
 } from "@mui/material";
 import StickyTable from "@components/StickyTable";
-import {
-  Refresh as RefreshIcon,
-  Add as AddIcon,
-} from "@mui/icons-material";
-import type { 
-  PositionSummary, 
-  OpenPositionRequest, 
-  ClosePositionRequest, 
-  ClosePartialPositionRequest 
+import { Refresh as RefreshIcon, Add as AddIcon } from "@mui/icons-material";
+import type {
+  PositionSummary,
+  OpenPositionRequest,
+  ClosePositionRequest,
+  ClosePartialPositionRequest,
+  TakeProfitRequest,
+  StopLossRequest,
 } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
 import { useTranslation } from "react-i18next";
@@ -28,6 +27,7 @@ import PositionActionButtons from "./PositionActionButtons";
 import OpenPositionDialog from "./OpenPositionDialog";
 import ClosePositionDialog from "./ClosePositionDialog";
 import ClosePartialPositionDialog from "./ClosePartialPositionDialog";
+import TPSLDialog from "./TPSLDialog";
 
 interface PositionsTabProps {
   positions: PositionSummary[];
@@ -36,6 +36,8 @@ interface PositionsTabProps {
   onOpenPosition: (data: OpenPositionRequest) => Promise<void>;
   onClosePosition: (data: ClosePositionRequest) => Promise<void>;
   onClosePartialPosition: (data: ClosePartialPositionRequest) => Promise<void>;
+  onPlaceTakeProfit?: (data: TakeProfitRequest) => Promise<void>;
+  onPlaceStopLoss?: (data: StopLossRequest) => Promise<void>;
 }
 
 const PositionsTab = ({
@@ -45,16 +47,20 @@ const PositionsTab = ({
   onOpenPosition,
   onClosePosition,
   onClosePartialPosition,
+  onPlaceTakeProfit,
+  onPlaceStopLoss,
 }: PositionsTabProps) => {
   const { t } = useTranslation();
   // Dialog states
   const [openPositionDialog, setOpenPositionDialog] = useState(false);
   const [closePositionDialog, setClosePositionDialog] = useState(false);
   const [closePartialDialog, setClosePartialDialog] = useState(false);
-  
+  const [tpslDialog, setTpslDialog] = useState(false);
+
   // Selected position for actions
-  const [selectedPosition, setSelectedPosition] = useState<PositionSummary | null>(null);
-  
+  const [selectedPosition, setSelectedPosition] =
+    useState<PositionSummary | null>(null);
+
   // Form states for opening new position
   const [newPositionData, setNewPositionData] = useState<{
     symbol: string;
@@ -77,7 +83,11 @@ const PositionsTab = ({
   };
 
   // Handle opening position with pre-filled data
-  const handleOpenPositionWithSymbol = (symbol: string, side: "BUY" | "SELL", positionSide: "BOTH" | "LONG" | "SHORT") => {
+  const handleOpenPositionWithSymbol = (
+    symbol: string,
+    side: "BUY" | "SELL",
+    positionSide: "BOTH" | "LONG" | "SHORT"
+  ) => {
     setNewPositionData({
       symbol,
       side,
@@ -87,8 +97,13 @@ const PositionsTab = ({
   };
 
   // Handle closing position
-  const handleClosePosition = (symbol: string, positionSide: "LONG" | "SHORT" | "BOTH") => {
-    const position = positions.find(p => p.symbol === symbol && p.position_side === positionSide);
+  const handleClosePosition = (
+    symbol: string,
+    positionSide: "LONG" | "SHORT" | "BOTH"
+  ) => {
+    const position = positions.find(
+      (p) => p.symbol === symbol && p.position_side === positionSide
+    );
     if (position) {
       setSelectedPosition(position);
       setClosePositionDialog(true);
@@ -99,6 +114,12 @@ const PositionsTab = ({
   const handlePartialClosePosition = (position: PositionSummary) => {
     setSelectedPosition(position);
     setClosePartialDialog(true);
+  };
+
+  // Handle TP/SL dialog
+  const handleOpenTPSL = (position: PositionSummary) => {
+    setSelectedPosition(position);
+    setTpslDialog(true);
   };
 
   // Handle dialog submissions
@@ -113,24 +134,32 @@ const PositionsTab = ({
     setSelectedPosition(null);
   };
 
-  const handleClosePartialPositionSubmit = async (data: ClosePartialPositionRequest) => {
+  const handleClosePartialPositionSubmit = async (
+    data: ClosePartialPositionRequest
+  ) => {
     await onClosePartialPosition(data);
     setClosePartialDialog(false);
     setSelectedPosition(null);
   };
 
   // Handle dialog close
-  const handleDialogClose = (dialogType: 'open' | 'close' | 'partial') => {
+  const handleDialogClose = (
+    dialogType: "open" | "close" | "partial" | "tpsl"
+  ) => {
     switch (dialogType) {
-      case 'open':
+      case "open":
         setOpenPositionDialog(false);
         break;
-      case 'close':
+      case "close":
         setClosePositionDialog(false);
         setSelectedPosition(null);
         break;
-      case 'partial':
+      case "partial":
         setClosePartialDialog(false);
+        setSelectedPosition(null);
+        break;
+      case "tpsl":
+        setTpslDialog(false);
         setSelectedPosition(null);
         break;
     }
@@ -138,9 +167,20 @@ const PositionsTab = ({
 
   return (
     <Box sx={{ p: { xs: 1.5, sm: 2.5, md: 3 } }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, gap: 1, flexWrap: 'wrap' }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+          gap: 1,
+          flexWrap: "wrap",
+        }}
+      >
         <Typography variant="h6">
-          {t("tradingAccount.detail.positions.title", { count: positions.length })}
+          {t("tradingAccount.detail.positions.title", {
+            count: positions.length,
+          })}
         </Typography>
         <Button
           variant="outlined"
@@ -149,12 +189,14 @@ const PositionsTab = ({
           disabled={isLoading}
           size="small"
         >
-          {isLoading ? t("common.loading") : t("tradingAccount.detail.positions.actions.refresh")}
+          {isLoading
+            ? t("common.loading")
+            : t("tradingAccount.detail.positions.actions.refresh")}
         </Button>
       </Box>
-      
+
       {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
           <CircularProgress />
         </Box>
       ) : positions.length === 0 ? (
@@ -178,16 +220,42 @@ const PositionsTab = ({
             head={
               <TableHead>
                 <TableRow>
-                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.orderId")}</TableCell>
-                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.symbol")}</TableCell>
-                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.type")}</TableCell>
-                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.quantity")}</TableCell>
-                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.entryPrice")}</TableCell>
-                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.currentPrice")}</TableCell>
-                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.liquidationPrice")}</TableCell>
-                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.pnl")}</TableCell>
-                  <TableCell>{t("tradingAccount.detail.positions.tableHeaders.time")}</TableCell>
-                  <TableCell align="center">{t("tradingAccount.detail.positions.tableHeaders.actions")}</TableCell>
+                  <TableCell>
+                    {t("tradingAccount.detail.positions.tableHeaders.orderId")}
+                  </TableCell>
+                  <TableCell>
+                    {t("tradingAccount.detail.positions.tableHeaders.symbol")}
+                  </TableCell>
+                  <TableCell>
+                    {t("tradingAccount.detail.positions.tableHeaders.type")}
+                  </TableCell>
+                  <TableCell>
+                    {t("tradingAccount.detail.positions.tableHeaders.quantity")}
+                  </TableCell>
+                  <TableCell>
+                    {t(
+                      "tradingAccount.detail.positions.tableHeaders.entryPrice"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {t(
+                      "tradingAccount.detail.positions.tableHeaders.currentPrice"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {t(
+                      "tradingAccount.detail.positions.tableHeaders.liquidationPrice"
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {t("tradingAccount.detail.positions.tableHeaders.pnl")}
+                  </TableCell>
+                  <TableCell>
+                    {t("tradingAccount.detail.positions.tableHeaders.time")}
+                  </TableCell>
+                  <TableCell align="center">
+                    {t("tradingAccount.detail.positions.tableHeaders.actions")}
+                  </TableCell>
                 </TableRow>
               </TableHead>
             }
@@ -196,7 +264,10 @@ const PositionsTab = ({
                 {positions.map((position: PositionSummary, index: number) => (
                   <TableRow key={`${position.order_id}-${index}`} hover>
                     <TableCell>
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontFamily: "monospace" }}
+                      >
                         {position.order_id}
                       </Typography>
                     </TableCell>
@@ -234,15 +305,23 @@ const PositionsTab = ({
                     </TableCell>
                     <TableCell>
                       <Box>
-                        <Typography 
-                          variant="body2" 
-                          color={position.unrealized_pnl >= 0 ? "success.main" : "error.main"}
+                        <Typography
+                          variant="body2"
+                          color={
+                            position.unrealized_pnl >= 0
+                              ? "success.main"
+                              : "error.main"
+                          }
                         >
                           ${position.unrealized_pnl.toFixed(2)}
                         </Typography>
-                        <Typography 
-                          variant="caption" 
-                          color={position.pnl_percentage >= 0 ? "success.main" : "error.main"}
+                        <Typography
+                          variant="caption"
+                          color={
+                            position.pnl_percentage >= 0
+                              ? "success.main"
+                              : "error.main"
+                          }
                         >
                           ({position.pnl_percentage.toFixed(2)}%)
                         </Typography>
@@ -259,6 +338,11 @@ const PositionsTab = ({
                         onOpenPosition={handleOpenPositionWithSymbol}
                         onClosePosition={handleClosePosition}
                         onPartialClosePosition={handlePartialClosePosition}
+                        onTPSL={
+                          onPlaceTakeProfit && onPlaceStopLoss
+                            ? handleOpenTPSL
+                            : undefined
+                        }
                       />
                     </TableCell>
                   </TableRow>
@@ -271,7 +355,7 @@ const PositionsTab = ({
           <Fab
             color="primary"
             aria-label={t("tradingAccount.detail.positions.fabAria")}
-            sx={{ position: 'fixed', bottom: 16, right: 16 }}
+            sx={{ position: "fixed", bottom: 16, right: 16 }}
             onClick={handleOpenNewPosition}
           >
             <AddIcon />
@@ -282,7 +366,7 @@ const PositionsTab = ({
       {/* Dialogs */}
       <OpenPositionDialog
         open={openPositionDialog}
-        onClose={() => handleDialogClose('open')}
+        onClose={() => handleDialogClose("open")}
         onSubmit={handleOpenPositionSubmit}
         initialSymbol={newPositionData.symbol}
         initialSide={newPositionData.side}
@@ -291,17 +375,34 @@ const PositionsTab = ({
 
       <ClosePositionDialog
         open={closePositionDialog}
-        onClose={() => handleDialogClose('close')}
+        onClose={() => handleDialogClose("close")}
         onSubmit={handleClosePositionSubmit}
         position={selectedPosition}
       />
 
       <ClosePartialPositionDialog
         open={closePartialDialog}
-        onClose={() => handleDialogClose('partial')}
+        onClose={() => handleDialogClose("partial")}
         onSubmit={handleClosePartialPositionSubmit}
         position={selectedPosition}
       />
+
+      {/* TPSL Dialog */}
+      {onPlaceTakeProfit && onPlaceStopLoss && selectedPosition && (
+        <TPSLDialog
+          open={tpslDialog}
+          onClose={() => handleDialogClose("tpsl")}
+          symbol={selectedPosition.symbol}
+          positionSide={
+            selectedPosition.position_side as "LONG" | "SHORT" | "BOTH"
+          }
+          currentQuantity={selectedPosition.quantity}
+          entryPrice={selectedPosition.entry_price}
+          markPrice={selectedPosition.mark_price}
+          onPlaceTakeProfit={onPlaceTakeProfit}
+          onPlaceStopLoss={onPlaceStopLoss}
+        />
+      )}
     </Box>
   );
 };

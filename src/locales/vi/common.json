@@ -948,13 +948,21 @@
         "refresh": "Không thể làm mới dữ liệu",
         "openPosition": "Không thể mở lệnh",
         "closePosition": "Không thể đóng lệnh",
-        "closePartialPosition": "Không thể đóng một phần lệnh"
+        "closePartialPosition": "Không thể đóng một phần lệnh",
+        "placeTakeProfit": "Không thể đặt lệnh chốt lời",
+        "placeStopLoss": "Không thể đặt lệnh cắt lỗ",
+        "cancelOrder": "Không thể hủy lệnh",
+        "cancelAllOrders": "Không thể hủy các lệnh"
       },
       "notifications": {
         "refreshSuccess": "Dữ liệu đã được làm mới",
         "openPosition": "Lệnh đã được mở thành công",
         "closePosition": "Lệnh đã được đóng thành công",
-        "closePartialPosition": "Đã đóng một phần lệnh thành công"
+        "closePartialPosition": "Đã đóng một phần lệnh thành công",
+        "takeProfitPlaced": "Đã đặt lệnh chốt lời",
+        "stopLossPlaced": "Đã đặt lệnh cắt lỗ",
+        "orderCancelled": "Đã hủy lệnh thành công",
+        "allOrdersCancelled": "Đã hủy {{count}} lệnh"
       },
       "actions": {
         "back": "Quay lại",
@@ -963,7 +971,8 @@
       "tabs": {
         "balance": "Số dư",
         "spot": "Ví spot",
-        "positions": "Lệnh đang mở"
+        "positions": "Lệnh đang mở",
+        "orders": "Lệnh chờ"
       },
       "header": {
         "title": "Chi tiết tài khoản trading"
@@ -1014,6 +1023,7 @@
           "openShort": "Mở Short {{symbol}}",
           "closePartial": "Đóng một phần",
           "closeAll": "Đóng toàn bộ lệnh",
+          "tpsl": "Đặt TP/SL",
           "refresh": "Làm mới"
         },
         "empty": "Không có lệnh nào đang mở",
@@ -1139,6 +1149,56 @@
         }
       },
       "empty": "Không tìm thấy tài khoản trading"
+    },
+    "orders": {
+      "title": "Lệnh chờ",
+      "filterSymbol": "Lọc theo symbol",
+      "refresh": "Làm mới",
+      "empty": "Không có lệnh chờ nào",
+      "cancelOrder": "Hủy lệnh",
+      "cancelAll": "Hủy tất cả",
+      "table": {
+        "symbol": "Symbol",
+        "type": "Loại",
+        "side": "Phía",
+        "positionSide": "Vị thế",
+        "quantity": "Số lượng",
+        "stopPrice": "Giá kích hoạt",
+        "status": "Trạng thái",
+        "time": "Thời gian",
+        "actions": "Thao tác"
+      },
+      "errors": {
+        "load": "Không thể tải danh sách lệnh",
+        "cancel": "Không thể hủy lệnh",
+        "cancelAll": "Không thể hủy các lệnh"
+      }
+    },
+    "tpsl": {
+      "title": "Chốt lời / Cắt lỗ",
+      "positionInfo": "Thông tin vị thế",
+      "side": "Phía",
+      "quantity": "Số lượng",
+      "entryPrice": "Giá vào",
+      "markPrice": "Giá mark",
+      "takeProfit": "Chốt lời (TP)",
+      "stopLoss": "Cắt lỗ (SL)",
+      "stopPrice": "Giá kích hoạt",
+      "useSuggested": "Dùng gợi ý",
+      "quantityOption": "Tùy chọn số lượng",
+      "fullPosition": "Toàn bộ vị thế",
+      "partialPosition": "Một phần vị thế",
+      "max": "Tối đa",
+      "workingType": "Loại giá",
+      "contractPrice": "Giá hợp đồng",
+      "markPriceOption": "Giá mark",
+      "placeTakeProfit": "Đặt chốt lời",
+      "placeStopLoss": "Đặt cắt lỗ",
+      "errors": {
+        "invalidPrice": "Vui lòng nhập giá kích hoạt hợp lệ",
+        "invalidQuantity": "Vui lòng nhập số lượng hợp lệ",
+        "submit": "Không thể đặt lệnh"
+      }
     }
   }
 }

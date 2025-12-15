@@ -428,3 +428,103 @@ export interface ActiveTradingState {
   lowest_balance: number;
   is_online: boolean;
 }
+
+// =====================
+// Orders Management Types
+// =====================
+
+// Order status enum
+export type OrderStatusType =
+  | "NEW"
+  | "PARTIALLY_FILLED"
+  | "FILLED"
+  | "CANCELED"
+  | "REJECTED"
+  | "EXPIRED";
+
+// Position side for orders
+export type PositionSideType = "BOTH" | "LONG" | "SHORT";
+
+// Working type for stop orders
+export type WorkingTypeOption = "CONTRACT_PRICE" | "MARK_PRICE";
+
+// Order type
+export type OrderType =
+  | "LIMIT"
+  | "MARKET"
+  | "STOP"
+  | "STOP_MARKET"
+  | "TAKE_PROFIT"
+  | "TAKE_PROFIT_MARKET"
+  | "TRAILING_STOP_MARKET";
+
+// Open order information
+export interface OpenOrderInfo {
+  order_id: number;
+  client_order_id: string;
+  symbol: string;
+  side: "BUY" | "SELL";
+  position_side: PositionSideType;
+  type: OrderType;
+  orig_quantity: number;
+  executed_quantity?: number;
+  price?: number;
+  avg_price?: number;
+  stop_price?: number;
+  status: OrderStatusType;
+  time_in_force?: "GTC" | "IOC" | "FOK";
+  reduce_only?: boolean;
+  close_position?: boolean;
+  working_type?: WorkingTypeOption;
+  create_time: number;
+  update_time: number;
+}
+
+// Open orders response
+export interface OpenOrdersResponse {
+  orders: OpenOrderInfo[];
+  total_count: number;
+}
+
+// Take profit request
+export interface TakeProfitRequest {
+  symbol: string;
+  position_side: PositionSideType;
+  stop_price: number;
+  quantity?: number | null;
+  working_type?: WorkingTypeOption;
+}
+
+// Stop loss request
+export interface StopLossRequest {
+  symbol: string;
+  position_side: PositionSideType;
+  stop_price: number;
+  quantity?: number | null;
+  working_type?: WorkingTypeOption;
+}
+
+// Take profit / Stop loss response
+export interface TakeProfitStopLossResponse {
+  success: boolean;
+  order: OpenOrderInfo;
+  message: string;
+}
+
+// Cancel order by ID response
+export interface CancelOrderByIdResponse {
+  success: boolean;
+  symbol: string;
+  order_id: number;
+  client_order_id: string;
+  status: OrderStatusType;
+  message: string;
+}
+
+// Cancel all orders response
+export interface CancelAllOrdersResponse {
+  success: boolean;
+  symbol: string;
+  cancelled_count: number;
+  message: string;
+}
