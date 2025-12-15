@@ -282,7 +282,7 @@ const OrdersTab = ({
                   <TableCell align="right">
                     {order.stop_price
                       ? `$${order.stop_price.toLocaleString()}`
-                      : "-"}
+                      : `$${order?.price?.toLocaleString()}`}
                   </TableCell>
                   <TableCell>
                     <Chip
