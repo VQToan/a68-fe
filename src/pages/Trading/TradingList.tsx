@@ -45,7 +45,16 @@ interface TradingListProps {
 }
 
 // Status chip color mapping
-const getStatusColor = (status: TradingStatusType): "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" => {
+const getStatusColor = (
+  status: TradingStatusType
+):
+  | "default"
+  | "primary"
+  | "secondary"
+  | "error"
+  | "info"
+  | "success"
+  | "warning" => {
   switch (status) {
     case "running":
       return "success";
@@ -93,16 +102,18 @@ const TradingList = ({
     onPageChange(newPage + 1); // MUI uses 0-based indexing, our API uses 1-based
   };
 
-  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRowsPerPageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     onRowsPerPageChange(parseInt(event.target.value, 10));
   };
 
   if (isLoading && processes.length === 0) {
     return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
         minHeight="200px"
       >
         <CircularProgress />
@@ -112,10 +123,10 @@ const TradingList = ({
 
   if (processes.length === 0) {
     return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
         minHeight="200px"
       >
         <Typography variant="body1" color="text.secondary">
@@ -126,7 +137,7 @@ const TradingList = ({
   }
 
   return (
-    <Paper sx={{ overflow: 'hidden', borderRadius: 2 }}>
+    <Paper sx={{ overflow: "hidden", borderRadius: 2 }}>
       <StickyTable
         height="60vh"
         minWidth={900}
@@ -134,14 +145,22 @@ const TradingList = ({
           <TableHead>
             <TableRow>
               <TableCell>{t("trading.list.headers.name")}</TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>{t("trading.list.headers.description")}</TableCell>
+              <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>
+                {t("trading.list.headers.description")}
+              </TableCell>
               <TableCell>{t("trading.list.headers.status")}</TableCell>
               <TableCell>{t("trading.list.headers.daysRunning")}</TableCell>
               <TableCell>{t("trading.list.headers.account")}</TableCell>
               <TableCell>{t("trading.list.headers.isFuture")}</TableCell>
-              <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>{t("trading.list.headers.template")}</TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>{t("trading.list.headers.createdAt")}</TableCell>
-              <TableCell align="right">{t("trading.list.headers.actions")}</TableCell>
+              <TableCell sx={{ display: { xs: "none", lg: "table-cell" } }}>
+                {t("trading.list.headers.template")}
+              </TableCell>
+              <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>
+                {t("trading.list.headers.createdAt")}
+              </TableCell>
+              <TableCell align="right">
+                {t("trading.list.headers.actions")}
+              </TableCell>
             </TableRow>
           </TableHead>
         }
@@ -154,15 +173,15 @@ const TradingList = ({
                     {process.name}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                  <Typography 
-                    variant="body2" 
+                <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>
+                  <Typography
+                    variant="body2"
                     color="text.secondary"
                     sx={{
                       maxWidth: 200,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap'
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {process.description}
@@ -180,10 +199,14 @@ const TradingList = ({
                     {(() => {
                       if (!process.started_at) return "-";
                       const start = new Date(process.started_at).getTime();
-                      const end = process.status === "running" || !process.stopped_at
-                        ? Date.now()
-                        : new Date(process.stopped_at).getTime();
-                      const diffDays = Math.max(0, Math.floor((end - start) / (1000 * 60 * 60 * 24)));
+                      const end =
+                        process.status === "running" || !process.stopped_at
+                          ? Date.now()
+                          : new Date(process.stopped_at).getTime();
+                      const diffDays = Math.max(
+                        0,
+                        Math.floor((end - start) / (1000 * 60 * 60 * 24))
+                      );
                       return t("trading.list.runningDays", { count: diffDays });
                     })()}
                   </Typography>
@@ -195,17 +218,19 @@ const TradingList = ({
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={process.is_future ? t("common.futures") : t("common.spot")}
+                    label={
+                      process.is_future ? t("common.futures") : t("common.spot")
+                    }
                     color={process.is_future ? "warning" : "info"}
                     size="small"
                   />
                 </TableCell>
-                <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>
+                <TableCell sx={{ display: { xs: "none", lg: "table-cell" } }}>
                   <Typography variant="body2">
                     {process.bot_template_name || t("common.notAvailable")}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>
                   <Typography variant="body2" color="text.secondary">
                     {new Date(process.created_at).toLocaleDateString()}
                   </Typography>
@@ -224,20 +249,22 @@ const TradingList = ({
                     </Tooltip>
 
                     {/* Start button - only show if not running or queued */}
-                    {(process.status !== "running" && process.status !== "queued") && (
-                      <Tooltip title={t("trading.list.tooltips.start")}>
-                        <IconButton
-                          size="small"
-                          color="success"
-                          onClick={() => onStart(process._id)}
-                        >
-                          <PlayArrowIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
+                    {process.status !== "running" &&
+                      process.status !== "queued" && (
+                        <Tooltip title={t("trading.list.tooltips.start")}>
+                          <IconButton
+                            size="small"
+                            color="success"
+                            onClick={() => onStart(process._id)}
+                          >
+                            <PlayArrowIcon />
+                          </IconButton>
+                        </Tooltip>
+                      )}
 
                     {/* Stop button - only show if running or queued */}
-                    {(process.status === "running" || process.status === "queued") && (
+                    {(process.status === "running" ||
+                      process.status === "queued") && (
                       <Tooltip title={t("trading.list.tooltips.stop")}>
                         <IconButton
                           size="small"
@@ -249,15 +276,28 @@ const TradingList = ({
                       </Tooltip>
                     )}
 
-                    {/* Edit button */}
-                    <Tooltip title={t("common.edit")}>
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={() => onEdit(process._id)}
-                      >
-                        <EditIcon />
-                      </IconButton>
+                    {/* Edit button - disabled when running or queued */}
+                    <Tooltip
+                      title={
+                        process.status === "running" ||
+                        process.status === "queued"
+                          ? t("trading.list.tooltips.disabledWhileRunning")
+                          : t("common.edit")
+                      }
+                    >
+                      <span>
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() => onEdit(process._id)}
+                          disabled={
+                            process.status === "running" ||
+                            process.status === "queued"
+                          }
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </span>
                     </Tooltip>
 
                     {/* Duplicate button */}
@@ -271,18 +311,29 @@ const TradingList = ({
                       </IconButton>
                     </Tooltip>
 
-                    {/* Delete button - only show if not running or queued */}
-                    {(process.status !== "running" && process.status !== "queued") && (
-                      <Tooltip title={t("common.delete")}>
+                    {/* Delete button - disabled when running or queued */}
+                    <Tooltip
+                      title={
+                        process.status === "running" ||
+                        process.status === "queued"
+                          ? t("trading.list.tooltips.disabledWhileRunning")
+                          : t("common.delete")
+                      }
+                    >
+                      <span>
                         <IconButton
                           size="small"
                           color="error"
                           onClick={() => onDelete(process._id, process.name)}
+                          disabled={
+                            process.status === "running" ||
+                            process.status === "queued"
+                          }
                         >
                           <DeleteIcon />
                         </IconButton>
-                      </Tooltip>
-                    )}
+                      </span>
+                    </Tooltip>
                   </Box>
                 </TableCell>
               </TableRow>
@@ -290,7 +341,7 @@ const TradingList = ({
           </TableBody>
         }
       />
-      
+
       <TablePagination
         component="div"
         count={pagination.total}

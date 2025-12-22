@@ -276,11 +276,13 @@ const BacktestList = ({
                   </Tooltip>
                 </TableCell>
                 <TableCell>
-                  <Chip 
-                    label={process.is_future ? t('common.futures') : t('common.spot')}
-                    size="small" 
+                  <Chip
+                    label={
+                      process.is_future ? t("common.futures") : t("common.spot")
+                    }
+                    size="small"
                     color={process.is_future ? "warning" : "info"}
-                    variant="outlined" 
+                    variant="outlined"
                   />
                 </TableCell>
                 <TableCell>
@@ -379,7 +381,16 @@ const BacktestList = ({
               <ListItemText primary={t("backtest.list.menu.view")} />
             </MenuItem>
           )}
-        <MenuItem onClick={handleEdit}>
+        <MenuItem
+          onClick={handleEdit}
+          disabled={
+            selectedId
+              ? ["running", "queued"].includes(
+                  processes.find((p) => p._id === selectedId)?.status as string
+                )
+              : false
+          }
+        >
           <ListItemIcon>
             <EditIcon fontSize="small" />
           </ListItemIcon>
@@ -412,7 +423,16 @@ const BacktestList = ({
             )}
           </>
         )}
-        <MenuItem onClick={handleDelete}>
+        <MenuItem
+          onClick={handleDelete}
+          disabled={
+            selectedId
+              ? ["running", "queued"].includes(
+                  processes.find((p) => p._id === selectedId)?.status as string
+                )
+              : false
+          }
+        >
           <ListItemIcon>
             <DeleteIcon fontSize="small" color="error" />
           </ListItemIcon>

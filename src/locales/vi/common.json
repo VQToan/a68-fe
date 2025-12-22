@@ -281,7 +281,8 @@
       "tooltips": {
         "view": "Xem chi tiết",
         "start": "Bắt đầu trading",
-        "stop": "Dừng trading"
+        "stop": "Dừng trading",
+        "disabledWhileRunning": "Không khả dụng khi đang chạy"
       },
       "runningDays": "{{count}} ngày",
       "pagination": {

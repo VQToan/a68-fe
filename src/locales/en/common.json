@@ -281,7 +281,8 @@
       "tooltips": {
         "view": "View details",
         "start": "Start trading",
-        "stop": "Stop trading"
+        "stop": "Stop trading",
+        "disabledWhileRunning": "Not available while process is running"
       },
       "runningDays_one": "{{count}} day",
       "runningDays_other": "{{count}} days",
