@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useState, useEffect } from "react";
 import {
   useNavigate,
   useLocation,
@@ -19,17 +19,50 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useAuth } from "../../hooks/useAuth";
-import { areEqual } from "@/utils/common";
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const fromLocation = (location.state as { from?: Location } | null)?.from;
-  const { login, error, isLoading } = useAuth();
+  const verified = (location.state as { verified?: boolean } | null)?.verified;
+  const passwordReset = (location.state as { passwordReset?: boolean } | null)
+    ?.passwordReset;
+
+  const {
+    login,
+    error,
+    isLoading,
+    requiresVerification,
+    pendingUsername,
+    clearError,
+  } = useAuth();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [successMessage, setSuccessMessage] = useState("");
+
+  // Clear error on mount
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
+
+  // Show success message for verified or password reset
+  useEffect(() => {
+    if (verified) {
+      setSuccessMessage("Email verified successfully! You can now sign in.");
+    } else if (passwordReset) {
+      setSuccessMessage("Password reset successfully! You can now sign in.");
+    }
+  }, [verified, passwordReset]);
+
+  // Redirect to verify-email if user needs verification
+  useEffect(() => {
+    if (requiresVerification && pendingUsername) {
+      navigate("/verify-email", { state: { email: pendingUsername } });
+    }
+  }, [requiresVerification, pendingUsername, navigate]);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,6 +78,17 @@ const Login = () => {
       try {
         const result = await login(formData);
         if (result.meta.requestStatus === "fulfilled") {
+          // Check if login requires verification
+          const payload = result.payload as {
+            requiresVerification?: boolean;
+            email?: string;
+          };
+          if (payload?.requiresVerification) {
+            navigate("/verify-email", { state: { email: formData.email } });
+            return;
+          }
+
+          // Successful login - redirect
           const storedRedirect =
             typeof window !== "undefined"
               ? localStorage.getItem("postLoginRedirect")
@@ -53,7 +97,9 @@ const Login = () => {
             fromLocation &&
             fromLocation.pathname &&
             fromLocation.pathname !== "/login"
-              ? `${fromLocation.pathname}${fromLocation.search ?? ""}${fromLocation.hash ?? ""}`
+              ? `${fromLocation.pathname}${fromLocation.search ?? ""}${
+                  fromLocation.hash ?? ""
+                }`
               : storedRedirect && storedRedirect !== "/login"
               ? storedRedirect
               : "/dashboard";
@@ -87,6 +133,12 @@ const Login = () => {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
+
+        {successMessage && (
+          <Alert severity="success" sx={{ width: "100%", mt: 2 }}>
+            {successMessage}
+          </Alert>
+        )}
 
         {error && (
           <Alert severity="error" sx={{ width: "100%", mt: 2 }}>
@@ -129,8 +181,17 @@ const Login = () => {
             {isLoading ? "Signing in..." : "Sign In"}
           </Button>
           <Grid container>
-            <Grid size={12}>
-              <Link component={RouterLink} to="/register" variant="body2" reloadDocument>
+            <Grid size={6}>
+              <Link
+                component={RouterLink}
+                to="/forgot-password"
+                variant="body2"
+              >
+                Forgot password?
+              </Link>
+            </Grid>
+            <Grid size={6} sx={{ textAlign: "right" }}>
+              <Link component={RouterLink} to="/register" variant="body2">
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>
@@ -141,4 +202,4 @@ const Login = () => {
   );
 };
 
-export default memo(Login, areEqual);
+export default memo(Login);

@@ -6,6 +6,9 @@ import AuthRedirectWrapper from "./AuthRedirectWrapper";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import VerifyEmail from "../pages/VerifyEmail";
+import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword";
 import Dashboard from "../pages/Dashboard";
 import ModuleBot from "../pages/ModuleBot";
 import Backtest from "../pages/Backtest";
@@ -35,6 +38,23 @@ export const routes: RouteObject[] = [
         <Register />
       </AuthRedirectWrapper>
     ),
+  },
+  // Verification and password reset routes (accessible without auth)
+  {
+    path: "/verify-email",
+    element: <VerifyEmail />,
+  },
+  {
+    path: "/forgot-password",
+    element: (
+      <AuthRedirectWrapper>
+        <ForgotPassword />
+      </AuthRedirectWrapper>
+    ),
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />,
   },
   // Main routes with MainLayout
   {

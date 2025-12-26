@@ -1,43 +1,112 @@
-import { useEffect } from 'react';
-import { useAppSelector, useAppDispatch } from './reduxHooks';
-import { 
-  login, 
-  logout, 
-  register, 
+import { useEffect, useCallback, useRef } from "react";
+import { useAppSelector, useAppDispatch } from "./reduxHooks";
+import {
+  login,
+  logout,
+  register,
+  confirmSignUp,
+  resendVerificationCode,
   fetchCurrentUser,
-  updateCurrentUser
-} from '@features/auth/authSlice';
-import { isTokenExpired } from '@/utils/tokenUtils';
-import type { LoginCredentials, RegisterCredentials, UserUpdate } from '../types/auth.types';
+  updateCurrentUser,
+  forgotPassword,
+  confirmPasswordReset,
+  checkAuthSession,
+  clearError,
+} from "@features/auth/authSlice";
+import cognitoService from "@services/cognito.service";
+import type {
+  LoginCredentials,
+  RegisterCredentials,
+  UserUpdate,
+  ConfirmSignUpCredentials,
+  ResetPasswordCredentials,
+} from "../types/auth.types";
 
 export const useAuth = () => {
   const auth = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
+  const sessionCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Handle login
-  const handleLogin = (credentials: LoginCredentials) => {
-    return dispatch(login(credentials));
-  };
+  const handleLogin = useCallback(
+    (credentials: LoginCredentials) => {
+      return dispatch(login(credentials));
+    },
+    [dispatch]
+  );
 
   // Handle register
-  const handleRegister = (credentials: RegisterCredentials) => {
-    return dispatch(register(credentials));
-  };
+  const handleRegister = useCallback(
+    (credentials: RegisterCredentials) => {
+      return dispatch(register(credentials));
+    },
+    [dispatch]
+  );
+
+  // Handle confirm sign up (email verification)
+  const handleConfirmSignUp = useCallback(
+    (credentials: ConfirmSignUpCredentials) => {
+      return dispatch(confirmSignUp(credentials));
+    },
+    [dispatch]
+  );
+
+  // Handle resend verification code
+  const handleResendVerificationCode = useCallback(
+    (email: string) => {
+      return dispatch(resendVerificationCode(email));
+    },
+    [dispatch]
+  );
 
   // Handle logout
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     return dispatch(logout());
-  };
+  }, [dispatch]);
 
   // Handle getting current user
-  const handleGetCurrentUser = () => {
+  const handleGetCurrentUser = useCallback(() => {
     return dispatch(fetchCurrentUser());
-  };
+  }, [dispatch]);
 
   // Handle updating current user
-  const handleUpdateCurrentUser = (userData: UserUpdate) => {
-    return dispatch(updateCurrentUser(userData));
-  };
+  const handleUpdateCurrentUser = useCallback(
+    (userData: UserUpdate) => {
+      return dispatch(updateCurrentUser(userData));
+    },
+    [dispatch]
+  );
+
+  // Handle forgot password
+  const handleForgotPassword = useCallback(
+    (email: string) => {
+      return dispatch(forgotPassword(email));
+    },
+    [dispatch]
+  );
+
+  // Handle confirm password reset
+  const handleConfirmPasswordReset = useCallback(
+    (credentials: ResetPasswordCredentials) => {
+      return dispatch(confirmPasswordReset(credentials));
+    },
+    [dispatch]
+  );
+
+  // Handle clear error
+  const handleClearError = useCallback(() => {
+    dispatch(clearError());
+  }, [dispatch]);
+
+  const sessionInitializedRef = useRef(false);
+
+  // Check authentication session only once on first mount
+  useEffect(() => {
+    if (!sessionInitializedRef.current) {
+      sessionInitializedRef.current = true;
+      dispatch(checkAuthSession());
+    }
+  }, [dispatch]);
 
   // Auto-fetch user data when logged in but no user data
   useEffect(() => {
@@ -46,28 +115,68 @@ export const useAuth = () => {
     }
   }, [auth.isLoggedIn, auth.user, auth.isLoading, dispatch]);
 
-  // Token refresh check (moved from AuthGuard)
+  // Token expiration check and auto-logout
   useEffect(() => {
-    // Set up an interval to check token expiration
-    const tokenCheckInterval = setInterval(() => {
-      if (auth.accessToken && isTokenExpired(auth.accessToken)) {
-        // Token refresh logic should be handled in the auth slice
-        // This just triggers the check periodically
-        dispatch(fetchCurrentUser());
+    const checkSession = async () => {
+      if (!auth.isLoggedIn) return;
+
+      try {
+        // Check if session is still valid
+        const isAuth = await cognitoService.isAuthenticated();
+
+        if (!isAuth) {
+          console.log("Session expired, logging out...");
+          dispatch(logout());
+          return;
+        }
+
+        // Check token expiration
+        const tokens = await cognitoService.getAuthTokens();
+        if (tokens?.expiresAt) {
+          const now = Math.floor(Date.now() / 1000);
+          const timeUntilExpiry = tokens.expiresAt - now;
+
+          // If token expires in less than 5 minutes, try to refresh
+          if (timeUntilExpiry < 300 && timeUntilExpiry > 0) {
+            console.log("Token expiring soon, refreshing...");
+            await cognitoService.refreshSession();
+          }
+        }
+      } catch (error) {
+        console.error("Session check error:", error);
+        dispatch(logout());
       }
-    }, 60000); // Check every minute
+    };
+
+    // Check session immediately
+    if (auth.isLoggedIn) {
+      checkSession();
+    }
+
+    // Set up interval to check session every minute
+    sessionCheckIntervalRef.current = setInterval(checkSession, 60000);
 
     return () => {
-      clearInterval(tokenCheckInterval);
+      if (sessionCheckIntervalRef.current) {
+        clearInterval(sessionCheckIntervalRef.current);
+      }
     };
-  }, [auth.accessToken, dispatch]);
+  }, [auth.isLoggedIn, dispatch]);
 
   return {
+    // State
     ...auth,
+
+    // Actions
     login: handleLogin,
     register: handleRegister,
+    confirmSignUp: handleConfirmSignUp,
+    resendVerificationCode: handleResendVerificationCode,
     logout: handleLogout,
     getCurrentUser: handleGetCurrentUser,
     updateCurrentUser: handleUpdateCurrentUser,
+    forgotPassword: handleForgotPassword,
+    confirmPasswordReset: handleConfirmPasswordReset,
+    clearError: handleClearError,
   };
 };

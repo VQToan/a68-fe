@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useState, useEffect } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Container,
@@ -14,11 +14,17 @@ import {
 } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useAuth } from "@hooks/useAuth";
-import { areEqual } from "@/utils/common";
 
 const Register = () => {
   const navigate = useNavigate();
-  const { register, error, isLoading } = useAuth();
+  const {
+    register,
+    error,
+    isLoading,
+    requiresVerification,
+    pendingUsername,
+    clearError,
+  } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -30,12 +36,24 @@ const Register = () => {
     confirmPassword: "",
   });
 
+  // Clear error on mount
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
+
+  // Redirect to verify-email after successful registration
+  useEffect(() => {
+    if (requiresVerification && pendingUsername) {
+      navigate("/verify-email", { state: { email: pendingUsername } });
+    }
+  }, [requiresVerification, pendingUsername, navigate]);
+
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
       setFormData((prev) => ({ ...prev, [name]: value }));
 
-      // Password validation
+      // Password validation - Cognito requires min 8 chars
       if (name === "password") {
         if (value.length < 8) {
           setFormErrors((prev) => ({
@@ -92,8 +110,12 @@ const Register = () => {
         const { confirmPassword, ...registerData } = formData;
         const result = await register(registerData);
         if (result.meta.requestStatus === "fulfilled") {
-          // After successful registration, redirect to login page
-          navigate("/login");
+          // Will be redirected by the useEffect when requiresVerification becomes true
+          // If signup is complete without verification (unlikely with Cognito), redirect to login
+          const payload = result.payload as { isComplete?: boolean };
+          if (payload?.isComplete) {
+            navigate("/login");
+          }
         }
       } catch (error) {
         console.error("Registration failed:", error);
@@ -192,7 +214,7 @@ const Register = () => {
           </Button>
           <Grid container justifyContent="flex-end">
             <Grid size={12}>
-                <Link component={RouterLink} to="/login" variant="body2" reloadDocument>
+              <Link component={RouterLink} to="/login" variant="body2">
                 Already have an account? Sign in
               </Link>
             </Grid>
@@ -203,4 +225,4 @@ const Register = () => {
   );
 };
 
-export default memo(Register, areEqual);
+export default memo(Register);

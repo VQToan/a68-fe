@@ -8,15 +8,37 @@ export interface User {
   updated_at: string;
 }
 
+// Cognito User (from Cognito attributes)
+export interface CognitoUserInfo {
+  userId: string;
+  username: string;
+  email?: string;
+  fullName?: string;
+  emailVerified?: boolean;
+}
+
+export type AuthStep =
+  | "IDLE"
+  | "CONFIRM_SIGN_UP"
+  | "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED"
+  | "RESET_PASSWORD"
+  | "DONE";
+
 export interface AuthState {
   user: User | null;
+  cognitoUser: CognitoUserInfo | null;
   accessToken: string | null;
+  idToken: string | null;
   refreshToken: string | null;
   accessTokenExpiresAt: number | null;
   refreshTokenExpiresAt: number | null;
   isLoggedIn: boolean;
   isLoading: boolean;
   error: string | null;
+  // Cognito specific states
+  requiresVerification: boolean;
+  pendingUsername: string | null;
+  authStep: AuthStep;
 }
 
 export interface LoginCredentials {
@@ -44,4 +66,15 @@ export interface Token {
   token_type: string;
   access_token_expires_at: number;
   refresh_token_expires_at: number;
+}
+
+export interface ConfirmSignUpCredentials {
+  email: string;
+  code: string;
+}
+
+export interface ResetPasswordCredentials {
+  email: string;
+  code: string;
+  newPassword: string;
 }

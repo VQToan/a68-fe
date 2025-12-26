@@ -1,10 +1,13 @@
-import axios from 'axios';
-import type { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders } from 'axios';
-import { AxiosHeaders } from 'axios';
-import { getAccessToken, getRefreshToken, storeTokens, removeTokens } from '@utils/tokenUtils';
-import { store } from '@features/store';
-import { updateTokens, forceLogout } from '@features/auth/authSlice';
-import type { Token } from '../types/auth.types';
+import axios from "axios";
+import type {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosRequestHeaders,
+} from "axios";
+import { AxiosHeaders } from "axios";
+import cognitoService from "@services/cognito.service";
+import { store } from "@features/store";
+import { forceLogout, updateTokens } from "@features/auth/authSlice";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -13,17 +16,16 @@ interface RetriableRequestConfig extends AxiosRequestConfig {
   headers?: AxiosRequestHeaders;
 }
 
-const LOGIN_PATH = '/login';
+const LOGIN_PATH = "/login";
 
 const redirectToLogin = () => {
   const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
   if (window.location.pathname !== LOGIN_PATH) {
-    localStorage.setItem('postLoginRedirect', currentPath);
+    localStorage.setItem("postLoginRedirect", currentPath);
   }
 
-  removeTokens();
   store.dispatch(forceLogout());
-  window.dispatchEvent(new CustomEvent('auth:logout'));
+  window.dispatchEvent(new CustomEvent("auth:logout"));
 
   if (window.location.pathname !== LOGIN_PATH) {
     window.location.assign(LOGIN_PATH);
@@ -35,25 +37,31 @@ const createApiClient = (): AxiosInstance => {
   const api = axios.create({
     baseURL: API_URL,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
   });
 
-  // Request interceptor - adds authorization token to requests
+  // Request interceptor - adds Cognito authorization token to requests
   api.interceptors.request.use(
-    (config) => {
-      const accessToken = getAccessToken();
-      if (accessToken) {
-        const headers = config.headers;
-        if (headers instanceof AxiosHeaders) {
-          headers.set('Authorization', `Bearer ${accessToken}`);
-        } else {
-          const plainHeaders = (headers ?? {}) as Record<string, unknown>;
-          config.headers = {
-            ...plainHeaders,
-            Authorization: `Bearer ${accessToken}`,
-          } as AxiosRequestHeaders;
+    async (config) => {
+      try {
+        // Get access token from Cognito
+        const accessToken = await cognitoService.getAccessToken();
+
+        if (accessToken) {
+          const headers = config.headers;
+          if (headers instanceof AxiosHeaders) {
+            headers.set("Authorization", `Bearer ${accessToken}`);
+          } else {
+            const plainHeaders = (headers ?? {}) as Record<string, unknown>;
+            config.headers = {
+              ...plainHeaders,
+              Authorization: `Bearer ${accessToken}`,
+            } as AxiosRequestHeaders;
+          }
         }
+      } catch (error) {
+        console.error("Error getting Cognito token:", error);
       }
       return config;
     },
@@ -68,55 +76,63 @@ const createApiClient = (): AxiosInstance => {
       const originalRequest = error.config as RetriableRequestConfig;
 
       if (status === 401) {
-        const refreshToken = getRefreshToken();
-
-        if (originalRequest && !originalRequest._retry && refreshToken) {
+        if (originalRequest && !originalRequest._retry) {
           originalRequest._retry = true;
 
           try {
-            console.log('Token expired. Attempting to refresh...');
-
-            const refreshApi = axios.create({
-              baseURL: API_URL,
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            });
-
-            const response = await refreshApi.post<Token>('/api/v1/auth/refresh', null, {
-              params: { refresh_token: refreshToken },
-            });
-
-            console.log('Token refreshed successfully');
-
-            storeTokens(
-              response.data.access_token,
-              response.data.refresh_token,
-              response.data.access_token_expires_at,
-              response.data.refresh_token_expires_at
+            console.log(
+              "Token expired. Attempting to refresh Cognito session..."
             );
-            store.dispatch(updateTokens(response.data));
 
-            const existingHeaders = originalRequest.headers;
+            // Try to refresh the Cognito session
+            const tokens = await cognitoService.refreshSession();
 
-            if (existingHeaders instanceof AxiosHeaders) {
-              existingHeaders.set('Authorization', `Bearer ${response.data.access_token}`);
+            if (tokens) {
+              console.log("Cognito session refreshed successfully");
+
+              // Update tokens in Redux store
+              store.dispatch(
+                updateTokens({
+                  accessToken: tokens.accessToken,
+                  idToken: tokens.idToken,
+                  expiresAt: tokens.expiresAt,
+                })
+              );
+
+              // Retry the original request with new token
+              const existingHeaders = originalRequest.headers;
+
+              if (existingHeaders instanceof AxiosHeaders) {
+                existingHeaders.set(
+                  "Authorization",
+                  `Bearer ${tokens.accessToken}`
+                );
+              } else {
+                const plainHeaders = (existingHeaders ?? {}) as Record<
+                  string,
+                  unknown
+                >;
+                originalRequest.headers = {
+                  ...plainHeaders,
+                  Authorization: `Bearer ${tokens.accessToken}`,
+                } as AxiosRequestHeaders;
+              }
+
+              return api(originalRequest);
             } else {
-              const plainHeaders = (existingHeaders ?? {}) as Record<string, unknown>;
-              originalRequest.headers = {
-                ...plainHeaders,
-                Authorization: `Bearer ${response.data.access_token}`,
-              } as AxiosRequestHeaders;
+              // Refresh failed, redirect to login
+              console.error("Failed to refresh Cognito session");
+              redirectToLogin();
+              return Promise.reject(error);
             }
-
-            return api(originalRequest);
           } catch (refreshError) {
-            console.error('Failed to refresh token:', refreshError);
+            console.error("Failed to refresh Cognito session:", refreshError);
             redirectToLogin();
             return Promise.reject(refreshError);
           }
         }
 
+        // Already tried to refresh or no retry flag
         redirectToLogin();
       }
 
@@ -131,7 +147,7 @@ const createApiClient = (): AxiosInstance => {
 export const publicApi = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
