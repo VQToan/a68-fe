@@ -140,9 +140,20 @@ export const useAuth = () => {
     };
   }, [auth.isLoggedIn, dispatch]);
 
+  // Check if user has admin or superadmin role
+  const isAdmin = Boolean(
+    auth.cognitoUser?.role &&
+      ["admin", "superadmin", "Admin", "SuperAdmin", "super_admin"].includes(
+        auth.cognitoUser.role
+      )
+  );
+
   return {
     // State
     ...auth,
+
+    // Computed properties
+    isAdmin,
 
     // Actions
     login: handleLogin,

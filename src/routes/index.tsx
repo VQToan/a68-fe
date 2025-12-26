@@ -1,5 +1,6 @@
 import type { RouteObject } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
+import AdminRoute from "./AdminRoute";
 import AuthRedirectWrapper from "./AuthRedirectWrapper";
 
 // Import your pages here
@@ -61,7 +62,7 @@ export const routes: RouteObject[] = [
     path: "/",
     element: <MainLayout />,
     children: [
-      // All routes inside MainLayout are now protected
+      // Regular protected routes
       {
         path: "/",
         element: <ProtectedRoute />,
@@ -73,14 +74,6 @@ export const routes: RouteObject[] = [
           {
             path: "dashboard",
             element: <Dashboard />,
-          },
-          {
-            path: "module-bot",
-            element: <ModuleBot />,
-          },
-          {
-            path: "bot-template",
-            element: <BotTemplate />,
           },
           {
             path: "backtest",
@@ -116,7 +109,21 @@ export const routes: RouteObject[] = [
             path: "settings",
             element: <div>Settings Page (Coming Soon)</div>,
           },
-          // Add more protected routes here
+        ],
+      },
+      // Admin-only routes
+      {
+        path: "/",
+        element: <AdminRoute />,
+        children: [
+          {
+            path: "module-bot",
+            element: <ModuleBot />,
+          },
+          {
+            path: "bot-template",
+            element: <BotTemplate />,
+          },
         ],
       },
       // Only NotFound is still accessible without login

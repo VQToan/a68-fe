@@ -15,6 +15,7 @@ export interface CognitoUserInfo {
   email?: string;
   fullName?: string;
   emailVerified?: boolean;
+  role?: string; // Custom attribute for user role
 }
 
 export type AuthStep =

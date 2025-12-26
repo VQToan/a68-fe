@@ -52,7 +52,7 @@ const MainLayout = () => {
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
   // Treat tablets as compact to avoid horizontal overflow
   const isCompact = useMediaQuery(muiTheme.breakpoints.down("md"));
-  const { cognitoUser, logout } = useAuth();
+  const { cognitoUser, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -405,83 +405,89 @@ const MainLayout = () => {
               </ListItemButton>
             </ListItem>
 
-            <ListItem disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                sx={{
-                  height: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                  "&:hover": {
-                    backgroundColor: "rgba(255,255,255,0.1)",
-                  },
-                }}
-                onClick={() => handleNavigation("/module-bot")}
-              >
-                <ListItemIcon
+            {/* Admin only: Module Bot */}
+            {isAdmin && (
+              <ListItem disablePadding sx={{ display: "block" }}>
+                <ListItemButton
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
-                    display: "flex",
-                    alignItems: "center",
-                    width: 24,
-                    height: 24,
+                    height: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
+                    "&:hover": {
+                      backgroundColor: "rgba(255,255,255,0.1)",
+                    },
                   }}
+                  onClick={() => handleNavigation("/module-bot")}
                 >
-                  <SmartToyIcon
+                  <ListItemIcon
                     sx={{
-                      fontSize: 24,
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                      display: "flex",
+                      alignItems: "center",
                       width: 24,
                       height: 24,
-                      transition: "none",
                     }}
+                  >
+                    <SmartToyIcon
+                      sx={{
+                        fontSize: 24,
+                        width: 24,
+                        height: 24,
+                        transition: "none",
+                      }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t("navigation.moduleBot")}
+                    sx={{ opacity: open ? 1 : 0 }}
                   />
-                </ListItemIcon>
-                <ListItemText
-                  primary={t("navigation.moduleBot")}
-                  sx={{ opacity: open ? 1 : 0 }}
-                />
-              </ListItemButton>
-            </ListItem>
+                </ListItemButton>
+              </ListItem>
+            )}
 
-            <ListItem disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                sx={{
-                  height: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                  "&:hover": {
-                    backgroundColor: "rgba(255,255,255,0.1)",
-                  },
-                }}
-                onClick={() => handleNavigation("/bot-template")}
-              >
-                <ListItemIcon
+            {/* Admin only: Bot Template */}
+            {isAdmin && (
+              <ListItem disablePadding sx={{ display: "block" }}>
+                <ListItemButton
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
-                    display: "flex",
-                    alignItems: "center",
-                    width: 24,
-                    height: 24,
+                    height: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
+                    "&:hover": {
+                      backgroundColor: "rgba(255,255,255,0.1)",
+                    },
                   }}
+                  onClick={() => handleNavigation("/bot-template")}
                 >
-                  <DescriptionIcon
+                  <ListItemIcon
                     sx={{
-                      fontSize: 24,
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                      display: "flex",
+                      alignItems: "center",
                       width: 24,
                       height: 24,
-                      transition: "none",
                     }}
+                  >
+                    <DescriptionIcon
+                      sx={{
+                        fontSize: 24,
+                        width: 24,
+                        height: 24,
+                        transition: "none",
+                      }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t("navigation.botTemplate")}
+                    sx={{ opacity: open ? 1 : 0 }}
                   />
-                </ListItemIcon>
-                <ListItemText
-                  primary={t("navigation.botTemplate")}
-                  sx={{ opacity: open ? 1 : 0 }}
-                />
-              </ListItemButton>
-            </ListItem>
+                </ListItemButton>
+              </ListItem>
+            )}
 
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton

@@ -40,6 +40,7 @@ export interface CognitoUser {
   email?: string;
   fullName?: string;
   emailVerified?: boolean;
+  role?: string; // Custom attribute for user role
 }
 
 export interface CognitoTokens {
@@ -221,6 +222,7 @@ export const getCurrentUser = async (): Promise<CognitoUser | null> => {
       email: attributes.email,
       fullName: attributes.name,
       emailVerified: attributes.email_verified === "true",
+      role: attributes["custom:role"] as string | undefined,
     };
   } catch {
     return null;
