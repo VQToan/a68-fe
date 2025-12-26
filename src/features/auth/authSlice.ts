@@ -4,13 +4,10 @@ import type {
   AuthState,
   LoginCredentials,
   RegisterCredentials,
-  User,
-  UserUpdate,
   ConfirmSignUpCredentials,
   ResetPasswordCredentials,
 } from "../../types/auth.types";
 import cognitoService from "@services/cognito.service";
-import { api } from "@services/apiClient";
 
 const initialState: AuthState = {
   user: null,
@@ -22,6 +19,7 @@ const initialState: AuthState = {
   refreshTokenExpiresAt: null,
   isLoggedIn: false,
   isLoading: false,
+  isInitializing: true, // Start with true, set false after first session check
   error: null,
   requiresVerification: false,
   pendingUsername: null,
@@ -91,7 +89,7 @@ export const resendVerificationCode = createAsyncThunk(
 // Login a user with Cognito
 export const login = createAsyncThunk(
   "auth/login",
-  async (credentials: LoginCredentials, { dispatch, rejectWithValue }) => {
+  async (credentials: LoginCredentials, { rejectWithValue }) => {
     try {
       const result = await cognitoService.signIn({
         email: credentials.email,
@@ -113,9 +111,6 @@ export const login = createAsyncThunk(
       // Get tokens after successful sign in
       const tokens = await cognitoService.getAuthTokens();
       const cognitoUser = await cognitoService.getCurrentUser();
-
-      // After successful Cognito login, fetch user data from backend
-      dispatch(fetchCurrentUser());
 
       return {
         accessToken: tokens?.accessToken || null,
@@ -159,44 +154,6 @@ export const logout = createAsyncThunk(
     } catch (error: unknown) {
       const err = error as Error & { message?: string };
       return rejectWithValue(err.message || "Logout failed");
-    }
-  }
-);
-
-// Fetch current user data from backend
-export const fetchCurrentUser = createAsyncThunk(
-  "auth/fetchCurrentUser",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await api.get<User>("/api/v1/users/me");
-      localStorage.setItem("user", JSON.stringify(response.data));
-      return response.data;
-    } catch (error: unknown) {
-      const err = error as Error & {
-        response?: { data?: { detail?: string } };
-      };
-      return rejectWithValue(
-        err.response?.data?.detail || "Failed to fetch user data"
-      );
-    }
-  }
-);
-
-// Update current user data
-export const updateCurrentUser = createAsyncThunk(
-  "auth/updateCurrentUser",
-  async (userData: UserUpdate, { rejectWithValue }) => {
-    try {
-      const response = await api.put<User>("/api/v1/users/me", userData);
-      localStorage.setItem("user", JSON.stringify(response.data));
-      return response.data;
-    } catch (error: unknown) {
-      const err = error as Error & {
-        response?: { data?: { detail?: string } };
-      };
-      return rejectWithValue(
-        err.response?.data?.detail || "Failed to update user data"
-      );
     }
   }
 );
@@ -258,7 +215,7 @@ export const refreshSession = createAsyncThunk(
 // Check and restore session on app load
 export const checkAuthSession = createAsyncThunk(
   "auth/checkAuthSession",
-  async (_, { dispatch, rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const isAuth = await cognitoService.isAuthenticated();
       if (!isAuth) {
@@ -267,9 +224,6 @@ export const checkAuthSession = createAsyncThunk(
 
       const tokens = await cognitoService.getAuthTokens();
       const cognitoUser = await cognitoService.getCurrentUser();
-
-      // Fetch user data from backend
-      dispatch(fetchCurrentUser());
 
       return {
         isLoggedIn: true,
@@ -441,40 +395,6 @@ const authSlice = createSlice({
         localStorage.removeItem("user");
       })
 
-      // Fetch current user cases
-      .addCase(fetchCurrentUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(
-        fetchCurrentUser.fulfilled,
-        (state, action: PayloadAction<User>) => {
-          state.isLoading = false;
-          state.user = action.payload;
-        }
-      )
-      .addCase(fetchCurrentUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload as string;
-      })
-
-      // Update current user cases
-      .addCase(updateCurrentUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(
-        updateCurrentUser.fulfilled,
-        (state, action: PayloadAction<User>) => {
-          state.isLoading = false;
-          state.user = action.payload;
-        }
-      )
-      .addCase(updateCurrentUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload as string;
-      })
-
       // Forgot password cases
       .addCase(forgotPassword.pending, (state) => {
         state.isLoading = true;
@@ -530,6 +450,7 @@ const authSlice = createSlice({
       })
       .addCase(checkAuthSession.fulfilled, (state, action) => {
         state.isLoading = false;
+        state.isInitializing = false;
         if (action.payload.isLoggedIn && "accessToken" in action.payload) {
           state.isLoggedIn = true;
           state.accessToken = action.payload.accessToken ?? null;
@@ -542,6 +463,7 @@ const authSlice = createSlice({
       })
       .addCase(checkAuthSession.rejected, (state) => {
         state.isLoading = false;
+        state.isInitializing = false;
         state.isLoggedIn = false;
       });
   },

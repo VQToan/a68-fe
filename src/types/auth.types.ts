@@ -34,6 +34,7 @@ export interface AuthState {
   refreshTokenExpiresAt: number | null;
   isLoggedIn: boolean;
   isLoading: boolean;
+  isInitializing: boolean; // true while checking session on app load
   error: string | null;
   // Cognito specific states
   requiresVerification: boolean;

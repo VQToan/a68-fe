@@ -6,8 +6,6 @@ import {
   register,
   confirmSignUp,
   resendVerificationCode,
-  fetchCurrentUser,
-  updateCurrentUser,
   forgotPassword,
   confirmPasswordReset,
   checkAuthSession,
@@ -17,7 +15,6 @@ import cognitoService from "@services/cognito.service";
 import type {
   LoginCredentials,
   RegisterCredentials,
-  UserUpdate,
   ConfirmSignUpCredentials,
   ResetPasswordCredentials,
 } from "../types/auth.types";
@@ -64,19 +61,6 @@ export const useAuth = () => {
     return dispatch(logout());
   }, [dispatch]);
 
-  // Handle getting current user
-  const handleGetCurrentUser = useCallback(() => {
-    return dispatch(fetchCurrentUser());
-  }, [dispatch]);
-
-  // Handle updating current user
-  const handleUpdateCurrentUser = useCallback(
-    (userData: UserUpdate) => {
-      return dispatch(updateCurrentUser(userData));
-    },
-    [dispatch]
-  );
-
   // Handle forgot password
   const handleForgotPassword = useCallback(
     (email: string) => {
@@ -107,13 +91,6 @@ export const useAuth = () => {
       dispatch(checkAuthSession());
     }
   }, [dispatch]);
-
-  // Auto-fetch user data when logged in but no user data
-  useEffect(() => {
-    if (auth.isLoggedIn && !auth.user && !auth.isLoading) {
-      dispatch(fetchCurrentUser());
-    }
-  }, [auth.isLoggedIn, auth.user, auth.isLoading, dispatch]);
 
   // Token expiration check and auto-logout
   useEffect(() => {
@@ -173,8 +150,6 @@ export const useAuth = () => {
     confirmSignUp: handleConfirmSignUp,
     resendVerificationCode: handleResendVerificationCode,
     logout: handleLogout,
-    getCurrentUser: handleGetCurrentUser,
-    updateCurrentUser: handleUpdateCurrentUser,
     forgotPassword: handleForgotPassword,
     confirmPasswordReset: handleConfirmPasswordReset,
     clearError: handleClearError,

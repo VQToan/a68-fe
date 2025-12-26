@@ -52,7 +52,7 @@ const MainLayout = () => {
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("sm"));
   // Treat tablets as compact to avoid horizontal overflow
   const isCompact = useMediaQuery(muiTheme.breakpoints.down("md"));
-  const { user, logout } = useAuth();
+  const { cognitoUser, logout } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -101,51 +101,55 @@ const MainLayout = () => {
     [isMobile, navigate]
   );
 
-  // const userName = user?.full_name || user?.email || "User";
+  // const userName = cognitoUser?.fullName || cognitoUser?.email || "User";
   const userName = useMemo(() => {
-    if (user?.full_name) {
-      return user.full_name;
-    } else if (user?.email) {
-      return user.email;
+    if (cognitoUser?.fullName) {
+      return cognitoUser.fullName;
+    } else if (cognitoUser?.email) {
+      return cognitoUser.email;
     } else {
       return t("common.user");
     }
-  }, [t, user]);
+  }, [t, cognitoUser]);
 
   // Get first letter for Avatar
   const getInitials = useCallback(
     (name: string) => {
       return name.charAt(0).toUpperCase();
     },
-    [user]
+    [cognitoUser]
   );
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ display: "flex", minHeight: '100vh', overflowX: 'hidden' }}>
+      <Box sx={{ display: "flex", minHeight: "100vh", overflowX: "hidden" }}>
         {/* App Bar */}
         <AppBar
           position="fixed"
           sx={{
-            maxWidth: '100vw',
-            overflowX: 'hidden',
+            maxWidth: "100vw",
+            overflowX: "hidden",
             zIndex: (theme) => theme.zIndex.drawer + 1,
             transition: theme.transitions.create(["width", "margin"], {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,
             }),
-            ...(open && !isCompact && {
-              marginLeft: drawerWidth,
-              width: `calc(100% - ${drawerWidth}px)`,
-              transition: theme.transitions.create(["width", "margin"], {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen,
+            ...(open &&
+              !isCompact && {
+                marginLeft: drawerWidth,
+                width: `calc(100% - ${drawerWidth}px)`,
+                transition: theme.transitions.create(["width", "margin"], {
+                  easing: theme.transitions.easing.sharp,
+                  duration: theme.transitions.duration.enteringScreen,
+                }),
               }),
-            }),
           }}
         >
-          <Toolbar variant={isCompact ? 'dense' : 'regular'} sx={{ minHeight: { xs: 40, sm: 52, md: 64 }, px: { xs: 1, sm: 2 } }}>
+          <Toolbar
+            variant={isCompact ? "dense" : "regular"}
+            sx={{ minHeight: { xs: 40, sm: 52, md: 64 }, px: { xs: 1, sm: 2 } }}
+          >
             <IconButton
               color="inherit"
               aria-label={t("layout.openDrawer")}
@@ -168,14 +172,33 @@ const MainLayout = () => {
                   borderRadius: "50%",
                 }}
               />
-              <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', sm: 'block' }, fontSize: { sm: '0.95rem', md: '1.15rem' } }}>
+              <Typography
+                variant="h6"
+                noWrap
+                component="div"
+                sx={{
+                  display: { xs: "none", sm: "block" },
+                  fontSize: { sm: "0.95rem", md: "1.15rem" },
+                }}
+              >
                 {t("app.name")}
               </Typography>
             </Box>
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: "flex", alignItems: "center", minWidth: 0 }}>
               <LanguageSwitcher />
-              <Typography variant="body1" sx={{ mr: 2, display: { xs: 'none', md: 'block' }, fontSize: { md: '0.95rem' }, maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <Typography
+                variant="body1"
+                sx={{
+                  mr: 2,
+                  display: { xs: "none", md: "block" },
+                  fontSize: { md: "0.95rem" },
+                  maxWidth: 240,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {userName}
               </Typography>
               <IconButton
@@ -186,7 +209,13 @@ const MainLayout = () => {
                 aria-expanded={userMenuOpen ? "true" : undefined}
                 sx={{ p: 0 }}
               >
-                <Avatar sx={{ bgcolor: "secondary.main", width: { xs: 26, sm: 30, md: 36 }, height: { xs: 26, sm: 30, md: 36 } }}>
+                <Avatar
+                  sx={{
+                    bgcolor: "secondary.main",
+                    width: { xs: 26, sm: 30, md: 36 },
+                    height: { xs: 26, sm: 30, md: 36 },
+                  }}
+                >
                   {getInitials(userName)}
                 </Avatar>
               </IconButton>
@@ -321,17 +350,19 @@ const MainLayout = () => {
                     height: 24,
                   }}
                 >
-                  <HomeIcon 
-                    sx={{ 
+                  <HomeIcon
+                    sx={{
                       fontSize: 24,
                       width: 24,
                       height: 24,
-                      transition: "none"
-                    }} 
+                      transition: "none",
+                    }}
                   />
                 </ListItemIcon>
-                <ListItemText primary={t("navigation.home")}
-                  sx={{ opacity: open ? 1 : 0 }} />
+                <ListItemText
+                  primary={t("navigation.home")}
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
               </ListItemButton>
             </ListItem>
 
@@ -358,13 +389,13 @@ const MainLayout = () => {
                     height: 24,
                   }}
                 >
-                  <DashboardIcon 
-                    sx={{ 
+                  <DashboardIcon
+                    sx={{
                       fontSize: 24,
                       width: 24,
                       height: 24,
-                      transition: "none"
-                    }} 
+                      transition: "none",
+                    }}
                   />
                 </ListItemIcon>
                 <ListItemText
@@ -397,13 +428,13 @@ const MainLayout = () => {
                     height: 24,
                   }}
                 >
-                  <SmartToyIcon 
-                    sx={{ 
+                  <SmartToyIcon
+                    sx={{
                       fontSize: 24,
                       width: 24,
                       height: 24,
-                      transition: "none"
-                    }} 
+                      transition: "none",
+                    }}
                   />
                 </ListItemIcon>
                 <ListItemText
@@ -436,13 +467,13 @@ const MainLayout = () => {
                     height: 24,
                   }}
                 >
-                  <DescriptionIcon 
-                    sx={{ 
+                  <DescriptionIcon
+                    sx={{
                       fontSize: 24,
                       width: 24,
                       height: 24,
-                      transition: "none"
-                    }} 
+                      transition: "none",
+                    }}
                   />
                 </ListItemIcon>
                 <ListItemText
@@ -475,13 +506,13 @@ const MainLayout = () => {
                     height: 24,
                   }}
                 >
-                  <BarChartIcon 
-                    sx={{ 
+                  <BarChartIcon
+                    sx={{
                       fontSize: 24,
                       width: 24,
                       height: 24,
-                      transition: "none"
-                    }} 
+                      transition: "none",
+                    }}
                   />
                 </ListItemIcon>
                 <ListItemText
@@ -514,13 +545,13 @@ const MainLayout = () => {
                     height: 24,
                   }}
                 >
-                  <CurrencyBitcoinIcon 
-                    sx={{ 
+                  <CurrencyBitcoinIcon
+                    sx={{
                       fontSize: 24,
                       width: 24,
                       height: 24,
-                      transition: "none"
-                    }} 
+                      transition: "none",
+                    }}
                   />
                 </ListItemIcon>
                 <ListItemText
@@ -553,13 +584,13 @@ const MainLayout = () => {
                     height: 24,
                   }}
                 >
-                  <AccountBalanceIcon 
-                    sx={{ 
+                  <AccountBalanceIcon
+                    sx={{
                       fontSize: 24,
                       width: 24,
                       height: 24,
-                      transition: "none"
-                    }} 
+                      transition: "none",
+                    }}
                   />
                 </ListItemIcon>
                 <ListItemText
@@ -594,16 +625,19 @@ const MainLayout = () => {
                     height: 24,
                   }}
                 >
-                  <LogoutIcon 
-                    sx={{ 
+                  <LogoutIcon
+                    sx={{
                       fontSize: 24,
                       width: 24,
                       height: 24,
-                      transition: "none"
-                    }} 
+                      transition: "none",
+                    }}
                   />
                 </ListItemIcon>
-                <ListItemText primary={t("common.logout")} sx={{ opacity: open ? 1 : 0 }} />
+                <ListItemText
+                  primary={t("common.logout")}
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
               </ListItemButton>
             </ListItem>
           </List>
@@ -618,8 +652,8 @@ const MainLayout = () => {
             py: { xs: 1.25, sm: 2, md: 3 },
             width: "100%",
             backgroundColor: "background.default",
-            overflowX: 'hidden',
-            maxWidth: '100vw',
+            overflowX: "hidden",
+            maxWidth: "100vw",
             marginLeft: isCompact
               ? 0
               : open
@@ -629,63 +663,64 @@ const MainLayout = () => {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,
             }),
-            [muiTheme.breakpoints.down('sm')]: {
-              '& .MuiPaper-root': {
+            [muiTheme.breakpoints.down("sm")]: {
+              "& .MuiPaper-root": {
                 padding: `${theme.spacing(1.5)} !important`,
                 borderRadius: 0,
                 marginLeft: 0,
                 marginRight: 0,
-                width: '100%',
+                width: "100%",
               },
-              '& .MuiCard-root': {
+              "& .MuiCard-root": {
                 padding: `${theme.spacing(1.5)} !important`,
                 borderRadius: theme.spacing(1.5),
                 marginLeft: 0,
                 marginRight: 0,
-                width: '100%',
+                width: "100%",
               },
-              '& .MuiTypography-h5': {
-                fontSize: '1.2rem',
+              "& .MuiTypography-h5": {
+                fontSize: "1.2rem",
                 lineHeight: 1.3,
               },
-              '& .MuiTypography-h6': {
-                fontSize: '1rem',
+              "& .MuiTypography-h6": {
+                fontSize: "1rem",
                 lineHeight: 1.35,
               },
-              '& .MuiTypography-body1': {
-                fontSize: '0.92rem',
+              "& .MuiTypography-body1": {
+                fontSize: "0.92rem",
                 lineHeight: 1.45,
               },
-              '& .MuiTypography-body2': {
-                fontSize: '0.84rem',
+              "& .MuiTypography-body2": {
+                fontSize: "0.84rem",
                 lineHeight: 1.5,
               },
-              '& .MuiButton-root': {
-                fontSize: '0.82rem',
+              "& .MuiButton-root": {
+                fontSize: "0.82rem",
                 padding: `${theme.spacing(0.75, 1.5)} !important`,
               },
             },
-            [muiTheme.breakpoints.between('sm', 'md')]: {
-              '& .MuiPaper-root, & .MuiCard-root': {
+            [muiTheme.breakpoints.between("sm", "md")]: {
+              "& .MuiPaper-root, & .MuiCard-root": {
                 padding: `${theme.spacing(2.25)} !important`,
                 borderRadius: theme.spacing(1.75),
               },
-              '& .MuiTypography-h5': {
-                fontSize: '1.35rem',
+              "& .MuiTypography-h5": {
+                fontSize: "1.35rem",
               },
-              '& .MuiTypography-h6': {
-                fontSize: '1.12rem',
+              "& .MuiTypography-h6": {
+                fontSize: "1.12rem",
               },
-              '& .MuiTypography-body1': {
-                fontSize: '0.96rem',
+              "& .MuiTypography-body1": {
+                fontSize: "0.96rem",
               },
-              '& .MuiTypography-body2': {
-                fontSize: '0.88rem',
+              "& .MuiTypography-body2": {
+                fontSize: "0.88rem",
               },
             },
           }}
         >
-          <Toolbar variant={isCompact ? 'dense' : 'regular'} /> {/* spacing below AppBar */}
+          <Toolbar variant={isCompact ? "dense" : "regular"} />{" "}
+          {/* spacing below AppBar */}
           <Outlet />
         </Box>
       </Box>

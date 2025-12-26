@@ -1,16 +1,18 @@
-import { 
-  Box, 
-  Typography, 
+import {
+  Box,
+  Typography,
   Grid,
-  Card, 
-  CardContent, 
-  Divider
-} from '@mui/material';
-import { useAuth } from '@hooks/useAuth';
-import { memo } from 'react';
+  Card,
+  CardContent,
+  Divider,
+  Chip,
+} from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { useAuth } from "@hooks/useAuth";
+import { memo } from "react";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { cognitoUser } = useAuth();
 
   return (
     <Box>
@@ -18,7 +20,8 @@ const Dashboard = () => {
         Dashboard
       </Typography>
       <Typography variant="body1" paragraph>
-        Welcome to your secure dashboard. This page is only accessible to authenticated users.
+        Welcome to your secure dashboard. This page is only accessible to
+        authenticated users.
       </Typography>
 
       <Grid container spacing={3}>
@@ -29,38 +32,57 @@ const Dashboard = () => {
                 User Information
               </Typography>
               <Divider sx={{ mb: 2 }} />
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Box sx={{ display: 'flex' }}>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold', width: '100px' }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                <Box sx={{ display: "flex" }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "bold", width: "120px" }}
+                  >
                     Email:
                   </Typography>
                   <Typography variant="body1">
-                    {user?.email}
+                    {cognitoUser?.email || "N/A"}
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex' }}>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold', width: '100px' }}>
+                <Box sx={{ display: "flex" }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "bold", width: "120px" }}
+                  >
                     Name:
                   </Typography>
                   <Typography variant="body1">
-                    {user?.full_name || 'Not provided'}
+                    {cognitoUser?.fullName || "Not provided"}
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex' }}>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold', width: '100px' }}>
+                <Box sx={{ display: "flex" }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "bold", width: "120px" }}
+                  >
                     User ID:
                   </Typography>
-                  <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-                    {user?._id}
+                  <Typography variant="body1" sx={{ wordBreak: "break-all" }}>
+                    {cognitoUser?.userId || "N/A"}
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex' }}>
-                  <Typography variant="body1" sx={{ fontWeight: 'bold', width: '100px' }}>
-                    Created:
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Typography
+                    variant="body1"
+                    sx={{ fontWeight: "bold", width: "120px" }}
+                  >
+                    Email Verified:
                   </Typography>
-                  <Typography variant="body1">
-                    {user?.created_at ? new Date(user.created_at).toLocaleString() : 'N/A'}
-                  </Typography>
+                  {cognitoUser?.emailVerified ? (
+                    <Chip
+                      icon={<CheckCircleIcon />}
+                      label="Verified"
+                      color="success"
+                      size="small"
+                    />
+                  ) : (
+                    <Chip label="Not Verified" color="warning" size="small" />
+                  )}
                 </Box>
               </Box>
             </CardContent>
@@ -75,10 +97,11 @@ const Dashboard = () => {
               </Typography>
               <Divider sx={{ mb: 2 }} />
               <Typography variant="body1" paragraph>
-                You are currently authenticated with JWT access token and refresh token.
+                You are authenticated with AWS Cognito.
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Your session is secured and will automatically refresh when needed.
+                Your session is secured and will automatically refresh when
+                needed.
               </Typography>
             </CardContent>
           </Card>
