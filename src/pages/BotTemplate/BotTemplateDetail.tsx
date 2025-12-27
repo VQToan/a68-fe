@@ -55,8 +55,27 @@ const BotTemplateDetail: React.FC<BotTemplateDetailProps> = ({
 
   return (
     <Paper sx={{ p: 3 }}>
-
       <Grid container spacing={2}>
+        <Grid size={{ xs: 12 }}>
+          <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+            <Chip
+              label={
+                template.is_future ? t("common.futures") : t("common.spot")
+              }
+              size="medium"
+              color={template.is_future ? "warning" : "info"}
+              variant="outlined"
+            />
+            <Chip
+              label={
+                template.is_active ? t("common.active") : t("common.inactive")
+              }
+              size="medium"
+              color={template.is_active ? "success" : "default"}
+              variant="outlined"
+            />
+          </Box>
+        </Grid>
         <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle1" fontWeight="bold">
             {t("botTemplate.detail.name")}:
@@ -74,7 +93,6 @@ const BotTemplateDetail: React.FC<BotTemplateDetailProps> = ({
             {template.description}
           </Typography>
         </Grid>
-
         <Grid size={{ xs: 12 }}>
           <Divider sx={{ my: 2 }} />
           <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>
@@ -172,12 +190,14 @@ const BotTemplateDetail: React.FC<BotTemplateDetailProps> = ({
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 6 }}>
           <Typography variant="body2" color="text.secondary">
-            {t("botTemplate.detail.createdAt")}: {new Date(template.created_at).toLocaleString()}
+            {t("botTemplate.detail.createdAt")}:{" "}
+            {new Date(template.created_at).toLocaleString()}
           </Typography>
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <Typography variant="body2" color="text.secondary">
-            {t("botTemplate.detail.updatedAt")}: {new Date(template.updated_at).toLocaleString()}
+            {t("botTemplate.detail.updatedAt")}:{" "}
+            {new Date(template.updated_at).toLocaleString()}
           </Typography>
         </Grid>
       </Grid>

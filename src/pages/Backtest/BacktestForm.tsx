@@ -142,8 +142,8 @@ const BacktestForm = ({
   const { t } = useTranslation();
   // Get bot templates from the store
   const {
-    templates,
-    getTemplates: getBotTemplates,
+    activeTemplates: templates, // Alias activeTemplates as templates
+    getActiveTemplates: getBotTemplates, // Alias getActiveTemplates as getBotTemplates
     isLoading: isLoadingTemplates,
   } = useBotTemplate();
 
@@ -223,12 +223,12 @@ const BacktestForm = ({
 
   // Filter templates based on is_future value
   const filteredTemplates = useMemo(() => {
-    return templates.filter(template => template.is_future === isFutureValue);
+    return templates.filter((template) => template.is_future === isFutureValue);
   }, [templates, isFutureValue]);
 
   useEffect(() => {
     reset(defaultFormValues);
-  }, [ defaultFormValues]);
+  }, [defaultFormValues]);
 
   // Fetch bot templates on component mount
   useEffect(() => {
@@ -253,7 +253,6 @@ const BacktestForm = ({
       const formattedParams = { ...params };
 
       // Convert dates to UTC timestamps
-     
 
       // Ensure PAUSE_DAY is correctly formatted as a comma-separated string
       formattedParams.PAUSE_DAY = selectedPauseDays.join(",");
@@ -323,7 +322,9 @@ const BacktestForm = ({
             <Controller
               name="description"
               control={control}
-              rules={{ required: t("backtest.form.validation.descriptionRequired") }}
+              rules={{
+                required: t("backtest.form.validation.descriptionRequired"),
+              }}
               render={({ field }) => (
                 <TextField
                   {...field}
@@ -333,7 +334,7 @@ const BacktestForm = ({
                   rows={3}
                   error={!!errors.description}
                   helperText={
-                    errors.description?.message as string ||
+                    (errors.description?.message as string) ||
                     t("backtest.form.helper.description")
                   }
                 />
@@ -357,7 +358,9 @@ const BacktestForm = ({
               <Controller
                 name="bot_template_id"
                 control={control}
-                rules={{ required: t("backtest.form.validation.botTemplateRequired") }}
+                rules={{
+                  required: t("backtest.form.validation.botTemplateRequired"),
+                }}
                 render={({ field }) => (
                   <Select
                     {...field}
@@ -374,7 +377,8 @@ const BacktestForm = ({
                       </MenuItem>
                     ) : filteredTemplates.length === 0 ? (
                       <MenuItem value="" disabled>
-                        {t("backtest.form.noTemplatesAvailable") || "No templates available for this trading type"}
+                        {t("backtest.form.noTemplatesAvailable") ||
+                          "No templates available for this trading type"}
                       </MenuItem>
                     ) : (
                       filteredTemplates.map((template) => (
@@ -408,7 +412,9 @@ const BacktestForm = ({
                       disabled={isSubmitting}
                     />
                   }
-                  label={t("backtest.form.fields.isFuture") || "Futures Trading"}
+                  label={
+                    t("backtest.form.fields.isFuture") || "Futures Trading"
+                  }
                   sx={{ gap: 1 }}
                 />
               )}
@@ -422,11 +428,11 @@ const BacktestForm = ({
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="SYMBOL"
-                    label={t("backtest.form.fields.symbol")}
-                    fullWidth
-                  />
+                    <ParameterTextField
+                      paramName="SYMBOL"
+                      label={t("backtest.form.fields.symbol")}
+                      fullWidth
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Controller
@@ -434,13 +440,13 @@ const BacktestForm = ({
                       name="parameters.INTERVAL_1"
                       render={({ field }) => (
                         <FormControl fullWidth>
-                          <InputLabel>{t("backtest.form.fields.interval1")}</InputLabel>
+                          <InputLabel>
+                            {t("backtest.form.fields.interval1")}
+                          </InputLabel>
                           <Select
                             {...field}
                             label={t("backtest.form.fields.interval1")}
-                            value={
-                              field.value ?? defaultBotParams.INTERVAL_1
-                            }
+                            value={field.value ?? defaultBotParams.INTERVAL_1}
                             onChange={(event) =>
                               field.onChange(event.target.value)
                             }
@@ -461,13 +467,13 @@ const BacktestForm = ({
                       name="parameters.INTERVAL_2"
                       render={({ field }) => (
                         <FormControl fullWidth>
-                          <InputLabel>{t("backtest.form.fields.interval2")}</InputLabel>
+                          <InputLabel>
+                            {t("backtest.form.fields.interval2")}
+                          </InputLabel>
                           <Select
                             {...field}
                             label={t("backtest.form.fields.interval2")}
-                            value={
-                              field.value ?? defaultBotParams.INTERVAL_2
-                            }
+                            value={field.value ?? defaultBotParams.INTERVAL_2}
                             onChange={(event) =>
                               field.onChange(event.target.value)
                             }
@@ -488,13 +494,13 @@ const BacktestForm = ({
                       name="parameters.TRADE_MODE"
                       render={({ field }) => (
                         <FormControl fullWidth>
-                          <InputLabel>{t("backtest.form.fields.tradeMode")}</InputLabel>
+                          <InputLabel>
+                            {t("backtest.form.fields.tradeMode")}
+                          </InputLabel>
                           <Select
                             {...field}
                             label={t("backtest.form.fields.tradeMode")}
-                            value={
-                              field.value ?? defaultBotParams.TRADE_MODE
-                            }
+                            value={field.value ?? defaultBotParams.TRADE_MODE}
                             onChange={(event) =>
                               field.onChange(Number(event.target.value))
                             }
@@ -522,14 +528,14 @@ const BacktestForm = ({
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="ENTRY_PERCENTAGE"
-                    label={t("backtest.form.fields.entryPercentage")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                    inputProps={{ step: "0.001" }}
-                    slotProps={{
+                    <ParameterTextField
+                      paramName="ENTRY_PERCENTAGE"
+                      label={t("backtest.form.fields.entryPercentage")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                      inputProps={{ step: "0.001" }}
+                      slotProps={{
                         input: {
                           endAdornment: (
                             <InputAdornment position="end">%</InputAdornment>
@@ -539,56 +545,56 @@ const BacktestForm = ({
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="TRAILING_PERCENTAGE"
-                    label={t("backtest.form.fields.trailingPercentage")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                    inputProps={{ step: "0.1" }}
-                    slotProps={{
+                    <ParameterTextField
+                      paramName="TRAILING_PERCENTAGE"
+                      label={t("backtest.form.fields.trailingPercentage")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                      inputProps={{ step: "0.1" }}
+                      slotProps={{
                         input: {
                           endAdornment: (
                             <InputAdornment position="end">%</InputAdornment>
                           ),
                         },
                       }}
-                  />
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="CALLBACK_PERCENTAGE"
-                    label={t("backtest.form.fields.callbackPercentage")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                    inputProps={{ step: "0.1" }}
-                    slotProps={{
+                    <ParameterTextField
+                      paramName="CALLBACK_PERCENTAGE"
+                      label={t("backtest.form.fields.callbackPercentage")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                      inputProps={{ step: "0.1" }}
+                      slotProps={{
                         input: {
                           endAdornment: (
                             <InputAdornment position="end">%</InputAdornment>
                           ),
                         },
                       }}
-                  />
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="LEVERAGE"
-                    label={t("backtest.form.fields.leverage")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                  />
+                    <ParameterTextField
+                      paramName="LEVERAGE"
+                      label={t("backtest.form.fields.leverage")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="FUNDS"
-                    label={t("backtest.form.fields.funds")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                    slotProps={{
+                    <ParameterTextField
+                      paramName="FUNDS"
+                      label={t("backtest.form.fields.funds")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                      slotProps={{
                         input: {
                           endAdornment: (
                             <InputAdornment position="end">USDT</InputAdornment>
@@ -598,14 +604,14 @@ const BacktestForm = ({
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="TIME_BETWEEN_ORDERS"
-                    label={t("backtest.form.fields.timeBetweenOrders")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                    inputProps={{ step: "1" }}
-                    slotProps={{
+                    <ParameterTextField
+                      paramName="TIME_BETWEEN_ORDERS"
+                      label={t("backtest.form.fields.timeBetweenOrders")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                      inputProps={{ step: "1" }}
+                      slotProps={{
                         input: {
                           endAdornment: (
                             <InputAdornment position="end">
@@ -617,12 +623,12 @@ const BacktestForm = ({
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="PAUSE_TIME"
-                    label={t("backtest.form.fields.pauseTime")}
-                    fullWidth
-                    placeholder={t("backtest.form.placeholders.pauseTime")}
-                  />
+                    <ParameterTextField
+                      paramName="PAUSE_TIME"
+                      label={t("backtest.form.fields.pauseTime")}
+                      fullWidth
+                      placeholder={t("backtest.form.placeholders.pauseTime")}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Controller
@@ -686,16 +692,18 @@ const BacktestForm = ({
             {/* Profit and Margin Settings */}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>{t("backtest.form.sections.profitMargin")}</Typography>
+                <Typography>
+                  {t("backtest.form.sections.profitMargin")}
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="MIN_ROI"
-                    label={t("backtest.form.fields.minRoi")}
-                    type="number"
-                    fullWidth
+                    <ParameterTextField
+                      paramName="MIN_ROI"
+                      label={t("backtest.form.fields.minRoi")}
+                      type="number"
+                      fullWidth
                       parseValue={toNumber}
                       inputProps={{ step: "0.1" }}
                       slotProps={{
@@ -708,19 +716,19 @@ const BacktestForm = ({
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="R2R"
-                    label={t("backtest.form.fields.riskToReward")}
-                    fullWidth
+                    <ParameterTextField
+                      paramName="R2R"
+                      label={t("backtest.form.fields.riskToReward")}
+                      fullWidth
                       placeholder="1:2"
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="MIN_MARGIN"
-                    label={t("backtest.form.fields.minMargin")}
-                    type="number"
-                    fullWidth
+                    <ParameterTextField
+                      paramName="MIN_MARGIN"
+                      label={t("backtest.form.fields.minMargin")}
+                      type="number"
+                      fullWidth
                       parseValue={toNumber}
                       inputProps={{ step: "0.1" }}
                       slotProps={{
@@ -733,11 +741,11 @@ const BacktestForm = ({
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="MAX_MARGIN_PERCENTAGE"
-                    label={t("backtest.form.fields.maxMarginPercentage")}
-                    type="number"
-                    fullWidth
+                    <ParameterTextField
+                      paramName="MAX_MARGIN_PERCENTAGE"
+                      label={t("backtest.form.fields.maxMarginPercentage")}
+                      type="number"
+                      fullWidth
                       parseValue={toNumber}
                       inputProps={{ step: "0.1" }}
                       slotProps={{
@@ -750,11 +758,11 @@ const BacktestForm = ({
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="MAX_LOSS"
-                    label={t("backtest.form.fields.maxLoss")}
-                    type="number"
-                    fullWidth
+                    <ParameterTextField
+                      paramName="MAX_LOSS"
+                      label={t("backtest.form.fields.maxLoss")}
+                      type="number"
+                      fullWidth
                       parseValue={toNumber}
                       inputProps={{ step: "0.1" }}
                       slotProps={{
@@ -773,18 +781,20 @@ const BacktestForm = ({
             {/* Technical indicators */}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>{t("backtest.form.sections.indicators")}</Typography>
+                <Typography>
+                  {t("backtest.form.sections.indicators")}
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="MA_PERIOD"
-                    label={t("backtest.form.fields.maPeriod")}
-                    fullWidth
-                    placeholder={t("backtest.form.placeholders.maPeriod")}
-                    helperText={t("backtest.form.helper.maPeriod")}
-                  />
+                    <ParameterTextField
+                      paramName="MA_PERIOD"
+                      label={t("backtest.form.fields.maPeriod")}
+                      fullWidth
+                      placeholder={t("backtest.form.placeholders.maPeriod")}
+                      helperText={t("backtest.form.helper.maPeriod")}
+                    />
                   </Grid>
 
                   {/* RSI Settings */}
@@ -795,77 +805,77 @@ const BacktestForm = ({
                   </Grid>
 
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="RSI_ENTRY_LONG"
-                    label={t("backtest.form.fields.rsiEntryLong")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                  />
+                    <ParameterTextField
+                      paramName="RSI_ENTRY_LONG"
+                      label={t("backtest.form.fields.rsiEntryLong")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="RSI_ENTRY_LONG_CANDLE"
-                    label={t("backtest.form.fields.rsiEntryLongCandle")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                  />
+                    <ParameterTextField
+                      paramName="RSI_ENTRY_LONG_CANDLE"
+                      label={t("backtest.form.fields.rsiEntryLongCandle")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="RSI_EXIT_LONG"
-                    label={t("backtest.form.fields.rsiExitLong")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                  />
+                    <ParameterTextField
+                      paramName="RSI_EXIT_LONG"
+                      label={t("backtest.form.fields.rsiExitLong")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="RSI_EXIT_LONG_CANDLE"
-                    label={t("backtest.form.fields.rsiExitLongCandle")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                  />
+                    <ParameterTextField
+                      paramName="RSI_EXIT_LONG_CANDLE"
+                      label={t("backtest.form.fields.rsiExitLongCandle")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                    />
                   </Grid>
 
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="RSI_ENTRY_SHORT"
-                    label={t("backtest.form.fields.rsiEntryShort")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                  />
+                    <ParameterTextField
+                      paramName="RSI_ENTRY_SHORT"
+                      label={t("backtest.form.fields.rsiEntryShort")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="RSI_ENTRY_SHORT_CANDLE"
-                    label={t("backtest.form.fields.rsiEntryShortCandle")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                  />
+                    <ParameterTextField
+                      paramName="RSI_ENTRY_SHORT_CANDLE"
+                      label={t("backtest.form.fields.rsiEntryShortCandle")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="RSI_EXIT_SHORT"
-                    label={t("backtest.form.fields.rsiExitShort")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                  />
+                    <ParameterTextField
+                      paramName="RSI_EXIT_SHORT"
+                      label={t("backtest.form.fields.rsiExitShort")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="RSI_EXIT_SHORT_CANDLE"
-                    label={t("backtest.form.fields.rsiExitShortCandle")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                  />
+                    <ParameterTextField
+                      paramName="RSI_EXIT_SHORT_CANDLE"
+                      label={t("backtest.form.fields.rsiExitShortCandle")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                    />
                   </Grid>
                 </Grid>
               </AccordionDetails>
@@ -924,35 +934,35 @@ const BacktestForm = ({
               <AccordionDetails>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="DCA_GRID"
-                    label={t("backtest.form.fields.dcaGrid")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                    inputProps={{ step: "0.001" }}
-                    helperText={t("backtest.form.helper.dcaGrid")}
-                  />
+                    <ParameterTextField
+                      paramName="DCA_GRID"
+                      label={t("backtest.form.fields.dcaGrid")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                      inputProps={{ step: "0.001" }}
+                      helperText={t("backtest.form.helper.dcaGrid")}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="GRID_MULTIPLIER"
-                    label={t("backtest.form.fields.gridMultiplier")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                    inputProps={{ step: "0.01" }}
-                  />
+                    <ParameterTextField
+                      paramName="GRID_MULTIPLIER"
+                      label={t("backtest.form.fields.gridMultiplier")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                      inputProps={{ step: "0.01" }}
+                    />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
-                  <ParameterTextField
-                    paramName="DCA_MULTIPLIER"
-                    label={t("backtest.form.fields.dcaMultiplier")}
-                    type="number"
-                    fullWidth
-                    parseValue={toNumber}
-                    inputProps={{ step: "0.01" }}
-                  />
+                    <ParameterTextField
+                      paramName="DCA_MULTIPLIER"
+                      label={t("backtest.form.fields.dcaMultiplier")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                      inputProps={{ step: "0.01" }}
+                    />
                   </Grid>
                 </Grid>
               </AccordionDetails>

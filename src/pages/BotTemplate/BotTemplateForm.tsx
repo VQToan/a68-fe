@@ -88,6 +88,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
       after_hedge_module: initialData?.after_hedge_module || "",
       stop_loss_module: initialData?.stop_loss_module || "",
       is_future: initialData?.is_future || false,
+      is_active: initialData?.is_active ?? true, // Default to true for new templates
     },
   });
 
@@ -144,6 +145,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
         after_hedge_module: initialData.after_hedge_module || "",
         stop_loss_module: initialData.stop_loss_module || "",
         is_future: initialData.is_future || false,
+        is_active: initialData.is_active ?? true,
       });
     }
   }, [initialData, reset]);
@@ -162,6 +164,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
         after_hedge_module: "",
         stop_loss_module: "",
         is_future: isFutureValue,
+        is_active: true,
       });
     }
   }, [isFutureValue]);
@@ -185,6 +188,29 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
       {/* Basic information section */}
       <Box sx={{ mb: 4 }}>
         <Grid container spacing={3}>
+          <Grid size={{ xs: 12, lg: 6 }}>
+            <Controller
+              name="is_active"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={Boolean(field.value)}
+                      onChange={(_, checked) => field.onChange(checked)}
+                      onBlur={field.onBlur}
+                      inputRef={field.ref}
+                      name={field.name}
+                      disabled={isSubmitting}
+                      color="success"
+                    />
+                  }
+                  label={t("botTemplate.form.fields.isActive")}
+                  sx={{ gap: 1 }}
+                />
+              )}
+            />
+          </Grid>
           <Grid size={{ xs: 12, lg: 6 }}>
             <Controller
               name="name"

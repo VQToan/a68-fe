@@ -58,7 +58,7 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
   }
 
   return (
-    <Paper sx={{ overflow: 'hidden' }}>
+    <Paper sx={{ overflow: "hidden" }}>
       <StickyTable
         height="60vh"
         minWidth={800}
@@ -68,6 +68,7 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
               <TableCell>{t("botTemplate.list.headers.name")}</TableCell>
               <TableCell>{t("botTemplate.list.headers.description")}</TableCell>
               <TableCell>{t("botTemplate.list.headers.isFuture")}</TableCell>
+              <TableCell>{t("botTemplate.list.headers.isActive")}</TableCell>
               <TableCell>{t("botTemplate.list.headers.createdAt")}</TableCell>
               <TableCell>{t("botTemplate.list.headers.actions")}</TableCell>
             </TableRow>
@@ -100,11 +101,27 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
                   </Tooltip>
                 </TableCell>
                 <TableCell>
-                  <Chip 
-                    label={template.is_future ? t('common.futures') : t('common.spot')}
-                    size="small" 
+                  <Chip
+                    label={
+                      template.is_future
+                        ? t("common.futures")
+                        : t("common.spot")
+                    }
+                    size="small"
                     color={template.is_future ? "warning" : "info"}
-                    variant="outlined" 
+                    variant="outlined"
+                  />
+                </TableCell>
+                <TableCell>
+                  <Chip
+                    label={
+                      template.is_active
+                        ? t("common.active")
+                        : t("common.inactive")
+                    }
+                    size="small"
+                    color={template.is_active ? "success" : "default"}
+                    variant="outlined"
                   />
                 </TableCell>
                 <TableCell>{formatDate(template.created_at)}</TableCell>

@@ -30,7 +30,10 @@ import InfoIcon from "@mui/icons-material/Info";
 import { useBotOptimization } from "@/hooks/useBotOptimization";
 import { useBotTemplate } from "@/hooks/useBotTemplate";
 import { useBacktest } from "@/hooks/useBacktest";
-import type { BotOptimizationRequest, LLMModel } from "@/types/botOptimization.type";
+import type {
+  BotOptimizationRequest,
+  LLMModel,
+} from "@/types/botOptimization.type";
 import { areEqual } from "@/utils/common";
 import { debounce } from "@/utils/debounceUtils";
 
@@ -58,23 +61,27 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
   onSuccess,
 }) => {
   // Get bot templates
-  const { templates, getTemplates, isLoading: templatesLoading } = useBotTemplate();
-  
+  const {
+    activeTemplates: templates,
+    getActiveTemplates: getTemplates,
+    isLoading: templatesLoading,
+  } = useBotTemplate();
+
   // Get backtest processes by template
   const { processesByTemplate, getProcessesByTemplateId } = useBacktest();
-  
+
   // Get optimization hook
-  const { 
-    optimizeBot, 
-    isLoading, 
-    error, 
-    availableModels, 
-    isLoadingModels, 
+  const {
+    optimizeBot,
+    isLoading,
+    error,
+    availableModels,
+    isLoadingModels,
     fetchAvailableModels,
     clearModels,
     defaultPrompt,
     isLoadingDefaultPrompt,
-    fetchDefaultPrompt
+    fetchDefaultPrompt,
   } = useBotOptimization();
 
   // Local state for form
@@ -91,13 +98,14 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
   const completedBacktests = useMemo(() => {
     if (!processesByTemplate) return [];
     return processesByTemplate.filter(
-      (process) => process.status === "completed" && (process?.num_results || 0) > 0
+      (process) =>
+        process.status === "completed" && (process?.num_results || 0) > 0
     );
   }, [processesByTemplate]);
 
   // Tạo hàm debounced để fetch models
   const debouncedFetchModels = useMemo(
-    () => 
+    () =>
       debounce(async (provider: string, key: string) => {
         if (provider && key && key.length >= 20) {
           try {
@@ -113,48 +121,57 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
   );
 
   // Handle template selection change
-  const handleTemplateChange = useCallback((event: SelectChangeEvent) => {
-    const templateId = event.target.value as string;
-    setSelectedTemplate(templateId);
-    setSelectedBacktests([]); // Reset selected backtests when template changes
-    
-    // Fetch backtests for the selected template
-    if (templateId) {
-      getProcessesByTemplateId(templateId, "completed");
-    }
-  }, [getProcessesByTemplateId]);
+  const handleTemplateChange = useCallback(
+    (event: SelectChangeEvent) => {
+      const templateId = event.target.value as string;
+      setSelectedTemplate(templateId);
+      setSelectedBacktests([]); // Reset selected backtests when template changes
+
+      // Fetch backtests for the selected template
+      if (templateId) {
+        getProcessesByTemplateId(templateId, "completed");
+      }
+    },
+    [getProcessesByTemplateId]
+  );
 
   // Handle provider selection change
-  const handleProviderChange = useCallback((event: SelectChangeEvent) => {
-    const newProvider = event.target.value as string;
-    setSelectedProvider(newProvider);
-    setSelectedModel(""); // Reset model when provider changes
-    clearModels(); // Clear available models
-    setApiKeyValidated(false); // Reset API key validation
-    
-    // If API key is already entered, fetch models for the new provider
-    if (apiKey && apiKey.length >= 20) {
-      debouncedFetchModels(newProvider, apiKey);
-    }
-  }, [apiKey, clearModels, debouncedFetchModels]);
+  const handleProviderChange = useCallback(
+    (event: SelectChangeEvent) => {
+      const newProvider = event.target.value as string;
+      setSelectedProvider(newProvider);
+      setSelectedModel(""); // Reset model when provider changes
+      clearModels(); // Clear available models
+      setApiKeyValidated(false); // Reset API key validation
+
+      // If API key is already entered, fetch models for the new provider
+      if (apiKey && apiKey.length >= 20) {
+        debouncedFetchModels(newProvider, apiKey);
+      }
+    },
+    [apiKey, clearModels, debouncedFetchModels]
+  );
 
   // Handle API key change
-  const handleApiKeyChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const newApiKey = event.target.value;
-    setApiKey(newApiKey);
-    
-    // Reset model selection and validation if API key changes significantly
-    if (newApiKey.length < 20 || !selectedProvider) {
-      setSelectedModel("");
-      setApiKeyValidated(false);
-      return;
-    }
-    
-    // Fetch models when provider and API key are both valid
-    if (selectedProvider) {
-      debouncedFetchModels(selectedProvider, newApiKey);
-    }
-  }, [selectedProvider, debouncedFetchModels]);
+  const handleApiKeyChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newApiKey = event.target.value;
+      setApiKey(newApiKey);
+
+      // Reset model selection and validation if API key changes significantly
+      if (newApiKey.length < 20 || !selectedProvider) {
+        setSelectedModel("");
+        setApiKeyValidated(false);
+        return;
+      }
+
+      // Fetch models when provider and API key are both valid
+      if (selectedProvider) {
+        debouncedFetchModels(selectedProvider, newApiKey);
+      }
+    },
+    [selectedProvider, debouncedFetchModels]
+  );
 
   // Handle model selection change
   const handleModelChange = useCallback((event: SelectChangeEvent) => {
@@ -162,41 +179,56 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
   }, []);
 
   // Handle backtest selection change
-  const handleBacktestToggle = useCallback((backtestId: string) => () => {
-    setSelectedBacktests((prev) => {
-      if (prev.includes(backtestId)) {
-        return prev.filter((id) => id !== backtestId);
-      } else {
-        return [...prev, backtestId];
-      }
-    });
-  }, []);
+  const handleBacktestToggle = useCallback(
+    (backtestId: string) => () => {
+      setSelectedBacktests((prev) => {
+        if (prev.includes(backtestId)) {
+          return prev.filter((id) => id !== backtestId);
+        } else {
+          return [...prev, backtestId];
+        }
+      });
+    },
+    []
+  );
 
   // Handle custom prompt toggle
-  const handleCustomPromptToggle = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setUseCustomPrompt(event.target.checked);
-    
-    // Reset custom prompt if toggled off
-    if (!event.target.checked) {
-      setCustomPrompt("");
-    }
-  }, []);
+  const handleCustomPromptToggle = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setUseCustomPrompt(event.target.checked);
+
+      // Reset custom prompt if toggled off
+      if (!event.target.checked) {
+        setCustomPrompt("");
+      }
+    },
+    []
+  );
 
   // Handle custom prompt change
-  const handleCustomPromptChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setCustomPrompt(event.target.value);
-  }, []);
+  const handleCustomPromptChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setCustomPrompt(event.target.value);
+    },
+    []
+  );
 
   // Handle form submission
   const handleSubmit = useCallback(async () => {
-    if (!selectedTemplate || !selectedProvider || !selectedModel || !apiKey || selectedBacktests.length === 0) {
+    if (
+      !selectedTemplate ||
+      !selectedProvider ||
+      !selectedModel ||
+      !apiKey ||
+      selectedBacktests.length === 0
+    ) {
       return;
     }
 
     const requestData: BotOptimizationRequest = {
       bot_template_id: selectedTemplate,
       backtest_process_ids: selectedBacktests,
-      llm_provider: selectedProvider as 'openai' | 'anthropic' | 'gemini',
+      llm_provider: selectedProvider as "openai" | "anthropic" | "gemini",
       model: selectedModel,
       api_key: apiKey,
       custom_prompt: useCustomPrompt ? customPrompt : undefined, // Include custom prompt if used
@@ -231,14 +263,21 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
   // Validation
   const isFormValid = useMemo(() => {
     return (
-      selectedTemplate !== "" && 
-      selectedProvider !== "" && 
-      selectedModel !== "" && 
-      apiKey.trim() !== "" && 
+      selectedTemplate !== "" &&
+      selectedProvider !== "" &&
+      selectedModel !== "" &&
+      apiKey.trim() !== "" &&
       apiKeyValidated &&
       selectedBacktests.length > 0
     );
-  }, [selectedTemplate, selectedProvider, selectedModel, apiKey, apiKeyValidated, selectedBacktests]);
+  }, [
+    selectedTemplate,
+    selectedProvider,
+    selectedModel,
+    apiKey,
+    apiKeyValidated,
+    selectedBacktests,
+  ]);
 
   // Fetch templates if not loaded
   useEffect(() => {
@@ -249,10 +288,21 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
 
   // Load default prompt when custom prompt is toggled on
   useEffect(() => {
-    if (useCustomPrompt && !customPrompt && !isLoadingDefaultPrompt && !defaultPrompt) {
+    if (
+      useCustomPrompt &&
+      !customPrompt &&
+      !isLoadingDefaultPrompt &&
+      !defaultPrompt
+    ) {
       fetchDefaultPrompt();
     }
-  }, [useCustomPrompt, customPrompt, isLoadingDefaultPrompt, defaultPrompt, fetchDefaultPrompt]);
+  }, [
+    useCustomPrompt,
+    customPrompt,
+    isLoadingDefaultPrompt,
+    defaultPrompt,
+    fetchDefaultPrompt,
+  ]);
 
   // Set custom prompt to default prompt when it's loaded
   useEffect(() => {
@@ -273,24 +323,23 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
   }, [open, clearModels]);
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="md" 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
       fullWidth
-      PaperProps={{ 
-        sx: { minHeight: "65vh" } 
+      PaperProps={{
+        sx: { minHeight: "65vh" },
       }}
     >
-      <DialogTitle>
-        Tối ưu hóa Bot với LLM
-      </DialogTitle>
+      <DialogTitle>Tối ưu hóa Bot với LLM</DialogTitle>
       <DialogContent dividers>
         <Box sx={{ mb: 3 }}>
           <Typography variant="body1" paragraph>
-            Sử dụng trí tuệ nhân tạo để phân tích kết quả backtest và đề xuất các tham số tối ưu cho bot của bạn.
+            Sử dụng trí tuệ nhân tạo để phân tích kết quả backtest và đề xuất
+            các tham số tối ưu cho bot của bạn.
           </Typography>
-          
+
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {error}
@@ -322,17 +371,21 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
             <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
               2. Chọn Backtest để phân tích
             </Typography>
-            <Paper 
-              variant="outlined" 
-              sx={{ 
-                maxHeight: 200, 
-                overflow: "auto", 
-                p: 1, 
-                bgcolor: (theme) => theme.palette.background.default 
+            <Paper
+              variant="outlined"
+              sx={{
+                maxHeight: 200,
+                overflow: "auto",
+                p: 1,
+                bgcolor: (theme) => theme.palette.background.default,
               }}
             >
               {completedBacktests.length === 0 ? (
-                <Typography variant="body2" color="text.secondary" sx={{ p: 1 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ p: 1 }}
+                >
                   Không có backtest nào đã hoàn thành để phân tích
                 </Typography>
               ) : (
@@ -351,11 +404,15 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
                         />
                         <ListItemText
                           primary={backtest.name}
-                          secondary={`Symbol: ${backtest.parameters?.SYMBOL} - ${new Date(backtest.created_at).toLocaleDateString()}`}
+                          secondary={`Symbol: ${
+                            backtest.parameters?.SYMBOL
+                          } - ${new Date(
+                            backtest.created_at
+                          ).toLocaleDateString()}`}
                         />
-                        <Chip 
-                          label={`${backtest.num_results} kết quả`} 
-                          size="small" 
+                        <Chip
+                          label={`${backtest.num_results} kết quả`}
+                          size="small"
                           variant="outlined"
                           color="primary"
                         />
@@ -400,14 +457,14 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
                 endAdornment: isLoadingModels ? (
                   <CircularProgress size={20} />
                 ) : apiKeyValidated ? (
-                  <Chip 
-                    label="Hợp lệ" 
-                    color="success" 
-                    size="small" 
+                  <Chip
+                    label="Hợp lệ"
+                    color="success"
+                    size="small"
                     variant="outlined"
                     sx={{ mr: 1 }}
                   />
-                ) : null
+                ) : null,
               }}
             />
 
@@ -421,12 +478,12 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
               >
                 {availableModels.map((model: LLMModel) => (
                   <MenuItem key={model.id} value={model.id}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
                       <Typography>{model.name}</Typography>
                       {model.is_recommended && (
-                        <Chip 
-                          label="Khuyến nghị" 
-                          color="primary" 
+                        <Chip
+                          label="Khuyến nghị"
+                          color="primary"
                           size="small"
                           sx={{ ml: 1 }}
                         />
@@ -440,10 +497,16 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
                   </MenuItem>
                 ))}
               </Select>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
-                {selectedModel && availableModels.length > 0 ? 
-                  `Context length: ${availableModels.find(m => m.id === selectedModel)?.context_length.toLocaleString()} tokens` : 
-                  "Nhập API key hợp lệ để xem danh sách models"}
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5 }}
+              >
+                {selectedModel && availableModels.length > 0
+                  ? `Context length: ${availableModels
+                      .find((m) => m.id === selectedModel)
+                      ?.context_length.toLocaleString()} tokens`
+                  : "Nhập API key hợp lệ để xem danh sách models"}
               </Typography>
             </FormControl>
           </Box>

@@ -58,7 +58,8 @@ const OptimizationResults: React.FC<OptimizationResultsProps> = ({
   // Get hooks
   const { optimizationResults, clearResults } = useBotOptimization();
   const { createProcess, processes } = useBacktest();
-  const { templates, getTemplates } = useBotTemplate();
+  const { activeTemplates: templates, getActiveTemplates: getTemplates } =
+    useBotTemplate();
   const { showNotification } = useNotification();
 
   // Local state for backtest information

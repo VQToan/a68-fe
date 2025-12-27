@@ -1,22 +1,35 @@
-import { useAppSelector, useAppDispatch } from './reduxHooks';
+import { useAppSelector, useAppDispatch } from "./reduxHooks";
 import {
   fetchBotTemplates,
+  fetchActiveBotTemplates,
   fetchBotTemplateById,
   createBotTemplate,
   updateBotTemplate,
   deleteBotTemplate,
   clearCurrentTemplate as clearCurrentTemplateAction,
-  clearError as clearErrorAction
-} from '@features/botTemplate/botTemplateSlice';
-import type { BotTemplateCreate, BotTemplateUpdate } from '../types/botTemplate.types';
+  clearError as clearErrorAction,
+} from "@features/botTemplate/botTemplateSlice";
+import type {
+  BotTemplateCreate,
+  BotTemplateUpdate,
+} from "../types/botTemplate.types";
 
 export const useBotTemplate = () => {
   const dispatch = useAppDispatch();
   const botTemplateState = useAppSelector((state) => state.botTemplate);
 
   // Get all bot templates (with optional search and pagination)
-  const handleGetTemplates = (keyword?: string, skip?: number, limit?: number) => {
+  const handleGetTemplates = (
+    keyword?: string,
+    skip?: number,
+    limit?: number
+  ) => {
     return dispatch(fetchBotTemplates({ keyword, skip, limit }));
+  };
+
+  // Get active bot templates for comboboxes
+  const handleGetActiveTemplates = () => {
+    return dispatch(fetchActiveBotTemplates());
   };
 
   // Get bot template by ID
@@ -52,6 +65,7 @@ export const useBotTemplate = () => {
   return {
     ...botTemplateState,
     getTemplates: handleGetTemplates,
+    getActiveTemplates: handleGetActiveTemplates,
     getTemplateById: handleGetTemplateById,
     createTemplate: handleCreateTemplate,
     updateTemplate: handleUpdateTemplate,

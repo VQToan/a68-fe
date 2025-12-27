@@ -1,23 +1,40 @@
-import api from './apiClient';
-import type { BotTemplate, BotTemplateCreate, BotTemplateUpdate } from '../types/botTemplate.types';
+import api from "./apiClient";
+import type {
+  BotTemplate,
+  BotTemplateCreate,
+  BotTemplateUpdate,
+} from "../types/botTemplate.types";
 
 // Get all bot templates with optional search and pagination
 export const getBotTemplates = async (
   keyword?: string,
-  skip?: number, 
-  limit?: number
+  skip?: number,
+  limit?: number,
+  is_active?: boolean
 ): Promise<BotTemplate[]> => {
   try {
     const params: Record<string, any> = {};
-    
+
     if (keyword) params.keyword = keyword;
     if (skip !== undefined) params.skip = skip;
     if (limit !== undefined) params.limit = limit;
+    if (is_active !== undefined) params.is_active = is_active;
 
-    const response = await api.get('/api/v1/bot-templates/', { params });
+    const response = await api.get("/api/v1/bot-templates/", { params });
     return response.data;
   } catch (error) {
-    console.error('Error fetching bot templates:', error);
+    console.error("Error fetching bot templates:", error);
+    throw error;
+  }
+};
+
+// Get active bot templates for comboboxes
+export const getActiveBotTemplates = async (): Promise<BotTemplate[]> => {
+  try {
+    const response = await api.get("/api/v1/bot-templates/active");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching active bot templates:", error);
     throw error;
   }
 };
@@ -38,10 +55,10 @@ export const createBotTemplate = async (
   templateData: BotTemplateCreate
 ): Promise<BotTemplate> => {
   try {
-    const response = await api.post('/api/v1/bot-templates/', templateData);
+    const response = await api.post("/api/v1/bot-templates/", templateData);
     return response.data;
   } catch (error) {
-    console.error('Error creating bot template:', error);
+    console.error("Error creating bot template:", error);
     throw error;
   }
 };

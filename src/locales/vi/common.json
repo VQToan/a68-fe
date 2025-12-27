@@ -159,6 +159,7 @@
         "name": "Tên",
         "description": "Mô tả",
         "isFuture": "Loại giao dịch",
+        "isActive": "Trạng thái",
         "createdAt": "Ngày tạo",
         "actions": "Thao tác"
       },
@@ -182,7 +183,8 @@
         "entryHedge": "Module Entry Hedge",
         "afterHedge": "Module After Hedge",
         "stopLoss": "Module Stop Loss",
-        "isFuture": "Giao dịch Futures"
+        "isFuture": "Giao dịch Futures",
+        "isActive": "Kích hoạt"
       },
       "placeholders": {
         "name": "Nhập tên template",
@@ -829,6 +831,8 @@
     "notAvailable": "N/A",
     "futures": "Futures",
     "spot": "Spot",
+    "active": "Đang hoạt động",
+    "inactive": "Ngừng hoạt động",
     "weekdays": {
       "monday": "Thứ hai",
       "tuesday": "Thứ ba",

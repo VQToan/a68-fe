@@ -159,6 +159,7 @@
         "name": "Name",
         "description": "Description",
         "isFuture": "Trading Type",
+        "isActive": "Active",
         "createdAt": "Created at",
         "actions": "Actions"
       },
@@ -182,7 +183,8 @@
         "entryHedge": "Entry hedge module",
         "afterHedge": "After hedge module",
         "stopLoss": "Stop loss module",
-        "isFuture": "Futures Trading"
+        "isFuture": "Futures Trading",
+        "isActive": "Active"
       },
       "placeholders": {
         "name": "Enter template name",
@@ -829,6 +831,8 @@
     "notAvailable": "N/A",
     "futures": "Futures",
     "spot": "Spot",
+    "active": "Active",
+    "inactive": "Inactive",
     "weekdays": {
       "monday": "Monday",
       "tuesday": "Tuesday",

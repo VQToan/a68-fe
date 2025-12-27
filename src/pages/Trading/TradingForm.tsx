@@ -146,15 +146,15 @@ const TradingForm = ({
 }: TradingFormProps) => {
   const { t } = useTranslation();
   // Get trading accounts and bot templates from the store
-  const { 
-    activeAccounts, 
-    getActiveAccounts, 
+  const {
+    activeAccounts,
+    getActiveAccounts,
     isLoading: isLoadingAccounts,
-    error: accountsError 
+    error: accountsError,
   } = useTradingAccount();
   const {
-    templates,
-    getTemplates: getBotTemplates,
+    activeTemplates: templates, // Alias activeTemplates as templates to minimize code changes
+    getActiveTemplates: getBotTemplates, // Alias getActiveTemplates as getBotTemplates
     isLoading: isLoadingTemplates,
   } = useBotTemplate();
 
@@ -240,12 +240,12 @@ const TradingForm = ({
 
   // Filter templates based on is_future value
   const filteredTemplates = useMemo(() => {
-    return templates.filter(template => template.is_future === isFutureValue);
+    return templates.filter((template) => template.is_future === isFutureValue);
   }, [templates, isFutureValue]);
 
   useEffect(() => {
     reset(defaultFormValues);
-  }, [ defaultFormValues]);
+  }, [defaultFormValues]);
 
   // Fetch bot templates on component mount
   useEffect(() => {
@@ -340,7 +340,9 @@ const TradingForm = ({
             <Controller
               name="description"
               control={control}
-              rules={{ required: t("trading.form.validation.descriptionRequired") }}
+              rules={{
+                required: t("trading.form.validation.descriptionRequired"),
+              }}
               render={({ field }) => (
                 <TextField
                   {...field}
@@ -371,7 +373,9 @@ const TradingForm = ({
               <Controller
                 name="bot_template_id"
                 control={control}
-                rules={{ required: t("trading.form.validation.botTemplateRequired") }}
+                rules={{
+                  required: t("trading.form.validation.botTemplateRequired"),
+                }}
                 render={({ field }) => (
                   <Select
                     {...field}
@@ -425,18 +429,19 @@ const TradingForm = ({
               </Select>
             </FormControl>
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              <FormControl
-                fullWidth
-                error={!!errors.trading_account_id}
-              >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+              <FormControl fullWidth error={!!errors.trading_account_id}>
                 <InputLabel id="trading-account-select-label">
                   {t("trading.form.fields.tradingAccount")}
                 </InputLabel>
                 <Controller
                   name="trading_account_id"
                   control={control}
-                  rules={{ required: t("trading.form.validation.tradingAccountRequired") }}
+                  rules={{
+                    required: t(
+                      "trading.form.validation.tradingAccountRequired"
+                    ),
+                  }}
                   render={({ field }) => (
                     <Select
                       {...field}
@@ -458,14 +463,18 @@ const TradingForm = ({
                       ) : (
                         activeAccounts.map((account) => (
                           <MenuItem key={account._id} value={account._id}>
-                            {account.account_name} ({account.exchange.toUpperCase()})
-                            {account.status && account.status !== 'valid' && (
-                              <Typography 
-                                component="span" 
-                                sx={{ 
-                                  color: account.status === 'invalid' ? 'error.main' : 'warning.main',
-                                  fontSize: 'xs',
-                                  ml: 1 
+                            {account.account_name} (
+                            {account.exchange.toUpperCase()})
+                            {account.status && account.status !== "valid" && (
+                              <Typography
+                                component="span"
+                                sx={{
+                                  color:
+                                    account.status === "invalid"
+                                      ? "error.main"
+                                      : "warning.main",
+                                  fontSize: "xs",
+                                  ml: 1,
                                 }}
                               >
                                 [{account.status.toUpperCase()}]
@@ -477,22 +486,24 @@ const TradingForm = ({
                     </Select>
                   )}
                 />
-              {errors.trading_account_id && (
-                <Typography color="error" variant="caption">
-                  {errors.trading_account_id.message as string}
-                </Typography>
-              )}
-              {accountsError && (
-                <Typography color="error" variant="caption" sx={{ mt: 1 }}>
-                  {t("trading.form.errors.loadAccounts", { message: accountsError })}
-                </Typography>
-              )}
-            </FormControl>
-            
-            <Tooltip title={t("trading.form.tooltips.refreshAccounts")}>
-              <IconButton 
-                onClick={handleRefreshAccounts}
-                disabled={isLoadingAccounts || isSubmitting}
+                {errors.trading_account_id && (
+                  <Typography color="error" variant="caption">
+                    {errors.trading_account_id.message as string}
+                  </Typography>
+                )}
+                {accountsError && (
+                  <Typography color="error" variant="caption" sx={{ mt: 1 }}>
+                    {t("trading.form.errors.loadAccounts", {
+                      message: accountsError,
+                    })}
+                  </Typography>
+                )}
+              </FormControl>
+
+              <Tooltip title={t("trading.form.tooltips.refreshAccounts")}>
+                <IconButton
+                  onClick={handleRefreshAccounts}
+                  disabled={isLoadingAccounts || isSubmitting}
                   sx={{ mt: 1 }}
                 >
                   <RefreshIcon />
@@ -544,12 +555,16 @@ const TradingForm = ({
                       name="parameters.INTERVAL_1"
                       render={({ field }) => (
                         <FormControl fullWidth>
-                          <InputLabel>{t("trading.form.fields.interval1")}</InputLabel>
+                          <InputLabel>
+                            {t("trading.form.fields.interval1")}
+                          </InputLabel>
                           <Select
                             {...field}
                             label={t("trading.form.fields.interval1")}
                             value={field.value ?? defaultBotParams.INTERVAL_1}
-                            onChange={(event) => field.onChange(event.target.value)}
+                            onChange={(event) =>
+                              field.onChange(event.target.value)
+                            }
                           >
                             {timeIntervalOptions.map((interval) => (
                               <MenuItem key={interval} value={interval}>
@@ -567,12 +582,16 @@ const TradingForm = ({
                       name="parameters.INTERVAL_2"
                       render={({ field }) => (
                         <FormControl fullWidth>
-                          <InputLabel>{t("trading.form.fields.interval2")}</InputLabel>
+                          <InputLabel>
+                            {t("trading.form.fields.interval2")}
+                          </InputLabel>
                           <Select
                             {...field}
                             label={t("trading.form.fields.interval2")}
                             value={field.value ?? defaultBotParams.INTERVAL_2}
-                            onChange={(event) => field.onChange(event.target.value)}
+                            onChange={(event) =>
+                              field.onChange(event.target.value)
+                            }
                           >
                             {timeIntervalOptions.map((interval) => (
                               <MenuItem key={interval} value={interval}>
@@ -590,12 +609,16 @@ const TradingForm = ({
                       name="parameters.TRADE_MODE"
                       render={({ field }) => (
                         <FormControl fullWidth>
-                          <InputLabel>{t("trading.form.fields.tradeMode")}</InputLabel>
+                          <InputLabel>
+                            {t("trading.form.fields.tradeMode")}
+                          </InputLabel>
                           <Select
                             {...field}
                             label={t("trading.form.fields.tradeMode")}
                             value={field.value ?? defaultBotParams.TRADE_MODE}
-                            onChange={(event) => field.onChange(Number(event.target.value))}
+                            onChange={(event) =>
+                              field.onChange(Number(event.target.value))
+                            }
                           >
                             {tradeModeOptions.map((option) => (
                               <MenuItem key={option.value} value={option.value}>
@@ -773,7 +796,9 @@ const TradingForm = ({
             {/* Profit and Margin Settings */}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>{t("trading.form.sections.profitMargin")}</Typography>
+                <Typography>
+                  {t("trading.form.sections.profitMargin")}
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
