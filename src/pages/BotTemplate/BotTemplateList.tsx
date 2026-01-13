@@ -9,10 +9,10 @@ import {
   Typography,
   IconButton,
   Tooltip,
-  CircularProgress,
   Chip,
 } from "@mui/material";
 import StickyTable from "@components/StickyTable";
+import { TableSkeleton } from "@components/skeletons";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -40,11 +40,7 @@ const BotTemplateList: React.FC<BotTemplateListProps> = ({
 }) => {
   const { t } = useTranslation();
   if (isLoading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <TableSkeleton columns={6} rows={5} hasActions />;
   }
 
   if (templates.length === 0) {

@@ -4,9 +4,9 @@ import {
   Paper,
   Tab,
   Tabs,
-  CircularProgress,
   Button,
   Typography,
+  Skeleton,
 } from "@mui/material";
 import { useNotification } from "@context/NotificationContext";
 import { useNavigate, useParams } from "react-router-dom";
@@ -347,15 +347,73 @@ const TradingAccountDetail = () => {
   // Loading state
   if (isLoading && !dashboardData) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "400px",
-        }}
-      >
-        <CircularProgress />
+      <Box sx={{ p: 3 }}>
+        {/* Header Skeleton */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 3 }}>
+          <Skeleton
+            variant="circular"
+            width={40}
+            height={40}
+            animation="wave"
+          />
+          <Box sx={{ flex: 1 }}>
+            <Skeleton variant="text" width="30%" height={32} animation="wave" />
+            <Skeleton variant="text" width="20%" height={20} animation="wave" />
+          </Box>
+          <Skeleton
+            variant="rounded"
+            width={100}
+            height={36}
+            animation="wave"
+          />
+        </Box>
+
+        {/* Summary Cards Skeleton */}
+        <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
+          {[1, 2, 3, 4].map((i) => (
+            <Box key={i} sx={{ flex: "1 1 200px" }}>
+              <Paper sx={{ p: 2 }}>
+                <Skeleton
+                  variant="text"
+                  width="60%"
+                  height={20}
+                  animation="wave"
+                />
+                <Skeleton
+                  variant="text"
+                  width="80%"
+                  height={32}
+                  animation="wave"
+                />
+              </Paper>
+            </Box>
+          ))}
+        </Box>
+
+        {/* Tabs Skeleton */}
+        <Paper>
+          <Box sx={{ borderBottom: 1, borderColor: "divider", px: 2 }}>
+            <Box sx={{ display: "flex", gap: 3 }}>
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton
+                  key={i}
+                  variant="text"
+                  width={80}
+                  height={48}
+                  animation="wave"
+                />
+              ))}
+            </Box>
+          </Box>
+          <Box sx={{ p: 3 }}>
+            <Skeleton
+              variant="rectangular"
+              height={300}
+              animation="wave"
+              sx={{ borderRadius: 1 }}
+            />
+          </Box>
+        </Paper>
       </Box>
     );
   }

@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { Box, CircularProgress } from "@mui/material";
+import { PageSkeleton } from "@components/skeletons";
 
 interface AuthRedirectWrapperProps {
   children: React.ReactNode;
@@ -18,18 +18,7 @@ const AuthRedirectWrapper: React.FC<AuthRedirectWrapperProps> = ({
 
   // Show loading while checking auth session
   if (isInitializing) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <PageSkeleton />;
   }
 
   // If user is already logged in, redirect to dashboard

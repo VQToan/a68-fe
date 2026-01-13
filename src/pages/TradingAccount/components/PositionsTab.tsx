@@ -7,11 +7,11 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  CircularProgress,
   Chip,
   Fab,
 } from "@mui/material";
 import StickyTable from "@components/StickyTable";
+import { TableSkeleton } from "@components/skeletons";
 import { Refresh as RefreshIcon, Add as AddIcon } from "@mui/icons-material";
 import type {
   PositionSummary,
@@ -196,9 +196,7 @@ const PositionsTab = ({
       </Box>
 
       {isLoading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-          <CircularProgress />
-        </Box>
+        <TableSkeleton columns={10} rows={5} hasActions />
       ) : positions.length === 0 ? (
         <Box sx={{ textAlign: "center", py: 4 }}>
           <Typography variant="body1" color="textSecondary" sx={{ mb: 2 }}>

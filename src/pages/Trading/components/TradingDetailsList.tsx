@@ -9,18 +9,18 @@ import {
   TableRow,
   Chip,
   Button,
-  CircularProgress,
   Pagination,
   IconButton,
   Tooltip,
 } from "@mui/material";
 import StickyTable from "@components/StickyTable";
-import {
-  Refresh as RefreshIcon,
-  Info as InfoIcon,
-} from "@mui/icons-material";
+import { TableSkeleton } from "@components/skeletons";
+import { Refresh as RefreshIcon, Info as InfoIcon } from "@mui/icons-material";
 import { useNotification } from "@context/NotificationContext";
-import type { TradingDetail, TradingDetailsResponse } from "@/types/trading.types";
+import type {
+  TradingDetail,
+  TradingDetailsResponse,
+} from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
 import * as tradingProcessService from "@services/tradingProcess.service";
 import { useTranslation } from "react-i18next";
@@ -38,17 +38,17 @@ const usePageSizeByHeight = () => {
     const calculatePageSize = () => {
       const screenHeight = window.innerHeight;
       const screenWidth = window.innerWidth;
-      
+
       // Điều chỉnh theo kích thước màn hình
       let basePageSize;
       let availableHeight;
-      
+
       // Mobile (< 768px)
       if (screenWidth < 768) {
         availableHeight = screenHeight - 300; // Ít space hơn trên mobile
         basePageSize = Math.floor(availableHeight / 80); // Rows cao hơn trên mobile
       }
-      // Tablet (768px - 1024px) 
+      // Tablet (768px - 1024px)
       else if (screenWidth < 1024) {
         availableHeight = screenHeight - 350;
         basePageSize = Math.floor(availableHeight / 70);
@@ -58,10 +58,10 @@ const usePageSizeByHeight = () => {
         availableHeight = screenHeight - 400;
         basePageSize = Math.floor(availableHeight / 60);
       }
-      
+
       // Đảm bảo page size trong khoảng hợp lý
       const calculatedPageSize = Math.max(10, Math.min(100, basePageSize));
-      
+
       setPageSize(calculatedPageSize);
     };
 
@@ -75,11 +75,11 @@ const usePageSizeByHeight = () => {
       timeoutId = setTimeout(calculatePageSize, 150); // Debounce 150ms
     };
 
-    window.addEventListener('resize', handleResize);
-    
+    window.addEventListener("resize", handleResize);
+
     // Cleanup
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
       clearTimeout(timeoutId);
     };
   }, []);
@@ -87,13 +87,16 @@ const usePageSizeByHeight = () => {
   return pageSize;
 };
 
-const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListProps) => {
+const TradingDetailsList = ({
+  processId,
+  onShowSetupInfo,
+}: TradingDetailsListProps) => {
   const { showNotification } = useNotification();
   const { t } = useTranslation();
-  
+
   // Tính toán page size dựa vào chiều cao màn hình
   const dynamicPageSize = usePageSizeByHeight();
-  
+
   // Local state
   const [tradingDetails, setTradingDetails] = useState<TradingDetail[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -112,34 +115,42 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
   }, [dynamicPageSize]);
 
   // Fetch trading details
-  const fetchTradingDetails = useCallback(async (page: number = 1) => {
-    if (!processId) return;
-    
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const response: TradingDetailsResponse = await tradingProcessService.getTradingDetails(
-        processId, 
-        page, 
-        pageSize
-      );
-      
-      setTradingDetails(response.details);
-      setTotal(response.total);
-      setCurrentPage(page);
-    } catch (error) {
-      const fallbackMessage = t('trading.details.errors.fetch');
-      const errorMessage = error instanceof Error ? error.message : fallbackMessage;
-      setError(errorMessage);
-      showNotification(errorMessage, 'error');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [processId, pageSize, showNotification, t]);
+  const fetchTradingDetails = useCallback(
+    async (page: number = 1) => {
+      if (!processId) return;
+
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response: TradingDetailsResponse =
+          await tradingProcessService.getTradingDetails(
+            processId,
+            page,
+            pageSize
+          );
+
+        setTradingDetails(response.details);
+        setTotal(response.total);
+        setCurrentPage(page);
+      } catch (error) {
+        const fallbackMessage = t("trading.details.errors.fetch");
+        const errorMessage =
+          error instanceof Error ? error.message : fallbackMessage;
+        setError(errorMessage);
+        showNotification(errorMessage, "error");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [processId, pageSize, showNotification, t]
+  );
 
   // Handle page change
-  const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
+  const handlePageChange = (
+    _event: React.ChangeEvent<unknown>,
+    page: number
+  ) => {
     fetchTradingDetails(page);
   };
 
@@ -159,8 +170,23 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <Paper sx={{ p: { xs: 1.5, sm: 2.5, md: 3 }, overflow: 'hidden', borderRadius: { xs: 1.5, md: 2 } }}>
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1, mb: 2, flexWrap: 'wrap' }}>
+    <Paper
+      sx={{
+        p: { xs: 1.5, sm: 2.5, md: 3 },
+        overflow: "hidden",
+        borderRadius: { xs: 1.5, md: 2 },
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 1,
+          mb: 2,
+          flexWrap: "wrap",
+        }}
+      >
         <Box>
           <Typography variant="h6">
             {t("trading.details.title", { total })}
@@ -169,13 +195,17 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
             {t("trading.details.subtitle", { count: pageSize })}
           </Typography>
         </Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: 'wrap' }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            flexWrap: "wrap",
+          }}
+        >
           {onShowSetupInfo && (
             <Tooltip title={t("trading.details.tooltips.setup")}>
-              <IconButton
-                size="small"
-                onClick={onShowSetupInfo}
-              >
+              <IconButton size="small" onClick={onShowSetupInfo}>
                 <InfoIcon />
               </IconButton>
             </Tooltip>
@@ -187,7 +217,9 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
             onClick={handleRefresh}
             disabled={isLoading}
           >
-            {isLoading ? t("common.loading") : t("trading.details.actions.refresh")}
+            {isLoading
+              ? t("common.loading")
+              : t("trading.details.actions.refresh")}
           </Button>
         </Box>
       </Box>
@@ -203,9 +235,7 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
 
       {/* Loading state */}
       {isLoading && tradingDetails.length === 0 ? (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-          <CircularProgress />
-        </Box>
+        <TableSkeleton columns={10} rows={8} showPagination />
       ) : (
         <>
           <StickyTable
@@ -214,16 +244,34 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
             head={
               <TableHead>
                 <TableRow>
-                  <TableCell>{t("trading.details.tableHeaders.time")}</TableCell>
-                  <TableCell>{t("trading.details.tableHeaders.price")}</TableCell>
-                  <TableCell>{t("trading.details.tableHeaders.reason")}</TableCell>
-                  <TableCell>{t("trading.details.tableHeaders.quantity")}</TableCell>
-                  <TableCell>{t("trading.details.tableHeaders.type")}</TableCell>
+                  <TableCell>
+                    {t("trading.details.tableHeaders.time")}
+                  </TableCell>
+                  <TableCell>
+                    {t("trading.details.tableHeaders.price")}
+                  </TableCell>
+                  <TableCell>
+                    {t("trading.details.tableHeaders.reason")}
+                  </TableCell>
+                  <TableCell>
+                    {t("trading.details.tableHeaders.quantity")}
+                  </TableCell>
+                  <TableCell>
+                    {t("trading.details.tableHeaders.type")}
+                  </TableCell>
                   <TableCell>{t("trading.details.tableHeaders.pnl")}</TableCell>
-                  <TableCell>{t("trading.details.tableHeaders.result")}</TableCell>
-                  <TableCell>{t("trading.details.tableHeaders.positionPnl")}</TableCell>
-                  <TableCell>{t("trading.details.tableHeaders.avgPrice")}</TableCell>
-                  <TableCell>{t("trading.details.tableHeaders.balance")}</TableCell>
+                  <TableCell>
+                    {t("trading.details.tableHeaders.result")}
+                  </TableCell>
+                  <TableCell>
+                    {t("trading.details.tableHeaders.positionPnl")}
+                  </TableCell>
+                  <TableCell>
+                    {t("trading.details.tableHeaders.avgPrice")}
+                  </TableCell>
+                  <TableCell>
+                    {t("trading.details.tableHeaders.balance")}
+                  </TableCell>
                 </TableRow>
               </TableHead>
             }
@@ -251,7 +299,7 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Chip 
+                        <Chip
                           label={trade.reason}
                           size="small"
                           variant="outlined"
@@ -263,35 +311,45 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Chip 
+                        <Chip
                           label={trade.side}
                           color={trade.side === "LONG" ? "success" : "error"}
                           size="small"
                         />
                       </TableCell>
                       <TableCell>
-                        <Typography 
+                        <Typography
                           variant="body2"
                           color={trade.pnl >= 0 ? "success.main" : "error.main"}
                           fontWeight="medium"
                         >
-                          {trade.pnl >= 0 ? "+" : ""}{trade.pnl.toFixed(2)}
+                          {trade.pnl >= 0 ? "+" : ""}
+                          {trade.pnl.toFixed(2)}
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Chip 
+                        <Chip
                           label={trade.position_result}
-                          color={trade.position_result === "WIN" ? "success" : "error"}
+                          color={
+                            trade.position_result === "WIN"
+                              ? "success"
+                              : "error"
+                          }
                           size="small"
                         />
                       </TableCell>
                       <TableCell>
-                        <Typography 
+                        <Typography
                           variant="body2"
-                          color={trade.position_pnl >= 0 ? "success.main" : "error.main"}
+                          color={
+                            trade.position_pnl >= 0
+                              ? "success.main"
+                              : "error.main"
+                          }
                           fontWeight="medium"
                         >
-                          {trade.position_pnl >= 0 ? "+" : ""}{trade.position_pnl.toFixed(2)}
+                          {trade.position_pnl >= 0 ? "+" : ""}
+                          {trade.position_pnl.toFixed(2)}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -313,12 +371,23 @@ const TradingDetailsList = ({ processId, onShowSetupInfo }: TradingDetailsListPr
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, mt: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 1,
+                mt: 3,
+              }}
+            >
               <Typography variant="caption" color="textSecondary">
                 {t("trading.details.pagination.summary", {
                   current: currentPage,
                   total: totalPages,
-                  visible: Math.min(pageSize, Math.max(total - (currentPage - 1) * pageSize, 0)),
+                  visible: Math.min(
+                    pageSize,
+                    Math.max(total - (currentPage - 1) * pageSize, 0)
+                  ),
                   totalItems: total,
                 })}
               </Typography>

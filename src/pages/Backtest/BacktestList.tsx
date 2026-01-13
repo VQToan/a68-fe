@@ -10,7 +10,6 @@ import {
   IconButton,
   Chip,
   Tooltip,
-  CircularProgress,
   Typography,
   MenuItem,
   ListItemIcon,
@@ -19,6 +18,7 @@ import {
   Popover,
 } from "@mui/material";
 import StickyTable from "@components/StickyTable";
+import { TableSkeleton } from "@components/skeletons";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
@@ -200,18 +200,7 @@ const BacktestList = ({
   }, [selectedId, onStop, handleMenuClose]);
 
   if (isLoading && processes.length === 0) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "200px",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <TableSkeleton columns={7} rows={5} hasActions showPagination />;
   }
 
   if (processes.length === 0) {

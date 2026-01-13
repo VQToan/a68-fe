@@ -12,10 +12,10 @@ import {
   TableCell,
   TableBody,
   Paper,
-  CircularProgress,
   Button,
   Chip,
 } from "@mui/material";
+import { CardSkeleton, TableSkeleton } from "@components/skeletons";
 import type { SpotBalanceResponse } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
 import { useTranslation } from "react-i18next";
@@ -27,7 +27,12 @@ interface SpotBalanceTabProps {
   onRetry?: () => void;
 }
 
-const SpotBalanceTab = ({ data, isLoading, error, onRetry }: SpotBalanceTabProps) => {
+const SpotBalanceTab = ({
+  data,
+  isLoading,
+  error,
+  onRetry,
+}: SpotBalanceTabProps) => {
   const { t } = useTranslation();
 
   const balances = useMemo(() => {
@@ -41,8 +46,16 @@ const SpotBalanceTab = ({ data, isLoading, error, onRetry }: SpotBalanceTabProps
 
   if (isLoading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 240 }}>
-        <CircularProgress />
+      <Box
+        sx={{
+          p: { xs: 1.5, sm: 2.5, md: 3 },
+          display: "flex",
+          flexDirection: "column",
+          gap: 3,
+        }}
+      >
+        <CardSkeleton count={3} variant="horizontal" />
+        <TableSkeleton columns={4} rows={5} />
       </Box>
     );
   }
@@ -73,7 +86,14 @@ const SpotBalanceTab = ({ data, isLoading, error, onRetry }: SpotBalanceTabProps
   }
 
   return (
-    <Box sx={{ p: { xs: 1.5, sm: 2.5, md: 3 }, display: "flex", flexDirection: "column", gap: 3 }}>
+    <Box
+      sx={{
+        p: { xs: 1.5, sm: 2.5, md: 3 },
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
+      }}
+    >
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, md: 4 }}>
           <Card variant="outlined">
@@ -82,7 +102,10 @@ const SpotBalanceTab = ({ data, isLoading, error, onRetry }: SpotBalanceTabProps
                 {t("tradingAccount.detail.spot.totalUsdt")}
               </Typography>
               <Typography variant="h6">
-                ${(data?.total_balance_usdt ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                $
+                {(data?.total_balance_usdt ?? 0).toLocaleString(undefined, {
+                  maximumFractionDigits: 2,
+                })}
               </Typography>
             </CardContent>
           </Card>
@@ -94,14 +117,18 @@ const SpotBalanceTab = ({ data, isLoading, error, onRetry }: SpotBalanceTabProps
                 {t("tradingAccount.detail.spot.totalBtc")}
               </Typography>
               <Typography variant="h6">
-                {(data?.total_balance_btc ?? 0).toLocaleString(undefined, { maximumFractionDigits: 8 })}
+                {(data?.total_balance_btc ?? 0).toLocaleString(undefined, {
+                  maximumFractionDigits: 8,
+                })}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid size={{ xs: 12, md: 4 }}>
           <Card variant="outlined">
-            <CardContent sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <CardContent
+              sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+            >
               <Typography variant="body2" color="textSecondary">
                 {t("tradingAccount.detail.spot.updatedAt")}
               </Typography>
@@ -126,10 +153,18 @@ const SpotBalanceTab = ({ data, isLoading, error, onRetry }: SpotBalanceTabProps
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>{t("tradingAccount.detail.spot.table.asset")}</TableCell>
-              <TableCell align="right">{t("tradingAccount.detail.spot.table.free")}</TableCell>
-              <TableCell align="right">{t("tradingAccount.detail.spot.table.locked")}</TableCell>
-              <TableCell align="right">{t("tradingAccount.detail.spot.table.total")}</TableCell>
+              <TableCell>
+                {t("tradingAccount.detail.spot.table.asset")}
+              </TableCell>
+              <TableCell align="right">
+                {t("tradingAccount.detail.spot.table.free")}
+              </TableCell>
+              <TableCell align="right">
+                {t("tradingAccount.detail.spot.table.locked")}
+              </TableCell>
+              <TableCell align="right">
+                {t("tradingAccount.detail.spot.table.total")}
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -141,13 +176,19 @@ const SpotBalanceTab = ({ data, isLoading, error, onRetry }: SpotBalanceTabProps
                   </Typography>
                 </TableCell>
                 <TableCell align="right">
-                  {balance.free.toLocaleString(undefined, { maximumFractionDigits: 8 })}
+                  {balance.free.toLocaleString(undefined, {
+                    maximumFractionDigits: 8,
+                  })}
                 </TableCell>
                 <TableCell align="right">
-                  {balance.locked.toLocaleString(undefined, { maximumFractionDigits: 8 })}
+                  {balance.locked.toLocaleString(undefined, {
+                    maximumFractionDigits: 8,
+                  })}
                 </TableCell>
                 <TableCell align="right">
-                  {balance.total.toLocaleString(undefined, { maximumFractionDigits: 8 })}
+                  {balance.total.toLocaleString(undefined, {
+                    maximumFractionDigits: 8,
+                  })}
                 </TableCell>
               </TableRow>
             ))}

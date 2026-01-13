@@ -10,9 +10,9 @@ import {
   IconButton,
   Tooltip,
   Box,
-  CircularProgress,
   Typography,
 } from "@mui/material";
+import { TableSkeleton } from "@components/skeletons";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -109,16 +109,7 @@ const TradingList = ({
   };
 
   if (isLoading && processes.length === 0) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="200px"
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <TableSkeleton columns={9} rows={5} hasActions showPagination />;
   }
 
   if (processes.length === 0) {

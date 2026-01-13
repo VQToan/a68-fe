@@ -10,14 +10,18 @@ import {
   IconButton,
   Tooltip,
   Box,
-  CircularProgress,
   Typography,
 } from "@mui/material";
+import { TableSkeleton } from "@components/skeletons";
 import StickyTable from "@components/StickyTable";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import type { TradingAccount, TradingExchangeType, AccountStatusType } from "@/types/trading.types";
+import type {
+  TradingAccount,
+  TradingExchangeType,
+  AccountStatusType,
+} from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
 import { useTranslation } from "react-i18next";
 
@@ -39,7 +43,16 @@ interface TradingAccountListProps {
 }
 
 // Exchange chip color mapping
-const getExchangeColor = (exchange: TradingExchangeType): "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" => {
+const getExchangeColor = (
+  exchange: TradingExchangeType
+):
+  | "default"
+  | "primary"
+  | "secondary"
+  | "error"
+  | "info"
+  | "success"
+  | "warning" => {
   switch (exchange) {
     case "binance":
       return "warning";
@@ -70,7 +83,16 @@ const getExchangeLabel = (exchange: TradingExchangeType): string => {
 };
 
 // Status chip color mapping
-const getStatusColor = (status: AccountStatusType): "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" => {
+const getStatusColor = (
+  status: AccountStatusType
+):
+  | "default"
+  | "primary"
+  | "secondary"
+  | "error"
+  | "info"
+  | "success"
+  | "warning" => {
   switch (status) {
     case "valid":
       return "success";
@@ -112,29 +134,22 @@ const TradingAccountList = ({
     onPageChange(newPage + 1); // MUI uses 0-based indexing, our API uses 1-based
   };
 
-  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRowsPerPageChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     onRowsPerPageChange(parseInt(event.target.value, 10));
   };
 
   if (isLoading && accounts.length === 0) {
-    return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
-        minHeight="200px"
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <TableSkeleton columns={8} rows={5} hasActions showPagination />;
   }
 
   if (accounts.length === 0) {
     return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
         minHeight="200px"
       >
         <Typography variant="body1" color="text.secondary">
@@ -145,21 +160,31 @@ const TradingAccountList = ({
   }
 
   return (
-    <Paper sx={{ overflow: 'hidden', borderRadius: 2 }}>
+    <Paper sx={{ overflow: "hidden", borderRadius: 2 }}>
       <StickyTable
         height="60vh"
         minWidth={900}
         head={
           <TableHead>
             <TableRow>
-              <TableCell>{t("tradingAccount.list.headers.accountName")}</TableCell>
+              <TableCell>
+                {t("tradingAccount.list.headers.accountName")}
+              </TableCell>
               <TableCell>{t("tradingAccount.list.headers.exchange")}</TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>{t("tradingAccount.list.headers.apiKey")}</TableCell>
+              <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>
+                {t("tradingAccount.list.headers.apiKey")}
+              </TableCell>
               <TableCell>{t("tradingAccount.list.headers.status")}</TableCell>
               <TableCell>{t("tradingAccount.list.headers.balance")}</TableCell>
-              <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>{t("tradingAccount.list.headers.chatIds")}</TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>{t("tradingAccount.list.headers.createdAt")}</TableCell>
-              <TableCell align="right">{t("tradingAccount.list.headers.actions")}</TableCell>
+              <TableCell sx={{ display: { xs: "none", lg: "table-cell" } }}>
+                {t("tradingAccount.list.headers.chatIds")}
+              </TableCell>
+              <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>
+                {t("tradingAccount.list.headers.createdAt")}
+              </TableCell>
+              <TableCell align="right">
+                {t("tradingAccount.list.headers.actions")}
+              </TableCell>
             </TableRow>
           </TableHead>
         }
@@ -179,18 +204,22 @@ const TradingAccountList = ({
                     size="small"
                   />
                 </TableCell>
-                <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                  <Typography 
-                    variant="body2" 
+                <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>
+                  <Typography
+                    variant="body2"
                     color="text.secondary"
-                    sx={{ fontFamily: 'monospace' }}
+                    sx={{ fontFamily: "monospace" }}
                   >
-                    {account.api_key_masked.slice(0, 10)}...{account.api_key_masked.slice(-10)}
+                    {account.api_key_masked.slice(0, 10)}...
+                    {account.api_key_masked.slice(-10)}
                   </Typography>
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={statusLabels[account.status] ?? account.status.toUpperCase()}
+                    label={
+                      statusLabels[account.status] ??
+                      account.status.toUpperCase()
+                    }
                     color={getStatusColor(account.status)}
                     size="small"
                   />
@@ -211,17 +240,18 @@ const TradingAccountList = ({
                     </Typography>
                   )}
                 </TableCell>
-                <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' } }}>
+                <TableCell sx={{ display: { xs: "none", lg: "table-cell" } }}>
                   <Typography variant="body2" color="text.secondary">
-                    {account.chat_ids.length > 0 
-                      ? t("tradingAccount.list.chatIds.count", { count: account.chat_ids.length })
-                      : t("tradingAccount.list.chatIds.empty")
-                    }
+                    {account.chat_ids.length > 0
+                      ? t("tradingAccount.list.chatIds.count", {
+                          count: account.chat_ids.length,
+                        })
+                      : t("tradingAccount.list.chatIds.empty")}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                <TableCell sx={{ display: { xs: "none", md: "table-cell" } }}>
                   <Typography variant="body2" color="text.secondary">
-                    {new Date(account.created_at).toLocaleDateString('vi-VN')}
+                    {new Date(account.created_at).toLocaleDateString("vi-VN")}
                   </Typography>
                 </TableCell>
                 <TableCell align="right">
@@ -253,7 +283,9 @@ const TradingAccountList = ({
                       <IconButton
                         size="small"
                         color="error"
-                        onClick={() => onDelete(account._id, account.account_name)}
+                        onClick={() =>
+                          onDelete(account._id, account.account_name)
+                        }
                       >
                         <DeleteIcon />
                       </IconButton>
@@ -265,7 +297,7 @@ const TradingAccountList = ({
           </TableBody>
         }
       />
-      
+
       <TablePagination
         component="div"
         count={pagination.total}
@@ -279,7 +311,7 @@ const TradingAccountList = ({
           t("tradingAccount.list.pagination.displayedRows", {
             from,
             to,
-            count
+            count,
           })
         }
       />

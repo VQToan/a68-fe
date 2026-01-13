@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { memo } from "react";
-import { Box, CircularProgress } from "@mui/material";
+import { PageSkeleton } from "@components/skeletons";
 
 interface ProtectedRouteProps {
   redirectPath?: string;
@@ -15,18 +15,7 @@ export const ProtectedRoute = ({
 
   // Show loading while checking auth session
   if (isInitializing) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <PageSkeleton />;
   }
 
   if (!isLoggedIn) {
