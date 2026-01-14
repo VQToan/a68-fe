@@ -21,8 +21,16 @@ import BacktestForm from "./BacktestForm";
 import RunBacktestDialog from "./components/RunBacktestDialog";
 import OptimizationDialog from "./components/Optimzation/OptimizationDialog";
 import OptimizationResults from "./components/Optimzation/OptimizationResults";
-import { useBacktest } from "@hooks/useBacktest";
-import { useModule } from "@hooks/useModule";
+import {
+  useBacktestsQuery,
+  useBacktestByIdQuery,
+  useCreateBacktestMutation,
+  useUpdateBacktestMutation,
+  useDeleteBacktestMutation,
+  useRunBacktestMutation,
+  useStopBacktestMutation,
+  useModulesQuery,
+} from "@hooks/queries";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
@@ -84,27 +92,6 @@ const Backtest = () => {
   const navigate = useNavigate();
   const isResultRoute = useMatch("/backtest/:id");
 
-  // Use the backtest hook for state management
-  const {
-    processes,
-    isLoading,
-    error,
-    currentProcess,
-    pagination,
-    getProcesses,
-    getProcessById,
-    createProcess,
-    updateProcess,
-    deleteProcess,
-    runProcess,
-    stopProcess,
-    clearError,
-    clearCurrentProcess,
-  } = useBacktest();
-
-  // Use the module hook to get available modules
-  const { getModules } = useModule();
-
   // Use the notification context
   const { showNotification } = useNotification();
 
@@ -114,7 +101,9 @@ const Backtest = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
   const { t } = useTranslation();
-  const [duplicateProcessData, setDuplicateProcessData] = useState<BacktestDuplicatePayload | null>(null);
+  const [duplicateProcessData, setDuplicateProcessData] =
+    useState<BacktestDuplicatePayload | null>(null);
+  const [editingProcessId, setEditingProcessId] = useState<string | null>(null);
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -161,38 +150,54 @@ const Backtest = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
 
-  // Initial fetch of backtests and modules
-  useEffect(() => {
-    fetchBacktests();
-    getModules();
-  }, []);
+  // Use TanStack Query for data fetching
+  const statusFilter = tabStatusMap[currentTab];
+  const {
+    data: processesData,
+    isLoading,
+    error,
+    refetch,
+  } = useBacktestsQuery(
+    statusFilter,
+    (currentPage - 1) * rowsPerPage,
+    rowsPerPage
+  );
 
-  // Fetch backtests when tab changes
-  useEffect(() => {
-    fetchBacktests();
-  }, [currentTab]);
+  // Use TanStack Query mutations
+  const createMutation = useCreateBacktestMutation();
+  const updateMutation = useUpdateBacktestMutation();
+  const deleteMutation = useDeleteBacktestMutation();
+  const runMutation = useRunBacktestMutation();
+  const stopMutation = useStopBacktestMutation();
 
-  // Fetch backtests with pagination parameters
-  const fetchBacktests = useCallback(() => {
-    getProcesses(
-      tabStatusMap[currentTab],
-      (currentPage - 1) * rowsPerPage,
-      rowsPerPage
-    );
-  }, [currentTab, currentPage, rowsPerPage, getProcesses]);
+  // Fetch current process when editing
+  const { data: currentProcess } = useBacktestByIdQuery(
+    editingProcessId ?? undefined
+  );
 
-  // Re-fetch when pagination changes
-  useEffect(() => {
-    fetchBacktests();
-  }, [currentPage, rowsPerPage, fetchBacktests]);
+  // Fetch modules for dropdowns
+  useModulesQuery();
+
+  // Extract data from query result
+  const processes = processesData?.items ?? [];
+  const pagination = processesData
+    ? {
+        total: processesData.total,
+        page: processesData.page,
+        page_size: processesData.page_size,
+        pageSize: processesData.page_size,
+        pages: Math.ceil(processesData.total / processesData.page_size),
+      }
+    : { total: 0, page: 1, page_size: 10, pageSize: 10, pages: 0 };
 
   // Show error notification when error occurs
   useEffect(() => {
     if (error) {
-      showNotification(error, "error");
-      clearError();
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      showNotification(errorMessage, "error");
     }
-  }, [error, showNotification, clearError]);
+  }, [error, showNotification]);
 
   // Handle search
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -229,24 +234,21 @@ const Backtest = () => {
   }, []);
 
   // Handle dialog open/close
-  const handleOpenDialog = useCallback(
-    (mode: FormMode = "create") => {
-      setDialogMode(mode);
-      if (mode === "create") {
-        setDuplicateProcessData(null);
-        clearCurrentProcess();
-      }
-      setOpenDialog(true);
-    },
-    [clearCurrentProcess]
-  );
+  const handleOpenDialog = useCallback((mode: FormMode = "create") => {
+    setDialogMode(mode);
+    if (mode === "create") {
+      setDuplicateProcessData(null);
+      setEditingProcessId(null);
+    }
+    setOpenDialog(true);
+  }, []);
 
   const handleCloseDialog = useCallback(() => {
     setOpenDialog(false);
     // Clear the current process when dialog closes
-    clearCurrentProcess();
+    setEditingProcessId(null);
     setDuplicateProcessData(null);
-  }, [clearCurrentProcess]);
+  }, []);
 
   // Handle form submission (add or update backtest)
   const handleSubmitBacktest = useCallback(
@@ -254,38 +256,35 @@ const Backtest = () => {
       try {
         if (dialogMode === "create") {
           // Create new backtest
-          await createProcess(formData as BacktestProcessCreate);
+          await createMutation.mutateAsync(formData as BacktestProcessCreate);
           showNotification(
             t("backtest.management.notifications.createSuccess"),
             "success"
           );
         } else if (dialogMode === "edit" && currentProcess) {
           // Update existing backtest
-          await updateProcess(
-            currentProcess._id,
-            formData as BacktestProcessUpdate
-          );
+          await updateMutation.mutateAsync({
+            id: currentProcess._id,
+            data: formData as BacktestProcessUpdate,
+          });
           showNotification(
             t("backtest.management.notifications.updateSuccess"),
             "success"
           );
         }
         handleCloseDialog();
-        // Re-fetch the list with latest data
-        fetchBacktests();
       } catch (error) {
         console.error("Error submitting backtest:", error);
       }
     },
     [
-      createProcess,
+      createMutation,
       currentProcess,
       dialogMode,
-      fetchBacktests,
       handleCloseDialog,
       showNotification,
       t,
-      updateProcess,
+      updateMutation,
     ]
   );
 
@@ -304,33 +303,29 @@ const Backtest = () => {
 
   // Handle edit backtest directly
   const handleEditBacktest = useCallback(
-    async (id: string) => {
-      try {
-        await getProcessById(id);
-        handleOpenDialog("edit");
-      } catch (error) {
-        console.error("Error fetching backtest details:", error);
-      }
+    (id: string) => {
+      setEditingProcessId(id);
+      handleOpenDialog("edit");
     },
-    [getProcessById, handleOpenDialog]
+    [handleOpenDialog]
   );
 
-  const handleDuplicateBacktest = useCallback(
-    (process: BacktestProcess) => {
-      const clonedParameters = { ...process.parameters } as Record<keyof BacktestParameter, any>;
-      setDuplicateProcessData({
-        name: `${process.name} Copy`,
-        description: process.description,
-        bot_template_id: process.bot_template_id,
-        parameters: clonedParameters,
-        is_future: process.is_future,
-      });
-      setDialogMode("create");
-      clearCurrentProcess();
-      setOpenDialog(true);
-    },
-    [clearCurrentProcess]
-  );
+  const handleDuplicateBacktest = useCallback((process: BacktestProcess) => {
+    const clonedParameters = { ...process.parameters } as Record<
+      keyof BacktestParameter,
+      any
+    >;
+    setDuplicateProcessData({
+      name: `${process.name} Copy`,
+      description: process.description,
+      bot_template_id: process.bot_template_id,
+      parameters: clonedParameters,
+      is_future: process.is_future,
+    });
+    setDialogMode("create");
+    setEditingProcessId(null);
+    setOpenDialog(true);
+  }, []);
 
   // Handle opening confirm delete dialog
   const handleOpenDeleteConfirm = useCallback((id: string, name: string) => {
@@ -355,21 +350,18 @@ const Backtest = () => {
     if (!confirmDelete.id) return;
 
     try {
-      await deleteProcess(confirmDelete.id);
+      await deleteMutation.mutateAsync(confirmDelete.id);
       showNotification(
         t("backtest.management.notifications.deleteSuccess"),
         "success"
       );
       handleCloseDeleteConfirm();
-      // Re-fetch the list with latest data
-      fetchBacktests();
     } catch (error) {
       console.error("Error deleting backtest:", error);
     }
   }, [
     confirmDelete.id,
-    deleteProcess,
-    fetchBacktests,
+    deleteMutation,
     handleCloseDeleteConfirm,
     showNotification,
     t,
@@ -379,28 +371,26 @@ const Backtest = () => {
   const handleStopBacktest = useCallback(
     async (id: string) => {
       try {
-        await stopProcess(id);
+        await stopMutation.mutateAsync(id);
         showNotification(
           t("backtest.management.notifications.stopSuccess"),
           "success"
         );
-        // Re-fetch the list with latest data
-        fetchBacktests();
       } catch (error) {
         console.error("Error stopping backtest:", error);
       }
     },
-    [fetchBacktests, showNotification, stopProcess, t]
+    [showNotification, stopMutation, t]
   );
 
   // Handle refreshing the backtest list
   const handleRefreshBacktests = useCallback(() => {
-    fetchBacktests();
+    refetch();
     showNotification(
       t("backtest.management.notifications.refreshSuccess"),
       "success"
     );
-  }, [fetchBacktests, showNotification, t]);
+  }, [refetch, showNotification, t]);
 
   // Handle opening run backtest dialog
   const handleOpenRunBacktestDialog = useCallback(
@@ -441,28 +431,27 @@ const Backtest = () => {
       if (!runBacktestDialog.id) return;
 
       try {
-        await runProcess(
-          runBacktestDialog.id,
-          startDate,
-          endDate,
-          combineBalance
-        );
+        await runMutation.mutateAsync({
+          id: runBacktestDialog.id,
+          params: {
+            start_date: startDate,
+            end_date: endDate,
+            combine_balance: combineBalance,
+          },
+        });
         showNotification(
           t("backtest.management.notifications.runSuccess"),
           "success"
         );
         handleCloseRunBacktestDialog();
-        // Re-fetch the list with latest data
-        fetchBacktests();
       } catch (error) {
         console.error("Error running backtest:", error);
       }
     },
     [
-      fetchBacktests,
       handleCloseRunBacktestDialog,
       runBacktestDialog.id,
-      runProcess,
+      runMutation,
       showNotification,
       t,
     ]
@@ -502,9 +491,9 @@ const Backtest = () => {
       });
 
       // Re-fetch the list with latest data
-      fetchBacktests();
+      refetch();
     },
-    [fetchBacktests]
+    [refetch]
   );
 
   // Handle closing optimization results dialog
@@ -731,11 +720,11 @@ const Backtest = () => {
         open={openDialog}
         onClose={handleCloseDialog}
         title={t(dialogTitleKey)}
-      maxWidth="sm"
-      footer={getModalFooter()}
-    >
-      <BacktestForm
-        initialData={
+        maxWidth="sm"
+        footer={getModalFooter()}
+      >
+        <BacktestForm
+          initialData={
             dialogMode === "edit" && currentProcess
               ? {
                   _id: currentProcess._id,
@@ -751,11 +740,11 @@ const Backtest = () => {
                   parameters: { ...duplicateProcessData.parameters },
                 }
               : undefined
-        }
-        onSubmit={handleSubmitBacktest}
-        isSubmitting={isLoading}
-        isEditMode={dialogMode === "edit"}
-        formId="backtest-form"
+          }
+          onSubmit={handleSubmitBacktest}
+          isSubmitting={isLoading}
+          isEditMode={dialogMode === "edit"}
+          formId="backtest-form"
         />
       </Modal>
 

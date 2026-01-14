@@ -7,7 +7,7 @@ import React, {
   useMemo,
 } from "react";
 import { Box, CircularProgress, Alert, Typography } from "@mui/material";
-import { useChart } from "@/hooks/useChart";
+import { useChart } from "@hooks/queries";
 import {
   CandlestickSeries,
   ColorType,
@@ -49,7 +49,7 @@ const BacktestChart: React.FC<BacktestChartProps> = ({
     x: number;
     y: number;
     content: string;
-  }>({ visible: false, x: 0, y: 0, content: '' });
+  }>({ visible: false, x: 0, y: 0, content: "" });
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const candleSeriesRef = useRef<any>(null);
@@ -68,17 +68,26 @@ const BacktestChart: React.FC<BacktestChartProps> = ({
     // Define color and shape mapping for different trade types
     const getMarkerStyle = (trade: BacktestTrade) => {
       const isLong = trade.side.includes("LONG");
-      const isOpen = trade.reason === "ENTRY" || trade.reason === "DCA" || 
-                    trade.reason.includes("ENTRY HEDGE") || trade.reason.includes("DCA HEDGE");
-      const isClose = trade.reason === "EXIT" || trade.reason === "CUTLOSS" || trade.reason === "MAX LOSS" ||
-                     trade.reason.includes("EXIT HEDGE") || trade.reason.includes("CUT LOSS HEDGE");
+      const isOpen =
+        trade.reason === "ENTRY" ||
+        trade.reason === "DCA" ||
+        trade.reason.includes("ENTRY HEDGE") ||
+        trade.reason.includes("DCA HEDGE");
+      const isClose =
+        trade.reason === "EXIT" ||
+        trade.reason === "CUTLOSS" ||
+        trade.reason === "MAX LOSS" ||
+        trade.reason.includes("EXIT HEDGE") ||
+        trade.reason.includes("CUT LOSS HEDGE");
 
       let color: string;
       let shape: "arrowUp" | "arrowDown" | "circle" | "square";
       let text: string;
-      
+
       // Position based on trade side
-      const position: "belowBar" | "aboveBar" = isLong ? "belowBar" : "aboveBar";
+      const position: "belowBar" | "aboveBar" = isLong
+        ? "belowBar"
+        : "aboveBar";
 
       // Determine marker style based on trade type
       if (isLong && isOpen) {
@@ -112,17 +121,18 @@ const BacktestChart: React.FC<BacktestChartProps> = ({
     };
 
     return trades
-      .filter((trade) => 
-        // Include all trade types for visualization
-        trade.reason === "ENTRY" ||
-        trade.reason === "EXIT" ||
-        trade.reason === "DCA" ||
-        trade.reason === "CUTLOSS" ||
-        trade.reason === "MAX LOSS" ||
-        trade.reason.includes("ENTRY HEDGE") ||
-        trade.reason.includes("EXIT HEDGE") ||
-        trade.reason.includes("CUT LOSS HEDGE") ||
-        trade.reason.includes("DCA HEDGE")
+      .filter(
+        (trade) =>
+          // Include all trade types for visualization
+          trade.reason === "ENTRY" ||
+          trade.reason === "EXIT" ||
+          trade.reason === "DCA" ||
+          trade.reason === "CUTLOSS" ||
+          trade.reason === "MAX LOSS" ||
+          trade.reason.includes("ENTRY HEDGE") ||
+          trade.reason.includes("EXIT HEDGE") ||
+          trade.reason.includes("CUT LOSS HEDGE") ||
+          trade.reason.includes("DCA HEDGE")
       )
       .map((trade) => {
         const style = getMarkerStyle(trade);
@@ -139,8 +149,8 @@ const BacktestChart: React.FC<BacktestChartProps> = ({
             price: trade.price,
             pnl: trade.pnl,
             side: trade.side,
-            quantity: trade.quantity
-          }
+            quantity: trade.quantity,
+          },
         };
       }) as any[];
   }, [trades]);
@@ -289,12 +299,12 @@ const BacktestChart: React.FC<BacktestChartProps> = ({
     // Add mouse event handlers for tooltip
     const crosshairMoveHandler = (param: any) => {
       if (!param.point || !param.time) {
-        setTooltip(prev => ({ ...prev, visible: false }));
+        setTooltip((prev) => ({ ...prev, visible: false }));
         return;
       }
 
       // Find all markers at the same time point (within tolerance)
-      const hoveredMarkers = tradeMarkers.filter(marker => {
+      const hoveredMarkers = tradeMarkers.filter((marker) => {
         const markerTime = marker.time;
         const timeDiff = Math.abs(Number(param.time) - Number(markerTime));
         return timeDiff < 60; // Within 1 minute tolerance
@@ -302,21 +312,25 @@ const BacktestChart: React.FC<BacktestChartProps> = ({
 
       if (hoveredMarkers.length > 0) {
         // Create tooltip content for all markers at this time point
-        const tooltipContent = hoveredMarkers.map((marker, index) => {
-          const info = marker.tradeInfo;
-          return `${index > 0 ? '\n---\n' : ''}${info.reason} - ${info.side}
+        const tooltipContent = hoveredMarkers
+          .map((marker, index) => {
+            const info = marker.tradeInfo;
+            return `${index > 0 ? "\n---\n" : ""}${info.reason} - ${info.side}
 Price: ${info.price.toFixed(3)}
-Quantity: ${info.quantity.toFixed(3)}${info.pnl ? `\nPnL: ${info.pnl.toFixed(3)}` : ''}`;
-        }).join('');
+Quantity: ${info.quantity.toFixed(3)}${
+              info.pnl ? `\nPnL: ${info.pnl.toFixed(3)}` : ""
+            }`;
+          })
+          .join("");
 
         setTooltip({
           visible: true,
           x: param.point.x + 10,
           y: param.point.y - 50,
-          content: tooltipContent
+          content: tooltipContent,
         });
       } else {
-        setTooltip(prev => ({ ...prev, visible: false }));
+        setTooltip((prev) => ({ ...prev, visible: false }));
       }
     };
 
@@ -325,7 +339,11 @@ Quantity: ${info.quantity.toFixed(3)}${info.pnl ? `\nPnL: ${info.pnl.toFixed(3)}
 
     // Handle window resize
     const handleResize = () => {
-      if (chartContainerRef.current && chartRef.current && !isDisposedRef.current) {
+      if (
+        chartContainerRef.current &&
+        chartRef.current &&
+        !isDisposedRef.current
+      ) {
         chartRef.current.applyOptions({
           width: chartContainerRef.current.clientWidth,
           height: chartContainerRef.current.clientHeight,
@@ -365,7 +383,9 @@ Quantity: ${info.quantity.toFixed(3)}${info.pnl ? `\nPnL: ${info.pnl.toFixed(3)}
       // Make sure we don't try to use chart methods after it's disposed
       if (chart) {
         try {
-          chart.timeScale().unsubscribeVisibleLogicalRangeChange(handleVisibleRangeChange);
+          chart
+            .timeScale()
+            .unsubscribeVisibleLogicalRangeChange(handleVisibleRangeChange);
           // Clean up crosshair subscription
           if (crosshairMoveHandlerRef.current) {
             chart.unsubscribeCrosshairMove(crosshairMoveHandlerRef.current);
@@ -384,7 +404,7 @@ Quantity: ${info.quantity.toFixed(3)}${info.pnl ? `\nPnL: ${info.pnl.toFixed(3)}
         chartRef.current = null;
       }
       // Hide tooltip on cleanup
-      setTooltip(prev => ({ ...prev, visible: false }));
+      setTooltip((prev) => ({ ...prev, visible: false }));
     };
   }, [chartData, loadMoreData, setVisibleBars, visibleBars, tradeMarkers]);
 
@@ -518,7 +538,10 @@ Quantity: ${info.quantity.toFixed(3)}${info.pnl ? `\nPnL: ${info.pnl.toFixed(3)}
           maxWidth: 200,
         }}
       >
-        <Typography variant="caption" sx={{ fontWeight: "bold", display: "block" }}>
+        <Typography
+          variant="caption"
+          sx={{ fontWeight: "bold", display: "block" }}
+        >
           {t("backtest.results.chart.legend.title")}
         </Typography>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
@@ -557,7 +580,7 @@ Quantity: ${info.quantity.toFixed(3)}${info.pnl ? `\nPnL: ${info.pnl.toFixed(3)}
           {tooltip.content}
         </Box>
       )}
-      
+
       {/* Chart Container */}
       <Box
         ref={chartContainerRef}

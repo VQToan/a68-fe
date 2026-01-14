@@ -14,8 +14,14 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import { useDebounce } from "@utils/debounceUtils";
-import { useBotTemplate } from "@hooks/useBotTemplate";
-import { useModule } from "@hooks/useModule";
+import {
+  useBotTemplatesQuery,
+  useBotTemplateByIdQuery,
+  useCreateBotTemplateMutation,
+  useUpdateBotTemplateMutation,
+  useDeleteBotTemplateMutation,
+  useModulesQuery,
+} from "@hooks/queries";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
@@ -34,23 +40,10 @@ import { useTranslation } from "react-i18next";
 export type FormMode = "create" | "view" | "edit";
 
 const BotTemplate = () => {
-  // Use the botTemplate hook for state management
-  const {
-    templates,
-    isLoading,
-    error,
-    currentTemplate,
-    getTemplates,
-    getTemplateById,
-    createTemplate,
-    updateTemplate,
-    deleteTemplate,
-    clearError,
-    clearCurrentTemplate,
-  } = useBotTemplate();
-
-  // Use the module hook to fetch modules for dropdowns
-  const { getModules } = useModule();
+  // Use TanStack Query mutations
+  const createMutation = useCreateBotTemplateMutation();
+  const updateMutation = useUpdateBotTemplateMutation();
+  const deleteMutation = useDeleteBotTemplateMutation();
 
   // Use the notification context
   const { showNotification } = useNotification();
@@ -68,6 +61,9 @@ const BotTemplate = () => {
   const [duplicateTemplateData, setDuplicateTemplateData] = useState<
     BotTemplateUpdate | undefined
   >(undefined);
+  const [editingTemplateId, setEditingTemplateId] = useState<string | null>(
+    null
+  );
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -80,24 +76,29 @@ const BotTemplate = () => {
     name: "",
   });
 
-  // Initial fetch of bot templates and modules
-  useEffect(() => {
-    getTemplates();
-    getModules();
-  }, []);
+  // Use TanStack Query for data fetching
+  const {
+    data: templates = [],
+    isLoading,
+    error,
+  } = useBotTemplatesQuery(debouncedSearchTerm || undefined);
 
-  // Fetch templates when search term changes
-  useEffect(() => {
-    getTemplates(debouncedSearchTerm);
-  }, [debouncedSearchTerm]);
+  // Fetch current template when editing/viewing
+  const { data: currentTemplate } = useBotTemplateByIdQuery(
+    editingTemplateId ?? undefined
+  );
+
+  // Fetch modules for dropdowns
+  useModulesQuery();
 
   // Show error notification when error occurs
   useEffect(() => {
     if (error) {
-      showNotification(error, "error");
-      clearError();
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      showNotification(errorMessage, "error");
     }
-  }, [error]);
+  }, [error, showNotification]);
 
   // Handle search
   const handleSearch = useCallback(
@@ -109,42 +110,45 @@ const BotTemplate = () => {
   );
 
   // Handle dialog open/close
-  const handleOpenDialog = useCallback(
-    (mode: FormMode = "create") => {
-      setDialogMode(mode);
-      if (mode === "create") {
-        setDuplicateTemplateData(undefined);
-        clearCurrentTemplate();
-      }
-      setOpenDialog(true);
-    },
-    [clearCurrentTemplate]
-  );
+  const handleOpenDialog = useCallback((mode: FormMode = "create") => {
+    setDialogMode(mode);
+    if (mode === "create") {
+      setDuplicateTemplateData(undefined);
+      setEditingTemplateId(null);
+    }
+    setOpenDialog(true);
+  }, []);
 
   const handleCloseDialog = useCallback(() => {
     setOpenDialog(false);
     setDuplicateTemplateData(undefined);
     // Delay clearing current template to avoid UI flicker during dialog close animation
     setTimeout(() => {
-      if (dialogMode === "create") {
-        clearCurrentTemplate();
-      }
+      setEditingTemplateId(null);
     }, 300);
-  }, [dialogMode, clearCurrentTemplate]);
+  }, []);
 
   // Handle form submission
   const handleSubmit = useCallback(
     async (formData: BotTemplateCreate | BotTemplateUpdate) => {
       try {
         if (dialogMode === "create") {
-          await createTemplate(formData as BotTemplateCreate);
-          showNotification(t("botTemplate.notifications.createSuccess"), "success");
+          await createMutation.mutateAsync(formData as BotTemplateCreate);
+          showNotification(
+            t("botTemplate.notifications.createSuccess"),
+            "success"
+          );
         } else if (dialogMode === "edit" && currentTemplate?._id) {
-          await updateTemplate(currentTemplate._id, formData as BotTemplateUpdate);
-          showNotification(t("botTemplate.notifications.updateSuccess"), "success");
+          await updateMutation.mutateAsync({
+            id: currentTemplate._id,
+            data: formData as BotTemplateUpdate,
+          });
+          showNotification(
+            t("botTemplate.notifications.updateSuccess"),
+            "success"
+          );
         }
         handleCloseDialog();
-        getTemplates(debouncedSearchTerm); // Refresh the list
       } catch (error) {
         console.error("Error submitting bot template:", error);
       }
@@ -152,11 +156,10 @@ const BotTemplate = () => {
     [
       dialogMode,
       currentTemplate,
-      createTemplate,
-      updateTemplate,
-      getTemplates,
-      debouncedSearchTerm,
+      createMutation,
+      updateMutation,
       handleCloseDialog,
+      showNotification,
       t,
     ]
   );
@@ -168,49 +171,38 @@ const BotTemplate = () => {
 
   // Handle view bot template details
   const handleViewTemplate = useCallback(
-    async (id: string) => {
-      try {
-        await getTemplateById(id);
-        handleOpenDialog("view");
-      } catch (error) {
-        console.error("Error fetching bot template details:", error);
-      }
+    (id: string) => {
+      setEditingTemplateId(id);
+      handleOpenDialog("view");
     },
-    [getTemplateById, handleOpenDialog]
+    [handleOpenDialog]
   );
 
   // Handle edit bot template directly
   const handleEditTemplate = useCallback(
-    async (id: string) => {
-      try {
-        await getTemplateById(id);
-        handleOpenDialog("edit");
-      } catch (error) {
-        console.error("Error fetching bot template details:", error);
-      }
+    (id: string) => {
+      setEditingTemplateId(id);
+      handleOpenDialog("edit");
     },
-    [getTemplateById, handleOpenDialog]
+    [handleOpenDialog]
   );
 
-  const handleDuplicateTemplate = useCallback(
-    (template: BotTemplate) => {
-      clearCurrentTemplate();
-      setDuplicateTemplateData({
-        name: `${template.name} Copy`,
-        description: template.description,
-        entry_module: template.entry_module,
-        exit_module: template.exit_module,
-        dca_cutloss_module: template.dca_cutloss_module,
-        entry_hedge_module: template.entry_hedge_module,
-        after_hedge_module: template.after_hedge_module,
-        stop_loss_module: template.stop_loss_module,
-        is_future: template.is_future,
-      });
-      setDialogMode("create");
-      setOpenDialog(true);
-    },
-    [clearCurrentTemplate]
-  );
+  const handleDuplicateTemplate = useCallback((template: BotTemplate) => {
+    setEditingTemplateId(null);
+    setDuplicateTemplateData({
+      name: `${template.name} Copy`,
+      description: template.description,
+      entry_module: template.entry_module,
+      exit_module: template.exit_module,
+      dca_cutloss_module: template.dca_cutloss_module,
+      entry_hedge_module: template.entry_hedge_module,
+      after_hedge_module: template.after_hedge_module,
+      stop_loss_module: template.stop_loss_module,
+      is_future: template.is_future,
+    });
+    setDialogMode("create");
+    setOpenDialog(true);
+  }, []);
 
   // Handle opening confirm delete dialog
   const handleOpenDeleteConfirm = useCallback(
@@ -238,7 +230,7 @@ const BotTemplate = () => {
     if (!confirmDelete.id) return;
 
     try {
-      await deleteTemplate(confirmDelete.id);
+      await deleteMutation.mutateAsync(confirmDelete.id);
       showNotification(t("botTemplate.notifications.deleteSuccess"), "success");
       handleCloseDeleteConfirm();
     } catch (error) {
@@ -246,7 +238,7 @@ const BotTemplate = () => {
     }
   }, [
     confirmDelete.id,
-    deleteTemplate,
+    deleteMutation,
     showNotification,
     handleCloseDeleteConfirm,
     t,
@@ -287,11 +279,16 @@ const BotTemplate = () => {
         <Button onClick={handleCloseDialog} variant="outlined">
           {t("common.cancel")}
         </Button>
-        <Button 
+        <Button
           onClick={() => {
-            const form = document.getElementById('bot-template-form') as HTMLFormElement;
-            if (form) form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-          }} 
+            const form = document.getElementById(
+              "bot-template-form"
+            ) as HTMLFormElement;
+            if (form)
+              form.dispatchEvent(
+                new Event("submit", { cancelable: true, bubbles: true })
+              );
+          }}
           variant="contained"
           disabled={isLoading}
         >
@@ -303,7 +300,15 @@ const BotTemplate = () => {
 
   return (
     <Box>
-      <Paper elevation={3} sx={{ p: { xs: 1.5, sm: 2.5, md: 3 }, mb: 3, overflow: 'hidden', borderRadius: { xs: 1.5, md: 2 } }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: { xs: 1.5, sm: 2.5, md: 3 },
+          mb: 3,
+          overflow: "hidden",
+          borderRadius: { xs: 1.5, md: 2 },
+        }}
+      >
         <Grid
           container
           spacing={2}
@@ -311,13 +316,26 @@ const BotTemplate = () => {
           wrap="wrap"
           justifyContent="space-between"
         >
-          <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ flexGrow: 1, minWidth: 0 }}>
+          <Grid
+            size={{ xs: "auto", md: "auto" }}
+            sx={{ flexGrow: 1, minWidth: 0 }}
+          >
             <Typography variant="h5" component="h1" gutterBottom>
               {t("botTemplate.pageTitle")}
             </Typography>
           </Grid>
-          <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ ml: { xs: 'auto', md: 0 } }}>
-            <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <Grid
+            size={{ xs: "auto", md: "auto" }}
+            sx={{ ml: { xs: "auto", md: 0 } }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1.5,
+                flexWrap: "wrap",
+                justifyContent: "flex-end",
+              }}
+            >
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
@@ -326,13 +344,16 @@ const BotTemplate = () => {
                 sx={{
                   px: { xs: 1.25, sm: 2 },
                   minHeight: 40,
-                  minWidth: { xs: 44, sm: 'auto' },
-                  '& .MuiButton-startIcon': {
+                  minWidth: { xs: 44, sm: "auto" },
+                  "& .MuiButton-startIcon": {
                     mr: { xs: 0, sm: 1 },
                   },
                 }}
               >
-                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
                   {t("botTemplate.create.button")}
                 </Box>
               </Button>
@@ -378,10 +399,7 @@ const BotTemplate = () => {
         footer={getModalFooter()}
       >
         {dialogMode === "view" && currentTemplate ? (
-          <BotTemplateDetail
-            template={currentTemplate}
-            isLoading={isLoading}
-          />
+          <BotTemplateDetail template={currentTemplate} isLoading={isLoading} />
         ) : (
           <BotTemplateForm
             initialData={
@@ -401,7 +419,9 @@ const BotTemplate = () => {
       <ConfirmDialog
         open={confirmDelete.open}
         title={t("botTemplate.confirmDelete.title")}
-        message={t("botTemplate.confirmDelete.message", { name: confirmDelete.name })}
+        message={t("botTemplate.confirmDelete.message", {
+          name: confirmDelete.name,
+        })}
         onConfirm={handleDeleteTemplate}
         onCancel={handleCloseDeleteConfirm}
       />

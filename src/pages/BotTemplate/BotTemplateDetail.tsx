@@ -9,7 +9,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import type { BotTemplate } from "../../types/botTemplate.types";
-import { useModule } from "@hooks/useModule";
+import { useModulesQuery } from "@hooks/queries";
 import { areEqual } from "@/utils/common";
 import { useTranslation } from "react-i18next";
 
@@ -22,7 +22,7 @@ const BotTemplateDetail: React.FC<BotTemplateDetailProps> = ({
   template,
   isLoading,
 }) => {
-  const { modules } = useModule();
+  const { data: modules = [] } = useModulesQuery();
   const { t } = useTranslation();
 
   // Helper function to get module name by ID

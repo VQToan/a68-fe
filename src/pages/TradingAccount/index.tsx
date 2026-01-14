@@ -17,11 +17,21 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import AddIcon from "@mui/icons-material/Add";
 import TradingAccountList from "./TradingAccountList";
 import TradingAccountForm from "./TradingAccountForm";
-import { useTradingAccount } from "@hooks/useTradingAccount";
+import {
+  useTradingAccountsQuery,
+  useTradingAccountByIdQuery,
+  useCreateTradingAccountMutation,
+  useUpdateTradingAccountMutation,
+  useDeleteTradingAccountMutation,
+} from "@hooks/queries";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
-import type { TradingAccountCreate, TradingAccountUpdate, TradingExchangeType } from "@/types/trading.types";
+import type {
+  TradingAccountCreate,
+  TradingAccountUpdate,
+  TradingExchangeType,
+} from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
 import { useTranslation } from "react-i18next";
 import FilterTabs from "@components/FilterTabs";
@@ -62,22 +72,19 @@ const tabFilterMap: Record<string, { exchange?: TradingExchangeType }> = {
 const TradingAccount = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  
-  // Use the trading account hook for state management
-  const {
-    accounts,
-    currentAccount,
-    pagination,
-    isLoading,
-    error,
-    getAccounts,
-    getAccountById,
-    createAccount,
-    updateAccount,
-    deleteAccount,
-    clearError,
-    clearCurrentAccount,
-  } = useTradingAccount();
+
+  // Use TanStack Query mutations
+  const createMutation = useCreateTradingAccountMutation();
+  const updateMutation = useUpdateTradingAccountMutation();
+  const deleteMutation = useDeleteTradingAccountMutation();
+
+  // Local state for current account being edited
+  const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
+
+  // Fetch current account when editing
+  const { data: currentAccount } = useTradingAccountByIdQuery(
+    editingAccountId ?? undefined
+  );
 
   // Use the notification context
   const { showNotification } = useNotification();
@@ -87,7 +94,9 @@ const TradingAccount = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
-  const [dialogTitleKey, setDialogTitleKey] = useState<string>("tradingAccount.dialog.createTitle");
+  const [dialogTitleKey, setDialogTitleKey] = useState<string>(
+    "tradingAccount.dialog.createTitle"
+  );
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -104,34 +113,35 @@ const TradingAccount = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(20);
 
-  // Initial fetch of trading accounts
-  useEffect(() => {
-    fetchTradingAccounts();
-  }, []);
+  // Get exchange filter from current tab
+  const exchangeFilter = tabFilterMap[currentTab]?.exchange;
 
-  // Fetch trading accounts when tab changes
-  useEffect(() => {
-    fetchTradingAccounts();
-  }, [currentTab]);
+  // Use TanStack Query for data fetching - replaces 4 useEffects!
+  const {
+    data: accountsData,
+    isLoading,
+    error,
+  } = useTradingAccountsQuery(currentPage, rowsPerPage, exchangeFilter);
 
-  // Fetch trading accounts with pagination parameters
-  const fetchTradingAccounts = useCallback(() => {
-    const filters = tabFilterMap[currentTab];
-    getAccounts(currentPage, rowsPerPage, filters.exchange);
-  }, [currentTab, currentPage, rowsPerPage, getAccounts]);
-
-  // Re-fetch when pagination changes
-  useEffect(() => {
-    fetchTradingAccounts();
-  }, [currentPage, rowsPerPage]);
+  // Extract data from query result
+  const accounts = accountsData?.items ?? [];
+  const pagination = accountsData
+    ? {
+        total: accountsData.total,
+        page: accountsData.page,
+        page_size: accountsData.page_size,
+        total_pages: accountsData.total_pages,
+      }
+    : { total: 0, page: 1, page_size: 20, total_pages: 0 };
 
   // Show error notification when error occurs
   useEffect(() => {
     if (error) {
-      showNotification(error, "error");
-      clearError();
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      showNotification(errorMessage, "error");
     }
-  }, [error, showNotification, clearError]);
+  }, [error, showNotification]);
 
   // Handle search
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,7 +150,6 @@ const TradingAccount = () => {
     // Note: API doesn't support search by keyword for trading accounts
     // This is just UI filtering for now
   };
-
 
   const handleFilterTabChange = (newValue: string) => {
     setCurrentTab(newValue);
@@ -151,7 +160,9 @@ const TradingAccount = () => {
   const filteredAccounts = searchTerm
     ? accounts.filter(
         (account) =>
-          account.account_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          account.account_name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
           account.exchange.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : accounts;
@@ -188,9 +199,9 @@ const TradingAccount = () => {
 
   const handleCloseDialog = useCallback(() => {
     setOpenDialog(false);
-    // Clear the current account when dialog closes
-    clearCurrentAccount();
-  }, [clearCurrentAccount]);
+    // Clear the editing account ID when dialog closes
+    setEditingAccountId(null);
+  }, []);
 
   // Handle form submission (add or update trading account)
   const handleSubmitTradingAccount = useCallback(
@@ -198,21 +209,36 @@ const TradingAccount = () => {
       try {
         if (dialogMode === "create") {
           // Create new trading account
-          await createAccount(formData as TradingAccountCreate);
-          showNotification(t("tradingAccount.notifications.createSuccess"), "success");
+          await createMutation.mutateAsync(formData as TradingAccountCreate);
+          showNotification(
+            t("tradingAccount.notifications.createSuccess"),
+            "success"
+          );
         } else if (dialogMode === "edit" && currentAccount) {
           // Update existing trading account
-          await updateAccount(currentAccount._id, formData as TradingAccountUpdate);
-          showNotification(t("tradingAccount.notifications.updateSuccess"), "success");
+          await updateMutation.mutateAsync({
+            id: currentAccount._id,
+            data: formData as TradingAccountUpdate,
+          });
+          showNotification(
+            t("tradingAccount.notifications.updateSuccess"),
+            "success"
+          );
         }
         handleCloseDialog();
-        // Re-fetch the list with latest data
-        fetchTradingAccounts();
       } catch (error) {
         console.error("Error submitting trading account:", error);
       }
     },
-    [dialogMode, currentAccount, createAccount, updateAccount, showNotification, handleCloseDialog, fetchTradingAccounts, t]
+    [
+      dialogMode,
+      currentAccount,
+      createMutation,
+      updateMutation,
+      showNotification,
+      handleCloseDialog,
+      t,
+    ]
   );
 
   // Handle edit mode toggle from view mode
@@ -231,15 +257,11 @@ const TradingAccount = () => {
 
   // Handle edit trading account directly
   const handleEditTradingAccount = useCallback(
-    async (id: string) => {
-      try {
-        await getAccountById(id);
-        handleOpenDialog("edit");
-      } catch (error) {
-        console.error("Error fetching trading account details:", error);
-      }
+    (id: string) => {
+      setEditingAccountId(id);
+      handleOpenDialog("edit");
     },
-    [getAccountById, handleOpenDialog]
+    [handleOpenDialog]
   );
 
   // Handle opening confirm delete dialog
@@ -265,21 +287,36 @@ const TradingAccount = () => {
     if (!confirmDelete.id) return;
 
     try {
-      await deleteAccount(confirmDelete.id);
-      showNotification(t("tradingAccount.notifications.deleteSuccess"), "success");
+      await deleteMutation.mutateAsync(confirmDelete.id);
+      showNotification(
+        t("tradingAccount.notifications.deleteSuccess"),
+        "success"
+      );
       handleCloseDeleteConfirm();
-      // Re-fetch the list with latest data
-      fetchTradingAccounts();
     } catch (error) {
       console.error("Error deleting trading account:", error);
     }
-  }, [confirmDelete.id, deleteAccount, showNotification, handleCloseDeleteConfirm, fetchTradingAccounts, t]);
+  }, [
+    confirmDelete.id,
+    deleteMutation,
+    showNotification,
+    handleCloseDeleteConfirm,
+    t,
+  ]);
 
   // Handle refreshing the trading account list
+  const { refetch } = useTradingAccountsQuery(
+    currentPage,
+    rowsPerPage,
+    exchangeFilter
+  );
   const handleRefreshTradingAccounts = useCallback(() => {
-    fetchTradingAccounts();
-    showNotification(t("tradingAccount.notifications.refreshSuccess"), "success");
-  }, [fetchTradingAccounts, showNotification, t]);
+    refetch();
+    showNotification(
+      t("tradingAccount.notifications.refreshSuccess"),
+      "success"
+    );
+  }, [refetch, showNotification, t]);
 
   // Create form footer based on dialog mode
   const getModalFooter = useCallback(() => {
@@ -307,8 +344,13 @@ const TradingAccount = () => {
         </Button>
         <Button
           onClick={() => {
-            const form = document.getElementById("trading-account-form") as HTMLFormElement;
-            if (form) form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+            const form = document.getElementById(
+              "trading-account-form"
+            ) as HTMLFormElement;
+            if (form)
+              form.dispatchEvent(
+                new Event("submit", { cancelable: true, bubbles: true })
+              );
           }}
           variant="contained"
           disabled={isLoading}
@@ -321,7 +363,15 @@ const TradingAccount = () => {
 
   return (
     <Box>
-      <Paper elevation={3} sx={{ p: { xs: 1.5, sm: 2.5, md: 3 }, mb: 3, overflow: 'hidden', borderRadius: { xs: 1.5, md: 2 } }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: { xs: 1.5, sm: 2.5, md: 3 },
+          mb: 3,
+          overflow: "hidden",
+          borderRadius: { xs: 1.5, md: 2 },
+        }}
+      >
         <Grid
           container
           spacing={2}
@@ -329,13 +379,26 @@ const TradingAccount = () => {
           wrap="wrap"
           justifyContent="space-between"
         >
-          <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ flexGrow: 1, minWidth: 0 }}>
+          <Grid
+            size={{ xs: "auto", md: "auto" }}
+            sx={{ flexGrow: 1, minWidth: 0 }}
+          >
             <Typography variant="h5" component="h1" gutterBottom>
               {t("tradingAccount.pageTitle")}
             </Typography>
           </Grid>
-          <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ ml: { xs: 'auto', md: 0 } }}>
-            <Box sx={{ display: "flex", gap: 2, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <Grid
+            size={{ xs: "auto", md: "auto" }}
+            sx={{ ml: { xs: "auto", md: 0 } }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexWrap: "wrap",
+                justifyContent: "flex-end",
+              }}
+            >
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
@@ -344,13 +407,16 @@ const TradingAccount = () => {
                 sx={{
                   px: { xs: 1.25, sm: 2 },
                   minHeight: 40,
-                  minWidth: { xs: 44, sm: 'auto' },
-                  '& .MuiButton-startIcon': {
+                  minWidth: { xs: 44, sm: "auto" },
+                  "& .MuiButton-startIcon": {
                     mr: { xs: 0, sm: 1 },
                   },
                 }}
               >
-                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
                   {t("tradingAccount.create.button")}
                 </Box>
               </Button>
@@ -365,11 +431,11 @@ const TradingAccount = () => {
           value={currentTab}
           onChange={handleFilterTabChange}
           items={[
-            { label: t("tradingAccount.tabs.all"), value: 'all' },
-            { label: 'Binance', value: 'binance' },
-            { label: 'Bybit', value: 'bybit' },
-            { label: 'OKX', value: 'okx' },
-            { label: 'Bitget', value: 'bitget' },
+            { label: t("tradingAccount.tabs.all"), value: "all" },
+            { label: "Binance", value: "binance" },
+            { label: "Bybit", value: "bybit" },
+            { label: "OKX", value: "okx" },
+            { label: "Bitget", value: "bitget" },
           ]}
         />
 
@@ -389,7 +455,7 @@ const TradingAccount = () => {
             endAdornment: (
               <InputAdornment position="end">
                 <Tooltip title={t("tradingAccount.tooltips.refreshList")}>
-                  <IconButton 
+                  <IconButton
                     onClick={handleRefreshTradingAccounts}
                     disabled={isLoading}
                     size="small"
@@ -408,7 +474,9 @@ const TradingAccount = () => {
             isLoading={isLoading}
             onView={handleViewTradingAccount}
             onEdit={handleEditTradingAccount}
-            onDelete={(id: string, name: string) => handleOpenDeleteConfirm(id, name)}
+            onDelete={(id: string, name: string) =>
+              handleOpenDeleteConfirm(id, name)
+            }
             onRefresh={handleRefreshTradingAccounts}
             pagination={pagination}
             onPageChange={handlePageChange}
@@ -426,13 +494,17 @@ const TradingAccount = () => {
         footer={getModalFooter()}
       >
         <TradingAccountForm
-          initialData={currentAccount ? {
-            _id: currentAccount._id,
-            account_name: currentAccount.account_name,
-            exchange: currentAccount.exchange,
-            chat_ids: currentAccount.chat_ids,
-            api_key_masked: currentAccount.api_key_masked,
-          } : undefined}
+          initialData={
+            currentAccount
+              ? {
+                  _id: currentAccount._id,
+                  account_name: currentAccount.account_name,
+                  exchange: currentAccount.exchange,
+                  chat_ids: currentAccount.chat_ids,
+                  api_key_masked: currentAccount.api_key_masked,
+                }
+              : undefined
+          }
           onSubmit={handleSubmitTradingAccount}
           isSubmitting={isLoading}
           isEditMode={dialogMode === "edit"}
@@ -445,7 +517,9 @@ const TradingAccount = () => {
       <ConfirmDialog
         open={confirmDelete.open}
         title={t("tradingAccount.confirmDelete.title")}
-        message={t("tradingAccount.confirmDelete.message", { name: confirmDelete.name })}
+        message={t("tradingAccount.confirmDelete.message", {
+          name: confirmDelete.name,
+        })}
         confirmLabel={t("common.delete")}
         confirmColor="error"
         onConfirm={handleDeleteTradingAccount}

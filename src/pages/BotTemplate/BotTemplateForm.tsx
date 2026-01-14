@@ -13,7 +13,7 @@ import {
   Switch,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import { useModule } from "@hooks/useModule";
+import { useModulesQuery } from "@hooks/queries";
 import {
   ModuleType,
   type BotTemplateCreate,
@@ -55,8 +55,8 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
   isSubmitting,
   formId = "bot-template-form",
 }) => {
-  // Get modules from the store for the module selections
-  const { modules, getModules, isLoading: isLoadingModules } = useModule();
+  // Use TanStack Query for modules
+  const { data: modules = [], isLoading: isLoadingModules } = useModulesQuery();
   const { t } = useTranslation();
 
   // Group modules by type
@@ -95,10 +95,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
   // Watch is_future value to filter modules
   const isFutureValue = watch("is_future");
 
-  // Fetch modules on component mount
-  useEffect(() => {
-    getModules();
-  }, []);
+  // Note: Modules are fetched automatically by TanStack Query
 
   // Group modules by type when modules are loaded
   useEffect(() => {

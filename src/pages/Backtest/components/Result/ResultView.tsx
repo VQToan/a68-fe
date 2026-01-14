@@ -30,7 +30,7 @@ import {
 import PerformanceStats from "./PerformanceStats";
 import { formatDate, formatNumber, areEqual } from "@/utils/common";
 import type { BacktestTrade } from "@/services/backtest.service";
-import { useBacktestResult } from "@/hooks/useBacktestResult";
+import { useBacktestResult } from "@hooks/queries";
 import BacktestChart from "./BacktestChart";
 import { useTranslation } from "react-i18next";
 
@@ -134,7 +134,9 @@ const ResultView: React.FC<ResultViewProps> = ({
                   <Skeleton variant="text" width={100} />
                 ) : (
                   <Typography variant="subtitle1" fontWeight="medium">
-                    {t("backtest.results.view.tradeCount", { count: trades.length })}
+                    {t("backtest.results.view.tradeCount", {
+                      count: trades.length,
+                    })}
                   </Typography>
                 )}
               </Box>
@@ -180,7 +182,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                                   color="success"
                                   sx={{ mr: 1 }}
                                   label={t("backtest.results.view.longTrades", {
-                                    count: trades.filter((t) =>
+                                    count: trades.filter((t: BacktestTrade) =>
                                       t.side.includes("LONG")
                                     ).length,
                                   })}
@@ -188,11 +190,14 @@ const ResultView: React.FC<ResultViewProps> = ({
                                 <Chip
                                   size="small"
                                   color="error"
-                                  label={t("backtest.results.view.shortTrades", {
-                                    count: trades.filter((t) =>
-                                      t.side.includes("SHORT")
-                                    ).length,
-                                  })}
+                                  label={t(
+                                    "backtest.results.view.shortTrades",
+                                    {
+                                      count: trades.filter((t: BacktestTrade) =>
+                                        t.side.includes("SHORT")
+                                      ).length,
+                                    }
+                                  )}
                                 />
                               </>
                             )}
@@ -201,14 +206,30 @@ const ResultView: React.FC<ResultViewProps> = ({
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>{t("backtest.results.view.tableHeaders.time")}</TableCell>
-                      <TableCell>{t("backtest.results.view.tableHeaders.type")}</TableCell>
-                      <TableCell>{t("backtest.results.view.tableHeaders.price")}</TableCell>
-                      <TableCell>{t("backtest.results.view.tableHeaders.quantity")}</TableCell>
-                      <TableCell>{t("backtest.results.view.tableHeaders.reason")}</TableCell>
-                      <TableCell>{t("backtest.results.view.tableHeaders.orderPnl")}</TableCell>
-                      <TableCell>{t("backtest.results.view.tableHeaders.transactionPnl")}</TableCell>
-                      <TableCell>{t("backtest.results.view.tableHeaders.balance")}</TableCell>
+                      <TableCell>
+                        {t("backtest.results.view.tableHeaders.time")}
+                      </TableCell>
+                      <TableCell>
+                        {t("backtest.results.view.tableHeaders.type")}
+                      </TableCell>
+                      <TableCell>
+                        {t("backtest.results.view.tableHeaders.price")}
+                      </TableCell>
+                      <TableCell>
+                        {t("backtest.results.view.tableHeaders.quantity")}
+                      </TableCell>
+                      <TableCell>
+                        {t("backtest.results.view.tableHeaders.reason")}
+                      </TableCell>
+                      <TableCell>
+                        {t("backtest.results.view.tableHeaders.orderPnl")}
+                      </TableCell>
+                      <TableCell>
+                        {t("backtest.results.view.tableHeaders.transactionPnl")}
+                      </TableCell>
+                      <TableCell>
+                        {t("backtest.results.view.tableHeaders.balance")}
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -249,7 +270,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                           </TableRow>
                         ))
                     ) : trades.length > 0 ? (
-                      trades.map((trade, index) => (
+                      trades.map((trade: any, index: number) => (
                         <TableRow key={index}>
                           <TableCell>{formatDate(trade.time / 1000)}</TableCell>
                           <TableCell>

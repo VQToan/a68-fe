@@ -18,13 +18,24 @@ import AddIcon from "@mui/icons-material/Add";
 import TradingList from "./TradingList";
 import TradingForm from "./TradingForm";
 import StopTradingConfirmDialog from "./components/StopTradingConfirmDialog";
-import { useTradingProcess } from "@hooks/useTradingProcess";
-import { useTradingAccount } from "@hooks/useTradingAccount";
-import { useBotTemplate } from "@hooks/useBotTemplate";
+import {
+  useTradingProcessesQuery,
+  useTradingProcessByIdQuery,
+  useCreateTradingProcessMutation,
+  useUpdateTradingProcessMutation,
+  useDeleteTradingProcessMutation,
+  useStartTradingProcessMutation,
+  useStopTradingProcessMutation,
+} from "@hooks/queries";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
 import Modal from "@components/Modal";
-import type { TradingStatusType, TradingProcess, TradingProcessCreate, TradingProcessUpdate } from "@/types/trading.types";
+import type {
+  TradingStatusType,
+  TradingProcess,
+  TradingProcessCreate,
+  TradingProcessUpdate,
+} from "@/types/trading.types";
 import type { BacktestParameter } from "@/types/backtest.type";
 import { areEqual } from "@/utils/common";
 import FilterTabs from "@components/FilterTabs";
@@ -58,7 +69,7 @@ function TabPanel(props: TabPanelProps) {
 const tabStatusMap: Record<string, TradingStatusType | undefined> = {
   all: undefined,
   created: "created",
-  queued: "queued", 
+  queued: "queued",
   running: "running",
   stopped: "stopped",
   failed: "failed",
@@ -76,30 +87,21 @@ type TradingDuplicatePayload = {
 
 const Trading = () => {
   const navigate = useNavigate();
-  
-  // Use hooks for state management
-  const {
-    processes,
-    isLoading,
-    error,
-    currentProcess,
-    pagination,
-    getProcesses,
-    getProcessById,
-    createProcess,
-    updateProcess,
-    deleteProcess,
-    startProcess,
-    stopProcess,
-    clearError,
-    clearCurrentProcess,
-  } = useTradingProcess();
 
-  // Use the trading account hook to get available accounts
-  const { getAccounts } = useTradingAccount();
+  // Use TanStack Query mutations
+  const createMutation = useCreateTradingProcessMutation();
+  const updateMutation = useUpdateTradingProcessMutation();
+  const deleteMutation = useDeleteTradingProcessMutation();
+  const startMutation = useStartTradingProcessMutation();
+  const stopMutation = useStopTradingProcessMutation();
 
-  // Use the bot template hook to get available templates
-  const { getTemplates } = useBotTemplate();
+  // Local state for current process being edited
+  const [editingProcessId, setEditingProcessId] = useState<string | null>(null);
+
+  // Fetch current process when editing
+  const { data: currentProcess } = useTradingProcessByIdQuery(
+    editingProcessId ?? undefined
+  );
 
   // Use the notification context
   const { showNotification } = useNotification();
@@ -110,7 +112,8 @@ const Trading = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [dialogMode, setDialogMode] = useState<FormMode>("create");
   const { t } = useTranslation();
-  const [duplicateProcessData, setDuplicateProcessData] = useState<TradingDuplicatePayload | null>(null);
+  const [duplicateProcessData, setDuplicateProcessData] =
+    useState<TradingDuplicatePayload | null>(null);
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -136,35 +139,40 @@ const Trading = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
 
-  // Initial fetch of trading processes, accounts, and bot templates
-  useEffect(() => {
-    fetchTradingProcesses();
-    getAccounts();
-    getTemplates();
-  }, []);
+  // Get status filter from current tab
+  const statusFilter = tabStatusMap[currentTab];
 
-  // Fetch trading processes when tab changes
-  useEffect(() => {
-    fetchTradingProcesses();
-  }, [currentTab]);
+  // Use TanStack Query for data fetching - replaces 4 useEffects!
+  const {
+    data: processesData,
+    isLoading,
+    error,
+    refetch,
+  } = useTradingProcessesQuery(
+    statusFilter,
+    (currentPage - 1) * rowsPerPage,
+    rowsPerPage
+  );
 
-  // Fetch trading processes with pagination parameters
-  const fetchTradingProcesses = useCallback(() => {
-    getProcesses(tabStatusMap[currentTab], (currentPage - 1) * rowsPerPage, rowsPerPage);
-  }, [currentTab, currentPage, rowsPerPage, getProcesses]);
-
-  // Re-fetch when pagination changes
-  useEffect(() => {
-    fetchTradingProcesses();
-  }, [currentPage, rowsPerPage]);
+  // Extract data from query result
+  const processes = processesData?.items ?? [];
+  const pagination = processesData
+    ? {
+        total: processesData.total,
+        page: processesData.page,
+        page_size: processesData.page_size,
+        total_pages: processesData.total_pages,
+      }
+    : { total: 0, page: 1, page_size: 10, total_pages: 0 };
 
   // Show error notification when error occurs
   useEffect(() => {
     if (error) {
-      showNotification(error, "error");
-      clearError();
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      showNotification(errorMessage, "error");
     }
-  }, [error, showNotification, clearError]);
+  }, [error, showNotification]);
 
   // Handle search
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -217,37 +225,46 @@ const Trading = () => {
     setDialogMode(mode);
     if (mode === "create") {
       setDuplicateProcessData(null);
-      clearCurrentProcess();
+      setEditingProcessId(null);
     }
     setOpenDialog(true);
-  }, [clearCurrentProcess]);
+  }, []);
 
   const handleCloseDialog = useCallback(() => {
     setOpenDialog(false);
-    // Clear the current process when dialog closes
-    clearCurrentProcess();
+    // Clear the editing process ID when dialog closes
+    setEditingProcessId(null);
     setDuplicateProcessData(null);
-  }, [clearCurrentProcess]);
+  }, []);
 
   // Handle form submission (add or update trading process)
   const handleSubmitTradingProcess = useCallback(
     async (formData: TradingProcessCreate | TradingProcessUpdate) => {
       try {
         if (dialogMode === "create") {
-          await createProcess(formData as TradingProcessCreate);
+          await createMutation.mutateAsync(formData as TradingProcessCreate);
           showNotification(t("trading.notifications.createSuccess"), "success");
         } else if (dialogMode === "edit" && currentProcess) {
-          await updateProcess(currentProcess._id, formData as TradingProcessUpdate);
+          await updateMutation.mutateAsync({
+            id: currentProcess._id,
+            data: formData as TradingProcessUpdate,
+          });
           showNotification(t("trading.notifications.updateSuccess"), "success");
         }
         handleCloseDialog();
-        // Re-fetch the list with latest data
-        fetchTradingProcesses();
       } catch (error) {
         console.error("Error submitting trading process:", error);
       }
     },
-    [dialogMode, currentProcess, createProcess, updateProcess, showNotification, handleCloseDialog, fetchTradingProcesses, t]
+    [
+      dialogMode,
+      currentProcess,
+      createMutation,
+      updateMutation,
+      showNotification,
+      handleCloseDialog,
+      t,
+    ]
   );
 
   // Handle edit mode toggle from view mode
@@ -257,20 +274,19 @@ const Trading = () => {
 
   // Handle edit trading process directly
   const handleEditTradingProcess = useCallback(
-    async (id: string) => {
-      try {
-        await getProcessById(id);
-        handleOpenDialog("edit");
-      } catch (error) {
-        console.error("Error fetching trading process details:", error);
-      }
+    (id: string) => {
+      setEditingProcessId(id);
+      handleOpenDialog("edit");
     },
-    [getProcessById, handleOpenDialog]
+    [handleOpenDialog]
   );
 
   const handleDuplicateTradingProcess = useCallback(
     (process: TradingProcess) => {
-      const clonedParameters = { ...process.parameters } as Record<keyof BacktestParameter, any>;
+      const clonedParameters = { ...process.parameters } as Record<
+        keyof BacktestParameter,
+        any
+      >;
       setDuplicateProcessData({
         name: `${process.name} Copy`,
         description: process.description,
@@ -280,10 +296,10 @@ const Trading = () => {
         is_future: process.is_future,
       });
       setDialogMode("create");
-      clearCurrentProcess();
+      setEditingProcessId(null);
       setOpenDialog(true);
     },
-    [clearCurrentProcess]
+    []
   );
 
   // Handle view trading process detail
@@ -317,27 +333,32 @@ const Trading = () => {
     if (!confirmDelete.id) return;
 
     try {
-      await deleteProcess(confirmDelete.id);
+      await deleteMutation.mutateAsync(confirmDelete.id);
       showNotification(t("trading.notifications.deleteSuccess"), "success");
       handleCloseDeleteConfirm();
-      // Re-fetch the list with latest data
-      fetchTradingProcesses();
     } catch (error) {
       console.error("Error deleting trading process:", error);
     }
-  }, [confirmDelete.id, deleteProcess, showNotification, handleCloseDeleteConfirm, fetchTradingProcesses, t]);
+  }, [
+    confirmDelete.id,
+    deleteMutation,
+    showNotification,
+    handleCloseDeleteConfirm,
+    t,
+  ]);
 
   // Handle start trading process
-  const handleStartTradingProcess = useCallback(async (id: string) => {
-    try {
-      await startProcess(id);
-      showNotification(t("trading.notifications.startSuccess"), "success");
-      // Re-fetch the list with latest data
-      fetchTradingProcesses();
-    } catch (error) {
-      console.error("Error starting trading process:", error);
-    }
-  }, [startProcess, showNotification, fetchTradingProcesses, t]);
+  const handleStartTradingProcess = useCallback(
+    async (id: string) => {
+      try {
+        await startMutation.mutateAsync(id);
+        showNotification(t("trading.notifications.startSuccess"), "success");
+      } catch (error) {
+        console.error("Error starting trading process:", error);
+      }
+    },
+    [startMutation, showNotification, t]
+  );
 
   // Open confirm stop dialog
   const handleOpenStopConfirm = useCallback((process: TradingProcess) => {
@@ -349,29 +370,39 @@ const Trading = () => {
   }, []);
 
   // Confirm stop trading process
-  const handleConfirmStopTradingProcess = useCallback(async (shouldClearPositions: boolean) => {
-    const processId = confirmStop.process?._id;
-    if (!processId) return;
+  const handleConfirmStopTradingProcess = useCallback(
+    async (shouldClearPositions: boolean) => {
+      const processId = confirmStop.process?._id;
+      if (!processId) return;
 
-    try {
-      await stopProcess(processId, shouldClearPositions ? true : undefined);
-      const message = shouldClearPositions
-        ? t("trading.notifications.stopWithCloseSuccess")
-        : t("trading.notifications.stopSuccess");
-      showNotification(message, "success");
-      handleCloseStopConfirm();
-      // Re-fetch the list with latest data
-      fetchTradingProcesses();
-    } catch (error) {
-      console.error("Error stopping trading process:", error);
-    }
-  }, [confirmStop.process, stopProcess, showNotification, handleCloseStopConfirm, fetchTradingProcesses, t]);
+      try {
+        await stopMutation.mutateAsync({
+          id: processId,
+          clearPositions: shouldClearPositions ? true : undefined,
+        });
+        const message = shouldClearPositions
+          ? t("trading.notifications.stopWithCloseSuccess")
+          : t("trading.notifications.stopSuccess");
+        showNotification(message, "success");
+        handleCloseStopConfirm();
+      } catch (error) {
+        console.error("Error stopping trading process:", error);
+      }
+    },
+    [
+      confirmStop.process,
+      stopMutation,
+      showNotification,
+      handleCloseStopConfirm,
+      t,
+    ]
+  );
 
   // Handle refreshing the trading process list
   const handleRefreshTradingProcesses = useCallback(() => {
-    fetchTradingProcesses();
+    refetch();
     showNotification(t("trading.notifications.refreshSuccess"), "success");
-  }, [fetchTradingProcesses, showNotification, t]);
+  }, [refetch, showNotification, t]);
 
   // Create form footer based on dialog mode
   const dialogTitleKey = useMemo(() => {
@@ -410,8 +441,13 @@ const Trading = () => {
         </Button>
         <Button
           onClick={() => {
-            const form = document.getElementById("trading-form") as HTMLFormElement;
-            if (form) form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+            const form = document.getElementById(
+              "trading-form"
+            ) as HTMLFormElement;
+            if (form)
+              form.dispatchEvent(
+                new Event("submit", { cancelable: true, bubbles: true })
+              );
           }}
           variant="contained"
           disabled={isLoading}
@@ -424,7 +460,15 @@ const Trading = () => {
 
   return (
     <Box>
-      <Paper elevation={3} sx={{ p: { xs: 1.5, sm: 2.5, md: 3 }, mb: 3, overflow: 'hidden', borderRadius: { xs: 1.5, md: 2 } }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: { xs: 1.5, sm: 2.5, md: 3 },
+          mb: 3,
+          overflow: "hidden",
+          borderRadius: { xs: 1.5, md: 2 },
+        }}
+      >
         <Grid
           container
           spacing={2}
@@ -432,13 +476,26 @@ const Trading = () => {
           wrap="wrap"
           justifyContent="space-between"
         >
-          <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ flexGrow: 1, minWidth: 0 }}>
+          <Grid
+            size={{ xs: "auto", md: "auto" }}
+            sx={{ flexGrow: 1, minWidth: 0 }}
+          >
             <Typography variant="h5" component="h1" gutterBottom>
               {t("trading.pageTitle")}
             </Typography>
           </Grid>
-          <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ ml: { xs: 'auto', md: 0 } }}>
-            <Box sx={{ display: "flex", gap: 2, flexWrap: 'wrap', justifyContent: { xs: 'flex-end', md: 'flex-end' } }}>
+          <Grid
+            size={{ xs: "auto", md: "auto" }}
+            sx={{ ml: { xs: "auto", md: 0 } }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexWrap: "wrap",
+                justifyContent: { xs: "flex-end", md: "flex-end" },
+              }}
+            >
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
@@ -447,13 +504,16 @@ const Trading = () => {
                 sx={{
                   px: { xs: 1.25, sm: 2 },
                   minHeight: 40,
-                  minWidth: { xs: 44, sm: 'auto' },
-                  '& .MuiButton-startIcon': {
+                  minWidth: { xs: 44, sm: "auto" },
+                  "& .MuiButton-startIcon": {
                     mr: { xs: 0, sm: 1 },
                   },
                 }}
               >
-                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
                   {t("trading.create.button")}
                 </Box>
               </Button>
@@ -486,7 +546,7 @@ const Trading = () => {
             endAdornment: (
               <InputAdornment position="end">
                 <Tooltip title={t("trading.refreshTooltip")}>
-                  <IconButton 
+                  <IconButton
                     onClick={handleRefreshTradingProcesses}
                     disabled={isLoading}
                     size="small"
@@ -505,7 +565,9 @@ const Trading = () => {
             isLoading={isLoading}
             onView={handleViewTradingProcess}
             onEdit={handleEditTradingProcess}
-            onDelete={(id: string, name: string) => handleOpenDeleteConfirm(id, name)}
+            onDelete={(id: string, name: string) =>
+              handleOpenDeleteConfirm(id, name)
+            }
             onStart={handleStartTradingProcess}
             onStop={handleOpenStopConfirm}
             onRefresh={handleRefreshTradingProcesses}
@@ -555,7 +617,9 @@ const Trading = () => {
       <ConfirmDialog
         open={confirmDelete.open}
         title={t("trading.confirmDelete.title")}
-        message={t("trading.confirmDelete.message", { name: confirmDelete.name })}
+        message={t("trading.confirmDelete.message", {
+          name: confirmDelete.name,
+        })}
         confirmLabel={t("common.delete")}
         confirmColor="error"
         onConfirm={handleDeleteTradingProcess}

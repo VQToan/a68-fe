@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useForm, Controller } from "react-hook-form";
-import { useBotTemplate } from "@hooks/useBotTemplate";
+import { useActiveBotTemplatesQuery } from "@hooks/queries";
 import type { TextFieldProps } from "@mui/material/TextField";
 import type {
   BacktestParameter,
@@ -140,12 +140,9 @@ const BacktestForm = ({
   formId = "backtest-form",
 }: BacktestFormProps) => {
   const { t } = useTranslation();
-  // Get bot templates from the store
-  const {
-    activeTemplates: templates, // Alias activeTemplates as templates
-    getActiveTemplates: getBotTemplates, // Alias getActiveTemplates as getBotTemplates
-    isLoading: isLoadingTemplates,
-  } = useBotTemplate();
+  // Use TanStack Query for bot templates
+  const { data: templates = [], isLoading: isLoadingTemplates } =
+    useActiveBotTemplatesQuery();
 
   const initialParameters = useMemo<Record<string, any>>(
     () => ({
@@ -230,10 +227,7 @@ const BacktestForm = ({
     reset(defaultFormValues);
   }, [defaultFormValues]);
 
-  // Fetch bot templates on component mount
-  useEffect(() => {
-    getBotTemplates();
-  }, []);
+  // Note: Bot templates are fetched automatically by TanStack Query
 
   // Reset bot_template_id when is_future changes
   useEffect(() => {

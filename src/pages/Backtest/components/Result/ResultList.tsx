@@ -23,7 +23,7 @@ import {
   areEqual,
   downloadJson,
 } from "@/utils/common";
-import { useBacktestResult } from "@/hooks/useBacktestResult";
+import { useBacktestResult } from "@hooks/queries";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { useTranslation } from "react-i18next";
 
@@ -140,7 +140,9 @@ const ResultList: React.FC<ResultListProps> = ({
             alignItems="center"
             mb={2}
           >
-            <Typography variant="h6">{t("backtest.results.list.title")}</Typography>
+            <Typography variant="h6">
+              {t("backtest.results.list.title")}
+            </Typography>
           </Box>
 
           {loading ? (
@@ -252,9 +254,7 @@ const ResultList: React.FC<ResultListProps> = ({
               ))}
             </List>
           ) : (
-            <Alert severity="info">
-              {t("backtest.results.list.empty")}
-            </Alert>
+            <Alert severity="info">{t("backtest.results.list.empty")}</Alert>
           )}
         </CardContent>
       </Card>

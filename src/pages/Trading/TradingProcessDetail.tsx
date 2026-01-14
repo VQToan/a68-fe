@@ -25,7 +25,11 @@ import {
   NotificationsOff as NotificationsOffIcon,
   AccountBalanceWallet as AccountBalanceWalletIcon,
 } from "@mui/icons-material";
-import { useTradingProcess } from "@hooks/useTradingProcess";
+import {
+  useTradingProcessByIdQuery,
+  useStartTradingProcessMutation,
+  useStopTradingProcessMutation,
+} from "@hooks/queries";
 import { useNotification } from "@context/NotificationContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { areEqual } from "@/utils/common";
@@ -43,16 +47,17 @@ const TradingProcessDetail = () => {
   const navigate = useNavigate();
   const { showNotification } = useNotification();
 
-  // Hooks
+  // Use TanStack Query for process data
   const {
-    currentProcess,
+    data: currentProcess,
     isLoading,
     error,
-    getProcessById,
-    startProcess,
-    stopProcess,
-    clearError,
-  } = useTradingProcess();
+    refetch: refetchProcess,
+  } = useTradingProcessByIdQuery(id);
+
+  // Use TanStack Query mutations
+  const startMutation = useStartTradingProcessMutation();
+  const stopMutation = useStopTradingProcessMutation();
 
   // Local state
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -129,10 +134,9 @@ const TradingProcessDetail = () => {
     }
   }, [id, showNotification, t]);
 
-  // Fetch process details on mount
+  // Fetch additional data on mount (process data is fetched by query)
   useEffect(() => {
     if (id) {
-      fetchProcessDetails();
       fetchPerformanceData();
       fetchNotificationStatus();
       fetchCombineBalanceStatus();
@@ -142,27 +146,17 @@ const TradingProcessDetail = () => {
   // Handle errors
   useEffect(() => {
     if (error) {
-      showNotification(error, "error");
-      clearError();
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      showNotification(errorMessage, "error");
     }
-  }, [error, showNotification, clearError]);
-
-  // Fetch process details
-  const fetchProcessDetails = useCallback(async () => {
-    if (!id) return;
-
-    try {
-      await getProcessById(id);
-    } catch (error) {
-      console.error("Error fetching process details:", error);
-    }
-  }, [id, getProcessById]);
+  }, [error, showNotification]);
 
   // Handle refresh
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     await Promise.all([
-      fetchProcessDetails(),
+      refetchProcess(),
       fetchPerformanceData(),
       fetchNotificationStatus(),
       fetchCombineBalanceStatus(),
@@ -173,7 +167,7 @@ const TradingProcessDetail = () => {
       "success"
     );
   }, [
-    fetchProcessDetails,
+    refetchProcess,
     fetchPerformanceData,
     fetchNotificationStatus,
     fetchCombineBalanceStatus,
@@ -194,21 +188,21 @@ const TradingProcessDetail = () => {
         setConfirmStopOpen(true);
         return;
       } else {
-        await startProcess(currentProcess._id);
+        await startMutation.mutateAsync(currentProcess._id);
         showNotification(
           t("trading.detail.notifications.startSuccess"),
           "success"
         );
       }
-      await fetchProcessDetails(); // Refresh data
+      await refetchProcess(); // Refresh data
       await fetchPerformanceData(); // Refresh performance data
     } catch (error) {
       console.error("Error toggling process:", error);
     }
   }, [
     currentProcess,
-    startProcess,
-    fetchProcessDetails,
+    startMutation,
+    refetchProcess,
     fetchPerformanceData,
     showNotification,
     t,
@@ -218,16 +212,16 @@ const TradingProcessDetail = () => {
     async (shouldClearPositions: boolean) => {
       if (!currentProcess) return;
       try {
-        await stopProcess(
-          currentProcess._id,
-          shouldClearPositions ? true : undefined
-        );
+        await stopMutation.mutateAsync({
+          id: currentProcess._id,
+          clearPositions: shouldClearPositions ? true : undefined,
+        });
         const message = shouldClearPositions
           ? t("trading.detail.notifications.stopWithCloseSuccess")
           : t("trading.detail.notifications.stopSuccess");
         showNotification(message, "success");
         setConfirmStopOpen(false);
-        await fetchProcessDetails();
+        await refetchProcess();
         await fetchPerformanceData();
       } catch (error) {
         console.error("Error stopping process:", error);
@@ -235,8 +229,8 @@ const TradingProcessDetail = () => {
     },
     [
       currentProcess,
-      stopProcess,
-      fetchProcessDetails,
+      stopMutation,
+      refetchProcess,
       fetchPerformanceData,
       showNotification,
       t,

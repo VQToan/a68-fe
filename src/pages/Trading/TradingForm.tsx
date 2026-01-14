@@ -20,12 +20,15 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { useTradingAccount } from "@hooks/useTradingAccount";
-import { useBotTemplate } from "@hooks/useBotTemplate";
+import {
+  useActiveAccountsQuery,
+  useActiveBotTemplatesQuery,
+} from "@hooks/queries";
 import type {
   TradingProcessCreate,
   TradingProcessUpdate,
   TradingProcess,
+  TradingExchangeType,
 } from "@/types/trading.types";
 import type { BacktestParameter } from "@/types/backtest.type";
 import { areEqual } from "@/utils/common";
@@ -145,21 +148,22 @@ const TradingForm = ({
   formId,
 }: TradingFormProps) => {
   const { t } = useTranslation();
-  // Get trading accounts and bot templates from the store
-  const {
-    activeAccounts,
-    getActiveAccounts,
-    isLoading: isLoadingAccounts,
-    error: accountsError,
-  } = useTradingAccount();
-  const {
-    activeTemplates: templates, // Alias activeTemplates as templates to minimize code changes
-    getActiveTemplates: getBotTemplates, // Alias getActiveTemplates as getBotTemplates
-    isLoading: isLoadingTemplates,
-  } = useBotTemplate();
 
   // State for exchange filter
-  const [exchangeFilter, setExchangeFilter] = useState<string>("");
+  const [exchangeFilter, setExchangeFilter] = useState<
+    TradingExchangeType | undefined
+  >(undefined);
+
+  // Use TanStack Query for data fetching
+  const {
+    data: activeAccounts = [],
+    isLoading: isLoadingAccounts,
+    error: accountsError,
+    refetch: refetchAccounts,
+  } = useActiveAccountsQuery(exchangeFilter);
+
+  const { data: templates = [], isLoading: isLoadingTemplates } =
+    useActiveBotTemplatesQuery();
 
   const initialParameters = useMemo<Record<string, any>>(
     () => ({
@@ -247,15 +251,8 @@ const TradingForm = ({
     reset(defaultFormValues);
   }, [defaultFormValues]);
 
-  // Fetch bot templates on component mount
-  useEffect(() => {
-    getBotTemplates();
-  }, []);
-
-  // Fetch trading accounts when exchange filter changes
-  useEffect(() => {
-    getActiveAccounts(exchangeFilter as any);
-  }, [exchangeFilter]);
+  // Note: Bot templates are fetched automatically by TanStack Query
+  // No need for explicit useEffect calls
 
   // Reset bot_template_id when is_future changes
   useEffect(() => {
@@ -270,11 +267,13 @@ const TradingForm = ({
   }, [isFutureValue]);
 
   const handleRefreshAccounts = useCallback(() => {
-    getActiveAccounts(exchangeFilter as any);
-  }, [getActiveAccounts, exchangeFilter]);
+    refetchAccounts();
+  }, [refetchAccounts]);
 
   const handleExchangeFilterChange = useCallback((exchange: string) => {
-    setExchangeFilter(exchange);
+    setExchangeFilter(
+      exchange === "" ? undefined : (exchange as TradingExchangeType)
+    );
   }, []);
 
   const formatParameters = useCallback(

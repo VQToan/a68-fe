@@ -27,9 +27,11 @@ import {
   type SelectChangeEvent,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import { useBotOptimization } from "@/hooks/useBotOptimization";
-import { useBotTemplate } from "@/hooks/useBotTemplate";
-import { useBacktest } from "@/hooks/useBacktest";
+import {
+  useBotOptimization,
+  useBotTemplate,
+  useBacktest,
+} from "@hooks/queries";
 import type {
   BotOptimizationRequest,
   LLMModel,
@@ -235,7 +237,7 @@ const OptimizationDialog: React.FC<OptimizationDialogProps> = ({
     };
 
     try {
-      await optimizeBot(requestData).unwrap();
+      await optimizeBot(requestData);
       // Pass optimization parameters to the parent component
       onSuccess({
         botTemplateId: selectedTemplate,

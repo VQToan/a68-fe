@@ -14,7 +14,13 @@ import AddIcon from "@mui/icons-material/Add";
 import ModuleBotList from "./ModuleBotList";
 import ModuleBotForm from "./ModuleBotForm";
 import type { FormMode } from "./ModuleBotForm";
-import { useModule } from "@hooks/useModule";
+import {
+  useModulesQuery,
+  useModuleByIdQuery,
+  useCreateModuleMutation,
+  useUpdateModuleMutation,
+  useDeleteModuleMutation,
+} from "@hooks/queries";
 import { useDebounce } from "@utils/debounceUtils";
 import { useNotification } from "@context/NotificationContext";
 import ConfirmDialog from "@components/ConfirmDialog";
@@ -24,20 +30,10 @@ import { areEqual } from "@/utils/common";
 import { useTranslation } from "react-i18next";
 
 const ModuleBot = () => {
-  // Use the moduleSlice through the useModule hook
-  const {
-    modules,
-    isLoading,
-    error,
-    currentModule,
-    getModules,
-    getModuleById,
-    createModule,
-    updateModule,
-    deleteModule,
-    clearError,
-    clearCurrentModule,
-  } = useModule();
+  // Use TanStack Query mutations
+  const createMutation = useCreateModuleMutation();
+  const updateMutation = useUpdateModuleMutation();
+  const deleteMutation = useDeleteModuleMutation();
 
   // Use the notification context
   const { showNotification } = useNotification();
@@ -51,6 +47,7 @@ const ModuleBot = () => {
   const [duplicateModuleData, setDuplicateModuleData] = useState<
     Partial<IModuleBot> | undefined
   >(undefined);
+  const [editingModuleId, setEditingModuleId] = useState<string | null>(null);
 
   // State for confirm delete dialog
   const [confirmDelete, setConfirmDelete] = useState<{
@@ -63,25 +60,26 @@ const ModuleBot = () => {
     name: "",
   });
 
-  // Initial fetch
-  useEffect(() => {
-    getModules();
-  }, []);
+  // Use TanStack Query for data fetching
+  const {
+    data: modules = [],
+    isLoading,
+    error,
+  } = useModulesQuery(debouncedSearchTerm || undefined);
 
-  // Search with debounce
-  useEffect(() => {
-    if (debouncedSearchTerm !== undefined) {
-      getModules(debouncedSearchTerm);
-    }
-  }, [debouncedSearchTerm]);
+  // Fetch current module when editing/viewing
+  const { data: currentModule } = useModuleByIdQuery(
+    editingModuleId ?? undefined
+  );
 
   // Show error notification when error occurs
   useEffect(() => {
     if (error) {
-      showNotification(error, "error");
-      clearError();
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      showNotification(errorMessage, "error");
     }
-  }, [error]);
+  }, [error, showNotification]);
 
   // Handle search
   const handleSearch = useCallback(
@@ -93,24 +91,21 @@ const ModuleBot = () => {
   );
 
   // Handle dialog open/close
-  const handleOpenDialog = useCallback(
-    (mode: FormMode = "create") => {
-      setDialogMode(mode);
-      if (mode === "create") {
-        setDuplicateModuleData(undefined);
-        clearCurrentModule();
-      }
-      setOpenDialog(true);
-    },
-    [clearCurrentModule]
-  );
+  const handleOpenDialog = useCallback((mode: FormMode = "create") => {
+    setDialogMode(mode);
+    if (mode === "create") {
+      setDuplicateModuleData(undefined);
+      setEditingModuleId(null);
+    }
+    setOpenDialog(true);
+  }, []);
 
   const handleCloseDialog = useCallback(() => {
     setOpenDialog(false);
     // Clear the current module when dialog closes
-    clearCurrentModule();
+    setEditingModuleId(null);
     setDuplicateModuleData(undefined);
-  }, [clearCurrentModule]);
+  }, []);
 
   // Handle form submission (add or update module)
   const handleSubmitModule = useCallback(
@@ -118,19 +113,36 @@ const ModuleBot = () => {
       try {
         if (dialogMode === "create") {
           // Create new module
-          await createModule(formData);
-          showNotification(t("moduleBot.notifications.createSuccess"), "success");
+          await createMutation.mutateAsync(formData);
+          showNotification(
+            t("moduleBot.notifications.createSuccess"),
+            "success"
+          );
         } else if (dialogMode === "edit" && currentModule) {
           // Update existing module
-          await updateModule(currentModule._id, formData);
-          showNotification(t("moduleBot.notifications.updateSuccess"), "success");
+          await updateMutation.mutateAsync({
+            id: currentModule._id,
+            data: formData,
+          });
+          showNotification(
+            t("moduleBot.notifications.updateSuccess"),
+            "success"
+          );
         }
         handleCloseDialog();
       } catch (error) {
         console.error("Error submitting module bot:", error);
       }
     },
-    [createModule, currentModule, dialogMode, handleCloseDialog, showNotification, t, updateModule]
+    [
+      createMutation,
+      currentModule,
+      dialogMode,
+      handleCloseDialog,
+      showNotification,
+      t,
+      updateMutation,
+    ]
   );
 
   // Handle edit mode toggle from view mode
@@ -140,45 +152,34 @@ const ModuleBot = () => {
 
   // Handle view module details
   const handleViewModule = useCallback(
-    async (id: string) => {
-      try {
-        await getModuleById(id);
-        handleOpenDialog("view");
-      } catch (error) {
-        console.error("Error fetching module details:", error);
-      }
+    (id: string) => {
+      setEditingModuleId(id);
+      handleOpenDialog("view");
     },
-    [getModuleById, handleOpenDialog]
+    [handleOpenDialog]
   );
 
   // Handle edit module directly
   const handleEditModule = useCallback(
-    async (id: string) => {
-      try {
-        await getModuleById(id);
-        handleOpenDialog("edit");
-      } catch (error) {
-        console.error("Error fetching module details:", error);
-      }
+    (id: string) => {
+      setEditingModuleId(id);
+      handleOpenDialog("edit");
     },
-    [getModuleById, handleOpenDialog]
+    [handleOpenDialog]
   );
 
-  const handleDuplicateModule = useCallback(
-    (module: IModuleBot) => {
-      clearCurrentModule();
-      setDuplicateModuleData({
-        name: `${module.name} Copy`,
-        name_in_source: `${module.name_in_source}_copy`,
-        description: module.description,
-        type: module.type,
-        is_future: module.is_future,
-      });
-      setDialogMode("create");
-      setOpenDialog(true);
-    },
-    [clearCurrentModule]
-  );
+  const handleDuplicateModule = useCallback((module: IModuleBot) => {
+    setEditingModuleId(null);
+    setDuplicateModuleData({
+      name: `${module.name} Copy`,
+      name_in_source: `${module.name_in_source}_copy`,
+      description: module.description,
+      type: module.type,
+      is_future: module.is_future,
+    });
+    setDialogMode("create");
+    setOpenDialog(true);
+  }, []);
 
   // Handle opening confirm delete dialog
   const handleOpenDeleteConfirm = useCallback(
@@ -206,13 +207,19 @@ const ModuleBot = () => {
     if (!confirmDelete.id) return;
 
     try {
-      await deleteModule(confirmDelete.id);
+      await deleteMutation.mutateAsync(confirmDelete.id);
       showNotification(t("moduleBot.notifications.deleteSuccess"), "success");
       handleCloseDeleteConfirm();
     } catch (error) {
       console.error("Error deleting module bot:", error);
     }
-  }, [confirmDelete.id, deleteModule, handleCloseDeleteConfirm, showNotification, t]);
+  }, [
+    confirmDelete.id,
+    deleteMutation,
+    handleCloseDeleteConfirm,
+    showNotification,
+    t,
+  ]);
 
   // Create form footer based on dialog mode
   const getModalFooter = useCallback(() => {
@@ -232,17 +239,22 @@ const ModuleBot = () => {
         </>
       );
     }
-    
+
     return (
       <>
         <Button onClick={handleCloseDialog} variant="outlined">
           {t("common.cancel")}
         </Button>
-        <Button 
+        <Button
           onClick={() => {
-            const form = document.getElementById('module-bot-form') as HTMLFormElement;
-            if (form) form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-          }} 
+            const form = document.getElementById(
+              "module-bot-form"
+            ) as HTMLFormElement;
+            if (form)
+              form.dispatchEvent(
+                new Event("submit", { cancelable: true, bubbles: true })
+              );
+          }}
           variant="contained"
         >
           {t("common.save")}
@@ -264,7 +276,15 @@ const ModuleBot = () => {
 
   return (
     <Box>
-      <Paper elevation={3} sx={{ p: { xs: 1.5, sm: 2.5, md: 3 }, mb: 3, overflow: 'hidden', borderRadius: { xs: 1.5, md: 2 } }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: { xs: 1.5, sm: 2.5, md: 3 },
+          mb: 3,
+          overflow: "hidden",
+          borderRadius: { xs: 1.5, md: 2 },
+        }}
+      >
         <Grid
           container
           spacing={2}
@@ -272,13 +292,26 @@ const ModuleBot = () => {
           wrap="wrap"
           justifyContent="space-between"
         >
-          <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ flexGrow: 1, minWidth: 0 }}>
+          <Grid
+            size={{ xs: "auto", md: "auto" }}
+            sx={{ flexGrow: 1, minWidth: 0 }}
+          >
             <Typography variant="h5" component="h1" gutterBottom>
               {t("moduleBot.pageTitle")}
             </Typography>
           </Grid>
-          <Grid size={{ xs: 'auto', md: 'auto' }} sx={{ ml: { xs: 'auto', md: 0 } }}>
-            <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <Grid
+            size={{ xs: "auto", md: "auto" }}
+            sx={{ ml: { xs: "auto", md: 0 } }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                gap: 1.5,
+                flexWrap: "wrap",
+                justifyContent: "flex-end",
+              }}
+            >
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
@@ -287,13 +320,16 @@ const ModuleBot = () => {
                 sx={{
                   px: { xs: 1.25, sm: 2 },
                   minHeight: 40,
-                  minWidth: { xs: 44, sm: 'auto' },
-                  '& .MuiButton-startIcon': {
+                  minWidth: { xs: 44, sm: "auto" },
+                  "& .MuiButton-startIcon": {
                     mr: { xs: 0, sm: 1 },
                   },
                 }}
               >
-                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
                   {t("moduleBot.addNew")}
                 </Box>
               </Button>
@@ -338,10 +374,11 @@ const ModuleBot = () => {
         footer={getModalFooter()}
       >
         <ModuleBotForm
-          initialData=
-            {dialogMode === "create"
+          initialData={
+            dialogMode === "create"
               ? duplicateModuleData || {}
-              : currentModule || {}}
+              : currentModule || {}
+          }
           onSubmit={handleSubmitModule}
           mode={dialogMode}
           formId="module-bot-form"
@@ -352,7 +389,9 @@ const ModuleBot = () => {
       <ConfirmDialog
         open={confirmDelete.open}
         title={t("moduleBot.confirmDeleteTitle")}
-        message={t("moduleBot.confirmDeleteMessage", { name: confirmDelete.name })}
+        message={t("moduleBot.confirmDeleteMessage", {
+          name: confirmDelete.name,
+        })}
         confirmLabel={t("common.delete")}
         confirmColor="error"
         onConfirm={handleDeleteModule}

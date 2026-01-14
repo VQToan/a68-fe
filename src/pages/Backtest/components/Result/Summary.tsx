@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CloseIcon from "@mui/icons-material/Close";
-import { useBacktest } from "@/hooks/useBacktest";
+import { useBacktest } from "@hooks/queries";
 import { areEqual, formatDate } from "@/utils/common";
 import { useTranslation } from "react-i18next";
 
@@ -132,9 +132,7 @@ const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
           justifyItems: "start",
         }}
       >
-        <Typography variant="body1">
-          {t("backtest.summary.noData")}
-        </Typography>
+        <Typography variant="body1">{t("backtest.summary.noData")}</Typography>
       </Paper>
     );
   }
@@ -157,7 +155,8 @@ const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
       <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
         <Chip
           label={t("backtest.summary.symbolChip", {
-            symbol: currentProcess.parameters?.SYMBOL?.toUpperCase() ||
+            symbol:
+              currentProcess.parameters?.SYMBOL?.toUpperCase() ||
               t("common.notAvailable"),
           })}
           color="primary"
@@ -194,7 +193,8 @@ const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
       </Button>
       <Chip
         label={t("backtest.summary.tradeInterval", {
-          value: currentProcess.parameters?.INTERVAL_1 || t("common.notAvailable"),
+          value:
+            currentProcess.parameters?.INTERVAL_1 || t("common.notAvailable"),
         })}
         color="secondary"
         variant="outlined"
@@ -202,7 +202,8 @@ const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
       />
       <Chip
         label={t("backtest.summary.trendInterval", {
-          value: currentProcess.parameters?.INTERVAL_2 || t("common.notAvailable"),
+          value:
+            currentProcess.parameters?.INTERVAL_2 || t("common.notAvailable"),
         })}
         color="secondary"
         variant="outlined"
@@ -211,7 +212,9 @@ const Summary: React.FC<SummaryProps> = ({ id, setSymbol }) => {
       {/* quantity */}
       <Chip
         label={t("backtest.summary.quantity", {
-          value: currentProcess.parameters?.ENTRY_PERCENTAGE || t("common.notAvailable"),
+          value:
+            currentProcess.parameters?.ENTRY_PERCENTAGE ||
+            t("common.notAvailable"),
         })}
         color="secondary"
         variant="outlined"

@@ -24,9 +24,11 @@ import {
   CardContent,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useBotOptimization } from "@/hooks/useBotOptimization";
-import { useBacktest } from "@/hooks/useBacktest";
-import { useBotTemplate } from "@/hooks/useBotTemplate";
+import {
+  useBotOptimization,
+  useBotTemplate,
+  useBacktest,
+} from "@hooks/queries";
 import { useNotification } from "@/context/NotificationContext";
 import type { OptimizedParameter } from "@/types/botOptimization.type";
 import type { BacktestProcessCreate } from "@/types/backtest.type";
@@ -113,9 +115,11 @@ const OptimizationResults: React.FC<OptimizationResultsProps> = ({
       };
 
       // Apply optimized parameters
-      optimizationResults.optimized_parameters.forEach((param) => {
-        currentParams[param.name] = param.optimized_value;
-      });
+      optimizationResults.optimized_parameters.forEach(
+        (param: OptimizedParameter) => {
+          currentParams[param.name] = param.optimized_value;
+        }
+      );
 
       // Create new backtest process
       const newBacktest: BacktestProcessCreate = {
