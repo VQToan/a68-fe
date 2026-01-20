@@ -26,6 +26,3 @@ dist-ssr
 .env.local
 .env.example
 
-# AI/UX Pro Max
-.agent
-.shared
