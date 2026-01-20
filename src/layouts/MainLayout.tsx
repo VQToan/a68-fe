@@ -490,6 +490,44 @@ const MainLayout = () => {
               </ListItem>
             )}
 
+            <ListItem disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                sx={{
+                  height: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                  },
+                }}
+                onClick={() => handleNavigation("/backtest")}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center",
+                    display: "flex",
+                    alignItems: "center",
+                    width: 24,
+                    height: 24,
+                  }}
+                >
+                  <BarChartIcon
+                    sx={{
+                      fontSize: 24,
+                      width: 24,
+                      height: 24,
+                      transition: "none",
+                    }}
+                  />
+                </ListItemIcon>
+                <ListItemText
+                  primary={t("navigation.backtest")}
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
+              </ListItemButton>
+            </ListItem>
             {/* Admin only: Trading Template */}
             {isAdmin && (
               <ListItem disablePadding sx={{ display: "block" }}>
@@ -531,45 +569,6 @@ const MainLayout = () => {
                 </ListItemButton>
               </ListItem>
             )}
-
-            <ListItem disablePadding sx={{ display: "block" }}>
-              <ListItemButton
-                sx={{
-                  height: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                  "&:hover": {
-                    backgroundColor: "rgba(255,255,255,0.1)",
-                  },
-                }}
-                onClick={() => handleNavigation("/backtest")}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
-                    display: "flex",
-                    alignItems: "center",
-                    width: 24,
-                    height: 24,
-                  }}
-                >
-                  <BarChartIcon
-                    sx={{
-                      fontSize: 24,
-                      width: 24,
-                      height: 24,
-                      transition: "none",
-                    }}
-                  />
-                </ListItemIcon>
-                <ListItemText
-                  primary={t("navigation.backtest")}
-                  sx={{ opacity: open ? 1 : 0 }}
-                />
-              </ListItemButton>
-            </ListItem>
 
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
