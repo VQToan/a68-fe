@@ -33,6 +33,7 @@ import SmartToyIcon from "@mui/icons-material/SmartToy";
 import CurrencyBitcoinIcon from "@mui/icons-material/CurrencyBitcoin";
 import BarChartIcon from "@mui/icons-material/BarChart"; // Import icon for Backtest
 import DescriptionIcon from "@mui/icons-material/Description"; // Import icon for Bot Template
+import ViewModuleIcon from "@mui/icons-material/ViewModule"; // Import icon for Trading Template
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance"; // Import icon for Trading Account
 import { useAuth } from "@hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -68,7 +69,7 @@ const MainLayout = () => {
     (event: React.MouseEvent<HTMLElement>) => {
       setAnchorEl(event.currentTarget);
     },
-    [setAnchorEl]
+    [setAnchorEl],
   );
 
   const handleUserMenuClose = useCallback(() => {
@@ -98,7 +99,7 @@ const MainLayout = () => {
         setOpen(false);
       }
     },
-    [isMobile, navigate]
+    [isMobile, navigate],
   );
 
   // const userName = cognitoUser?.fullName || cognitoUser?.email || "User";
@@ -117,7 +118,7 @@ const MainLayout = () => {
     (name: string) => {
       return name.charAt(0).toUpperCase();
     },
-    [cognitoUser]
+    [cognitoUser],
   );
 
   return (
@@ -489,6 +490,48 @@ const MainLayout = () => {
               </ListItem>
             )}
 
+            {/* Admin only: Trading Template */}
+            {isAdmin && (
+              <ListItem disablePadding sx={{ display: "block" }}>
+                <ListItemButton
+                  sx={{
+                    height: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
+                    "&:hover": {
+                      backgroundColor: "rgba(255,255,255,0.1)",
+                    },
+                  }}
+                  onClick={() => handleNavigation("/trading-template")}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                      display: "flex",
+                      alignItems: "center",
+                      width: 24,
+                      height: 24,
+                    }}
+                  >
+                    <ViewModuleIcon
+                      sx={{
+                        fontSize: 24,
+                        width: 24,
+                        height: 24,
+                        transition: "none",
+                      }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t("navigation.tradingTemplate")}
+                    sx={{ opacity: open ? 1 : 0 }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            )}
+
             <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{
@@ -663,8 +706,8 @@ const MainLayout = () => {
             marginLeft: isCompact
               ? 0
               : open
-              ? 0
-              : `calc(-${drawerWidth}px + ${theme.spacing(9)})`,
+                ? 0
+                : `calc(-${drawerWidth}px + ${theme.spacing(9)})`,
             transition: theme.transitions.create("margin", {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,

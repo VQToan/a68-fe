@@ -110,6 +110,17 @@ export const queryKeys = {
       [...queryKeys.botOptimization.all, "defaultPrompt"] as const,
   },
 
+  // Trading Templates
+  tradingTemplates: {
+    all: ["tradingTemplates"] as const,
+    lists: () => [...queryKeys.tradingTemplates.all, "list"] as const,
+    list: () => [...queryKeys.tradingTemplates.lists()] as const,
+    allList: () => [...queryKeys.tradingTemplates.all, "allList"] as const,
+    details: () => [...queryKeys.tradingTemplates.all, "detail"] as const,
+    detail: (id: string) =>
+      [...queryKeys.tradingTemplates.details(), id] as const,
+  },
+
   // Chart Data
   chart: {
     all: ["chart"] as const,

@@ -20,26 +20,40 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  Divider,
   Skeleton,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
 } from "@mui/material";
+import { useBacktestResult } from "@/hooks/queries";
+import { useTranslation } from "react-i18next";
 import PerformanceStats from "./PerformanceStats";
+import BacktestChart from "./BacktestChart";
 import { formatDate, formatNumber, areEqual } from "@/utils/common";
 import type { BacktestTrade } from "@/services/backtest.service";
-import { useBacktestResult } from "@hooks/queries";
-import BacktestChart from "./BacktestChart";
-import { useTranslation } from "react-i18next";
 
-const INTERVALS = ["1m", "5m", "15m", "30m", "1h", "4h", "1d"];
+const INTERVALS = [
+  "1m",
+  "3m",
+  "5m",
+  "15m",
+  "30m",
+  "1h",
+  "2h",
+  "4h",
+  "6h",
+  "8h",
+  "12h",
+  "1d",
+  "3d",
+  "1w",
+  "1M",
+];
 
 interface ResultViewProps {
   selectedResultId: string;
   symbol: string;
-  initialInterval?: string;
 }
 
 const ResultView: React.FC<ResultViewProps> = ({
@@ -55,18 +69,19 @@ const ResultView: React.FC<ResultViewProps> = ({
     loading: loadingDetail,
     resultDetails,
   } = useBacktestResult();
+
   const { t } = useTranslation();
 
   const resultDetail = useMemo(
     () => resultDetails[selectedResultId],
-    [resultDetails, selectedResultId]
+    [resultDetails, selectedResultId],
   );
 
   const metrics = useMemo(() => resultDetail?.metrics || {}, [resultDetail]);
 
   const trades = useMemo(
     () => resultDetail?.trades || ([] as BacktestTrade[]),
-    [resultDetail]
+    [resultDetail],
   );
   const handleIntervalChange = useCallback((event: any) => {
     setSelectedInterval(event.target.value as string);
@@ -108,7 +123,6 @@ const ResultView: React.FC<ResultViewProps> = ({
 
   return (
     <>
-      <Divider sx={{ my: 3 }} />
       {/* Performance Stats and Trade List */}
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 4 }}>
@@ -183,7 +197,7 @@ const ResultView: React.FC<ResultViewProps> = ({
                                   sx={{ mr: 1 }}
                                   label={t("backtest.results.view.longTrades", {
                                     count: trades.filter((t: BacktestTrade) =>
-                                      t.side.includes("LONG")
+                                      t.side.includes("LONG"),
                                     ).length,
                                   })}
                                 />
@@ -194,9 +208,9 @@ const ResultView: React.FC<ResultViewProps> = ({
                                     "backtest.results.view.shortTrades",
                                     {
                                       count: trades.filter((t: BacktestTrade) =>
-                                        t.side.includes("SHORT")
+                                        t.side.includes("SHORT"),
                                       ).length,
-                                    }
+                                    },
                                   )}
                                 />
                               </>
@@ -293,8 +307,8 @@ const ResultView: React.FC<ResultViewProps> = ({
                                 (trade.pnl || 0) > 0
                                   ? "success.main"
                                   : (trade.pnl || 0) < 0
-                                  ? "error.main"
-                                  : "inherit",
+                                    ? "error.main"
+                                    : "inherit",
                             }}
                           >
                             {trade.pnl ? formatNumber(trade.pnl) : "-"}
@@ -305,8 +319,8 @@ const ResultView: React.FC<ResultViewProps> = ({
                                 (trade.position_pnl || 0) > 0
                                   ? "success.main"
                                   : (trade.position_pnl || 0) < 0
-                                  ? "error.main"
-                                  : "inherit",
+                                    ? "error.main"
+                                    : "inherit",
                             }}
                           >
                             {trade.position_pnl
@@ -319,8 +333,8 @@ const ResultView: React.FC<ResultViewProps> = ({
                                 (trade.balance || 0) > 0
                                   ? "success.main"
                                   : (trade.balance || 0) < 0
-                                  ? "error.main"
-                                  : "inherit",
+                                    ? "error.main"
+                                    : "inherit",
                             }}
                           >
                             {trade.balance ? formatNumber(trade.balance) : "-"}

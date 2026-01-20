@@ -110,5 +110,16 @@ export {
   useBotOptimization,
 } from "./useBotOptimizationQueries";
 
+// Trading Template Queries & Mutations
+export {
+  useTradingTemplatesQuery,
+  useTradingTemplateByIdQuery,
+  useAllTradingTemplatesQuery,
+  useReleaseTemplateMutation,
+  useToggleTemplateActiveMutation,
+  useDeleteTemplateMutation,
+  useUpdateTradingTemplateMutation,
+} from "./useTradingTemplateQueries";
+
 // Backtest Result Queries (re-export for convenience)
 export { useBacktestResult } from "./useBacktestResultQueries";
