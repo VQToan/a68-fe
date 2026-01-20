@@ -7,8 +7,6 @@ import {
   Grid,
   IconButton,
   Button,
-  Snackbar,
-  Alert,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
@@ -20,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import ReleaseTemplateDialog from "./ReleaseTemplateDialog";
 import { useReleaseTemplateMutation } from "@/hooks/queries";
 import type { ReleaseTemplateInput } from "@/types/tradingTemplate.type";
+import { useNotification } from "@context/NotificationContext";
 
 interface BacktestResultProps {
   id?: string;
@@ -38,18 +37,10 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
     string | undefined
   >();
   const { t } = useTranslation();
+  const { showNotification } = useNotification();
 
   // Release Template State
   const [isReleaseDialogOpen, setIsReleaseDialogOpen] = useState(false);
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: "success" | "error";
-  }>({
-    open: false,
-    message: "",
-    severity: "success",
-  });
 
   const { mutate: releaseTemplate, isPending: isReleasing } =
     useReleaseTemplateMutation();
@@ -64,11 +55,10 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
 
   const handleOpenReleaseDialog = () => {
     if (!id) {
-      setSnackbar({
-        open: true,
-        message: t("backtest.errors.processIdMissing", "Process ID not found"),
-        severity: "error",
-      });
+      showNotification(
+        t("backtest.errors.processIdMissing", "Process ID not found"),
+        "error",
+      );
       return;
     }
     setIsReleaseDialogOpen(true);
@@ -78,10 +68,6 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
     setIsReleaseDialogOpen(false);
   };
 
-  const handleCloseSnackbar = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
   const handleReleaseTemplate = (data: ReleaseTemplateInput) => {
     if (!id) return;
 
@@ -89,25 +75,22 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
       { processId: id, data },
       {
         onSuccess: () => {
-          setSnackbar({
-            open: true,
-            message: t(
+          showNotification(
+            t(
               "backtest.messages.releaseSuccess",
               "Template released successfully!",
             ),
-            severity: "success",
-          });
+            "success",
+          );
           handleCloseReleaseDialog();
         },
         onError: (error: any) => {
-          setSnackbar({
-            open: true,
-            message:
-              error?.response?.data?.detail ||
+          showNotification(
+            error?.response?.data?.detail ||
               error?.message ||
               t("backtest.errors.releaseFailed", "Failed to release template"),
-            severity: "error",
-          });
+            "error",
+          );
         },
       },
     );
@@ -165,28 +148,13 @@ const BacktestResult: React.FC<BacktestResultProps> = ({
         <ResultView selectedResultId={selectedResultId} symbol={symbol} />
       )}
 
-      {/* Release Dialog & Snackbar */}
+      {/* Release Dialog */}
       <ReleaseTemplateDialog
         open={isReleaseDialogOpen}
         onClose={handleCloseReleaseDialog}
         onSubmit={handleReleaseTemplate}
         loading={isReleasing}
       />
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </Container>
   );
 };
