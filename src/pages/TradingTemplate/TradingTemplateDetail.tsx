@@ -179,7 +179,7 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
                 value={formData.description}
                 onChange={handleChange}
                 multiline
-                rows={2}
+                rows={4}
                 variant="outlined"
                 size="small"
                 sx={{ mt: 1 }}
