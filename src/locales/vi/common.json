@@ -16,6 +16,7 @@
     "dashboard": "Bảng điều khiển",
     "moduleBot": "Module Bot",
     "botTemplate": "Mẫu Bot",
+    "tradingTemplate": "Mẫu Trading",
     "backtest": "Backtest",
     "trading": "Giao dịch Crypto",
     "tradingAccounts": "Tài khoản Trading"
@@ -1204,6 +1205,44 @@
         "invalidQuantity": "Vui lòng nhập số lượng hợp lệ",
         "submit": "Không thể đặt lệnh"
       }
+    }
+  },
+  "tradingTemplate": {
+    "detail": {
+      "title": "Chi tiết Template",
+      "name": "Tên",
+      "description": "Mô tả",
+      "createdAt": "Ngày tạo",
+      "type": "Loại",
+      "status": "Trạng thái",
+      "modules": "Các Module"
+    },
+    "fields": {
+      "name": "Tên",
+      "description": "Mô tả",
+      "createdAt": "Ngày tạo",
+      "riskLevel": "Mức độ rủi ro",
+      "tradingStyle": "Phong cách giao dịch",
+      "entryModule": "Module Entry",
+      "exitModule": "Module Exit",
+      "stopLossModule": "Module Stop Loss",
+      "dcaCutlossModule": "Module DCA/Cutloss",
+      "entryHedgeModule": "Module Entry Hedge",
+      "afterHedgeModule": "Module After Hedge"
+    },
+    "riskLevels": {
+      "low": "Rủi ro thấp",
+      "medium": "Rủi ro trung bình",
+      "high": "Rủi ro cao"
+    },
+    "tradingStyles": {
+      "scalping": "Scalping",
+      "day_trade": "Giao dịch trong ngày",
+      "swing": "Swing"
+    },
+    "notifications": {
+      "updateSuccess": "Cập nhật template thành công",
+      "updateFailed": "Cập nhật template thất bại"
     }
   }
 }

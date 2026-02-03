@@ -11,6 +11,10 @@ import {
   FormControlLabel,
   Switch,
   CircularProgress,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { Save as SaveIcon } from "@mui/icons-material";
 import { formatDate } from "@/utils/common";
@@ -19,6 +23,7 @@ import {
   useUpdateTradingTemplateMutation,
   useTradingTemplateByIdQuery,
 } from "@/hooks/queries";
+import type { RiskLevel, TradingStyle } from "@/types/tradingTemplate.type";
 import { useNotification } from "@/context/NotificationContext";
 import Modal from "@/components/Modal";
 
@@ -47,6 +52,8 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
     name: "",
     description: "",
     is_active: false,
+    risk_level: "" as RiskLevel | "",
+    trading_style: "" as TradingStyle | "",
   });
 
   useEffect(() => {
@@ -55,6 +62,8 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
         name: template.name,
         description: template.description || "",
         is_active: template.is_active,
+        risk_level: (template as any).risk_level || "",
+        trading_style: (template as any).trading_style || "",
       });
     }
   }, [template]);
@@ -74,12 +83,34 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
     }));
   };
 
+  const handleSelectChange = (name: string) => (e: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: e.target.value,
+    }));
+  };
+
   const handleSave = async () => {
     if (!template) return;
     try {
+      // Filter out empty strings for optional fields
+      const updateData: any = {
+        name: formData.name,
+        description: formData.description,
+        is_active: formData.is_active,
+      };
+
+      if (formData.risk_level) {
+        updateData.risk_level = formData.risk_level;
+      }
+
+      if (formData.trading_style) {
+        updateData.trading_style = formData.trading_style;
+      }
+
       await updateMutation.mutateAsync({
         id: template._id,
-        data: formData,
+        data: updateData,
       });
       showNotification(
         t("tradingTemplate.notifications.updateSuccess", "Template updated"),
@@ -184,6 +215,57 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
                 size="small"
                 sx={{ mt: 1 }}
               />
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
+              <FormControl fullWidth size="small" sx={{ mt: 1 }}>
+                <InputLabel id="risk-level-label">
+                  {t("tradingTemplate.fields.riskLevel", "Risk Level")}
+                </InputLabel>
+                <Select
+                  labelId="risk-level-label"
+                  value={formData.risk_level}
+                  label={t("tradingTemplate.fields.riskLevel", "Risk Level")}
+                  onChange={handleSelectChange("risk_level")}
+                >
+                  <MenuItem value="low">
+                    {t("tradingTemplate.riskLevels.low", "Low Risk")}
+                  </MenuItem>
+                  <MenuItem value="medium">
+                    {t("tradingTemplate.riskLevels.medium", "Medium Risk")}
+                  </MenuItem>
+                  <MenuItem value="high">
+                    {t("tradingTemplate.riskLevels.high", "High Risk")}
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
+              <FormControl fullWidth size="small" sx={{ mt: 1 }}>
+                <InputLabel id="trading-style-label">
+                  {t("tradingTemplate.fields.tradingStyle", "Trading Style")}
+                </InputLabel>
+                <Select
+                  labelId="trading-style-label"
+                  value={formData.trading_style}
+                  label={t(
+                    "tradingTemplate.fields.tradingStyle",
+                    "Trading Style",
+                  )}
+                  onChange={handleSelectChange("trading_style")}
+                >
+                  <MenuItem value="scalping">
+                    {t("tradingTemplate.tradingStyles.scalping", "Scalping")}
+                  </MenuItem>
+                  <MenuItem value="day_trade">
+                    {t("tradingTemplate.tradingStyles.day_trade", "Day Trade")}
+                  </MenuItem>
+                  <MenuItem value="swing">
+                    {t("tradingTemplate.tradingStyles.swing", "Swing")}
+                  </MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>

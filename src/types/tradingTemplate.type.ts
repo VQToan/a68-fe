@@ -8,10 +8,15 @@ export interface ToggleActiveInput {
   is_active: boolean;
 }
 
+export type RiskLevel = "low" | "medium" | "high";
+export type TradingStyle = "scalping" | "day_trade" | "swing";
+
 export interface TradingTemplateUpdate {
   name?: string;
   description?: string;
   is_active?: boolean;
+  risk_level?: RiskLevel;
+  trading_style?: TradingStyle;
 }
 
 export interface BotModuleInfo {
