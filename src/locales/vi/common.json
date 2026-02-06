@@ -1215,7 +1215,8 @@
       "createdAt": "Ngày tạo",
       "type": "Loại",
       "status": "Trạng thái",
-      "modules": "Các Module"
+      "modules": "Các Module",
+      "parameters": "Thông số"
     },
     "fields": {
       "name": "Tên",

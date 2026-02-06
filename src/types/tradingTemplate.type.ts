@@ -46,6 +46,7 @@ export interface TradingTemplate {
   updated_at: string;
   aggregated_metrics?: any;
   bot_modules?: BotModules | null;
+  parameters?: Record<string, any>;
 }
 
 export interface TradingTemplateListItem {

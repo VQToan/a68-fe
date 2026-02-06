@@ -15,8 +15,13 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Collapse,
 } from "@mui/material";
-import { Save as SaveIcon } from "@mui/icons-material";
+import {
+  Save as SaveIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
+} from "@mui/icons-material";
 import { formatDate } from "@/utils/common";
 import { useTranslation } from "react-i18next";
 import {
@@ -55,6 +60,8 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
     risk_level: "" as RiskLevel | "",
     trading_style: "" as TradingStyle | "",
   });
+
+  const [parametersExpanded, setParametersExpanded] = useState(false);
 
   useEffect(() => {
     if (template) {
@@ -408,6 +415,59 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
               </Paper>
             </Grid>
           </Grid>
+
+          {/* Parameters Section */}
+          {template.parameters &&
+            Object.keys(template.parameters).length > 0 && (
+              <>
+                <Divider sx={{ my: 3 }} />
+
+                <Box>
+                  <Button
+                    onClick={() => setParametersExpanded(!parametersExpanded)}
+                    endIcon={
+                      parametersExpanded ? (
+                        <ExpandLessIcon />
+                      ) : (
+                        <ExpandMoreIcon />
+                      )
+                    }
+                    sx={{ mb: 1 }}
+                  >
+                    {t("tradingTemplate.detail.parameters", "Parameters")} (
+                    {Object.keys(template.parameters).length})
+                  </Button>
+
+                  <Collapse in={parametersExpanded}>
+                    <Paper variant="outlined" sx={{ p: 2, mt: 1 }}>
+                      <Grid container spacing={2}>
+                        {Object.entries(template.parameters).map(
+                          ([key, value]) => (
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={key}>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ display: "block", mb: 0.5 }}
+                              >
+                                {key}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                sx={{ wordBreak: "break-word" }}
+                              >
+                                {typeof value === "object"
+                                  ? JSON.stringify(value, null, 2)
+                                  : String(value)}
+                              </Typography>
+                            </Grid>
+                          ),
+                        )}
+                      </Grid>
+                    </Paper>
+                  </Collapse>
+                </Box>
+              </>
+            )}
         </Box>
       </Box>
     </Modal>

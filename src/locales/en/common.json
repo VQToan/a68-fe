@@ -1216,7 +1216,8 @@
       "createdAt": "Created At",
       "type": "Type",
       "status": "Status",
-      "modules": "Modules"
+      "modules": "Modules",
+      "parameters": "Parameters"
     },
     "fields": {
       "name": "Name",
