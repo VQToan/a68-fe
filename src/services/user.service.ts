@@ -28,7 +28,7 @@ export const updateUserRole = async (
   sub: string,
   data: UserRoleUpdateRequest,
 ): Promise<UserDetailResponse> => {
-  const response = await apiClient.put(`${API_BASE_PATH}/${sub}/role`, data);
+  const response = await apiClient.patch(`${API_BASE_PATH}/${sub}/role`, data);
   return response.data;
 };
 
@@ -37,6 +37,6 @@ export const updateUserStatus = async (
   sub: string,
   data: UserStatusUpdateRequest,
 ): Promise<UserDetailResponse> => {
-  const response = await apiClient.put(`${API_BASE_PATH}/${sub}/status`, data);
+  const response = await apiClient.patch(`${API_BASE_PATH}/${sub}/status`, data);
   return response.data;
 };
