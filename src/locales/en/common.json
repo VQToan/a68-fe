@@ -1293,7 +1293,8 @@
       "sections": {
         "basic": "Basic Information",
         "roleStatus": "Role & Status",
-        "subscription": "Subscription Information"
+        "subscription": "Subscription Information",
+        "changePackage": "Change Subscription Package"
       },
       "fields": {
         "sub": "User ID",
@@ -1305,15 +1306,31 @@
         "role": "Role",
         "isActive": "Active status",
         "currentPackage": "Current package",
-        "subscriptionEndDate": "Subscription end date"
+        "subscriptionEndDate": "Subscription end date",
+        "billingCycle": "Billing cycle",
+        "selectPackage": "Select package",
+        "startDate": "Start date",
+        "endDate": "End date"
       },
-      "onlySuperAdmin": "Only super admins can change roles"
+      "billingCycles": {
+        "monthly": "Monthly",
+        "yearly": "Yearly"
+      },
+      "changePackageButton": "Change Package",
+      "selectPackagePrompt": "Select a subscription package",
+      "packageFeatures": "Features",
+      "packagePrice": "Price",
+      "onlySuperAdmin": "Only super admins can change roles",
+      "onlySuperAdminPackage": "Only super admins can change subscription packages",
+      "noPackagesAvailable": "No packages available"
     },
     "notifications": {
       "roleUpdateSuccess": "User role updated successfully",
       "roleUpdateFailed": "Failed to update user role",
       "statusUpdateSuccess": "User status updated successfully",
       "statusUpdateFailed": "Failed to update user status",
+      "packageUpdateSuccess": "Subscription package updated successfully",
+      "packageUpdateFailed": "Failed to update subscription package",
       "paginationLimitation": "Previous page not supported with current API"
     },
     "confirmUpdateRole": {
@@ -1324,6 +1341,10 @@
       "title": "Toggle User Status",
       "messageEnable": "Are you sure you want to activate {{email}}?",
       "messageDisable": "Are you sure you want to deactivate {{email}}?"
+    },
+    "confirmChangePackage": {
+      "title": "Change Subscription Package",
+      "message": "Are you sure you want to change {{email}}'s subscription to {{packageName}} ({{billingCycle}})? This will suspend their current subscription and create a new one."
     }
   }
 }

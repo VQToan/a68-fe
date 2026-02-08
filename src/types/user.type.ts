@@ -37,3 +37,21 @@ export interface UserRoleUpdateRequest {
 export interface UserStatusUpdateRequest {
   enabled: boolean;
 }
+
+export interface SubscriptionPackage {
+  _id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  billing_cycle: "monthly" | "yearly";
+  features: string[];
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ForceUpdateSubscriptionRequest {
+  package_id: string;
+  start_date: string; // ISO 8601 format
+  end_date: string; // ISO 8601 format
+}

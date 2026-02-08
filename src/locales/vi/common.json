@@ -1292,7 +1292,8 @@
       "sections": {
         "basic": "Thông tin cơ bản",
         "roleStatus": "Vai trò & Trạng thái",
-        "subscription": "Thông tin đăng ký"
+        "subscription": "Thông tin đăng ký",
+        "changePackage": "Thay đổi gói đăng ký"
       },
       "fields": {
         "sub": "ID người dùng",
@@ -1304,15 +1305,31 @@
         "role": "Vai trò",
         "isActive": "Trạng thái hoạt động",
         "currentPackage": "Gói hiện tại",
-        "subscriptionEndDate": "Ngày hết hạn đăng ký"
+        "subscriptionEndDate": "Ngày hết hạn đăng ký",
+        "billingCycle": "Chu kỳ thanh toán",
+        "selectPackage": "Chọn gói",
+        "startDate": "Ngày bắt đầu",
+        "endDate": "Ngày kết thúc"
       },
-      "onlySuperAdmin": "Chỉ quản trị viên cấp cao mới có thể thay đổi vai trò"
+      "billingCycles": {
+        "monthly": "Hàng tháng",
+        "yearly": "Hàng năm"
+      },
+      "changePackageButton": "Thay đổi gói",
+      "selectPackagePrompt": "Chọn gói đăng ký",
+      "packageFeatures": "Tính năng",
+      "packagePrice": "Giá",
+      "onlySuperAdmin": "Chỉ quản trị viên cấp cao mới có thể thay đổi vai trò",
+      "onlySuperAdminPackage": "Chỉ quản trị viên cấp cao mới có thể thay đổi gói đăng ký",
+      "noPackagesAvailable": "Không có gói nào"
     },
     "notifications": {
       "roleUpdateSuccess": "Cập nhật vai trò người dùng thành công",
       "roleUpdateFailed": "Cập nhật vai trò người dùng thất bại",
       "statusUpdateSuccess": "Cập nhật trạng thái người dùng thành công",
       "statusUpdateFailed": "Cập nhật trạng thái người dùng thất bại",
+      "packageUpdateSuccess": "Cập nhật gói đăng ký thành công",
+      "packageUpdateFailed": "Cập nhật gói đăng ký thất bại",
       "paginationLimitation": "Không hỗ trợ quay lại trang trước với API hiện tại"
     },
     "confirmUpdateRole": {
@@ -1323,6 +1340,10 @@
       "title": "Thay đổi trạng thái người dùng",
       "messageEnable": "Bạn có chắc chắn muốn kích hoạt {{email}}?",
       "messageDisable": "Bạn có chắc chắn muốn vô hiệu hóa {{email}}?"
+    },
+    "confirmChangePackage": {
+      "title": "Thay đổi gói đăng ký",
+      "message": "Bạn có chắc chắn muốn thay đổi gói đăng ký của {{email}} thành {{packageName}} ({{billingCycle}})? Điều này sẽ tạm dừng gói hiện tại và tạo gói mới."
     }
   }
 }

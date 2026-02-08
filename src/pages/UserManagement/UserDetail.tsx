@@ -25,6 +25,7 @@ import { useNotification } from "@/context/NotificationContext";
 import { useAuth } from "@/hooks/useAuth";
 import Modal from "@/components/Modal";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import SubscriptionPackageManager from "@/components/SubscriptionPackageManager";
 
 interface UserDetailProps {
   userSub: string | null;
@@ -317,6 +318,13 @@ const UserDetail: React.FC<UserDetailProps> = ({ userSub, open, onClose }) => {
                 </Typography>
               </Grid>
             </Grid>
+
+            {/* Subscription Package Management */}
+            <SubscriptionPackageManager
+              userSub={user.sub}
+              userEmail={user.email || ""}
+              isSuperAdmin={isSuperAdmin}
+            />
           </Box>
         </Box>
       </Modal>

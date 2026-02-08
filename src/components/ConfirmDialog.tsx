@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo } from "react";
 import {
   Dialog,
   DialogActions,
@@ -8,10 +8,10 @@ import {
   Button,
   Typography,
   IconButton,
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import { areEqual } from '@/utils/common';
-import { useTranslation } from 'react-i18next';
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import { areEqual } from "@/utils/common";
+import { useTranslation } from "react-i18next";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -19,7 +19,15 @@ interface ConfirmDialogProps {
   message: string;
   confirmLabel?: string;
   cancelLabel?: string;
-  confirmColor?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning';
+  confirmColor?:
+    | "inherit"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "error"
+    | "info"
+    | "warning";
+  loading?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -30,13 +38,14 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   message,
   confirmLabel,
   cancelLabel,
-  confirmColor = 'error',
+  confirmColor = "error",
+  loading = false,
   onConfirm,
-  onCancel
+  onCancel,
 }) => {
   const { t } = useTranslation();
-  const resolvedConfirmLabel = confirmLabel ?? t('common.confirm');
-  const resolvedCancelLabel = cancelLabel ?? t('common.cancel');
+  const resolvedConfirmLabel = confirmLabel ?? t("common.confirm");
+  const resolvedCancelLabel = cancelLabel ?? t("common.cancel");
 
   return (
     <Dialog
@@ -46,33 +55,46 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       maxWidth="xs"
       PaperProps={{
         sx: {
-          borderRadius: 1
-        }
+          borderRadius: 1,
+        },
       }}
     >
-      <DialogTitle sx={{ 
-        borderBottom: 1, 
-        borderColor: 'divider', 
-        p: 2,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
+      <DialogTitle
+        sx={{
+          borderBottom: 1,
+          borderColor: "divider",
+          p: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Typography variant="h6">{title}</Typography>
-        <IconButton onClick={onCancel} size="small" sx={{ p: 0.5 }} aria-label={t('common.close')}>
+        <IconButton
+          onClick={onCancel}
+          size="small"
+          sx={{ p: 0.5 }}
+          aria-label={t("common.close")}
+        >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      
+
       <DialogContent sx={{ pt: 2, px: 3, pb: 1 }}>
         <DialogContentText>{message}</DialogContentText>
       </DialogContent>
-      
+
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={onCancel} variant="outlined">
+        <Button onClick={onCancel} variant="outlined" disabled={loading}>
           {resolvedCancelLabel}
         </Button>
-        <Button onClick={onConfirm} variant="contained" color={confirmColor} autoFocus>
+        <Button
+          onClick={onConfirm}
+          variant="contained"
+          color={confirmColor}
+          autoFocus
+          disabled={loading}
+        >
           {resolvedConfirmLabel}
         </Button>
       </DialogActions>

@@ -5,10 +5,15 @@ import {
   updateUserRole,
   updateUserStatus,
 } from "@/services/user.service";
+import {
+  getSubscriptionPackages,
+  forceUpdateUserSubscription,
+} from "@/services/subscription.service";
 import type {
   UserListParams,
   UserRoleUpdateRequest,
   UserStatusUpdateRequest,
+  ForceUpdateSubscriptionRequest,
 } from "@/types/user.type";
 
 export const USER_QUERY_KEYS = {
@@ -68,6 +73,35 @@ export const useUpdateUserStatusMutation = () => {
     }) => updateUserStatus(sub, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.lists() });
+    },
+  });
+};
+
+// Subscription packages query
+export const useSubscriptionPackagesQuery = (
+  billingCycle: "monthly" | "yearly" = "monthly",
+) => {
+  return useQuery({
+    queryKey: ["subscription-packages", billingCycle],
+    queryFn: () => getSubscriptionPackages(billingCycle),
+    staleTime: 300000, // 5 minutes
+  });
+};
+
+// Force update user subscription mutation
+export const useForceUpdateSubscriptionMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      userId,
+      data,
+    }: {
+      userId: string;
+      data: ForceUpdateSubscriptionRequest;
+    }) => forceUpdateUserSubscription(userId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.lists() });
+      queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.details() });
     },
   });
 };
