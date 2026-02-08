@@ -56,7 +56,7 @@ export const useUpdateUserRoleMutation = () => {
     }) => updateUserRole(sub, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.lists() });
-      queryClient.invalidateQueries({ queryKey: ["userDetail", variables.sub] });
+      queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.detail(variables.sub) });
     },
   });
 };
@@ -74,7 +74,7 @@ export const useUpdateUserStatusMutation = () => {
     }) => updateUserStatus(sub, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.lists() });
-      queryClient.invalidateQueries({ queryKey: ["userDetail", variables.sub] });
+      queryClient.invalidateQueries({ queryKey: USER_QUERY_KEYS.detail(variables.sub) });
     },
   });
 };

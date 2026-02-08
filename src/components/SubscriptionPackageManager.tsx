@@ -18,6 +18,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   useSubscriptionPackagesQuery,
   useForceUpdateSubscriptionMutation,
+  USER_QUERY_KEYS,
 } from "@/hooks/queries";
 import type { SubscriptionPackage } from "@/types/user.type";
 import { useNotification } from "@/context/NotificationContext";
@@ -109,7 +110,7 @@ const SubscriptionPackageManager: React.FC<SubscriptionPackageManagerProps> = ({
 
       // Invalidate user detail query to refresh data
       await queryClient.invalidateQueries({
-        queryKey: ["userDetail", userSub],
+        queryKey: USER_QUERY_KEYS.detail(userSub),
       });
 
       showNotification(
