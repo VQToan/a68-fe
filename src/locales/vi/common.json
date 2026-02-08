@@ -19,7 +19,8 @@
     "tradingTemplate": "Mẫu Trading",
     "backtest": "Backtest",
     "trading": "Giao dịch Crypto",
-    "tradingAccounts": "Tài khoản Trading"
+    "tradingAccounts": "Tài khoản Trading",
+    "userManagement": "Quản lý người dùng"
   },
   "navbar": {
     "toggleNavigation": "Mở menu điều hướng",
@@ -1244,6 +1245,84 @@
     "notifications": {
       "updateSuccess": "Cập nhật template thành công",
       "updateFailed": "Cập nhật template thất bại"
+    }
+  },
+  "userManagement": {
+    "pageTitle": "Quản lý người dùng",
+    "searchPlaceholder": "Tìm kiếm người dùng...",
+    "filters": {
+      "searchAttribute": "Tìm theo",
+      "role": "Vai trò",
+      "clearFilters": "Xóa bộ lọc"
+    },
+    "searchAttributes": {
+      "email": "Email",
+      "given_name": "Tên",
+      "family_name": "Họ"
+    },
+    "roles": {
+      "all": "Tất cả vai trò",
+      "user": "Người dùng",
+      "admin": "Quản trị viên",
+      "super_admin": "Quản trị viên cấp cao"
+    },
+    "list": {
+      "empty": "Không tìm thấy người dùng",
+      "headers": {
+        "email": "Email",
+        "username": "Tên đăng nhập",
+        "fullName": "Họ và tên",
+        "role": "Vai trò",
+        "subscription": "Gói đăng ký",
+        "status": "Trạng thái",
+        "actions": "Thao tác"
+      },
+      "tooltips": {
+        "view": "Xem chi tiết"
+      },
+      "active": "Hoạt động",
+      "inactive": "Không hoạt động",
+      "noSubscription": "Chưa đăng ký",
+      "expiresOn": "Hết hạn",
+      "nextPage": "Trang tiếp theo"
+    },
+    "detail": {
+      "title": "Chi tiết người dùng",
+      "notFound": "Không tìm thấy người dùng",
+      "sections": {
+        "basic": "Thông tin cơ bản",
+        "roleStatus": "Vai trò & Trạng thái",
+        "subscription": "Thông tin đăng ký"
+      },
+      "fields": {
+        "sub": "ID người dùng",
+        "email": "Email",
+        "username": "Tên đăng nhập",
+        "fullName": "Họ và tên",
+        "givenName": "Tên",
+        "familyName": "Họ",
+        "role": "Vai trò",
+        "isActive": "Trạng thái hoạt động",
+        "currentPackage": "Gói hiện tại",
+        "subscriptionEndDate": "Ngày hết hạn đăng ký"
+      },
+      "onlySuperAdmin": "Chỉ quản trị viên cấp cao mới có thể thay đổi vai trò"
+    },
+    "notifications": {
+      "roleUpdateSuccess": "Cập nhật vai trò người dùng thành công",
+      "roleUpdateFailed": "Cập nhật vai trò người dùng thất bại",
+      "statusUpdateSuccess": "Cập nhật trạng thái người dùng thành công",
+      "statusUpdateFailed": "Cập nhật trạng thái người dùng thất bại",
+      "paginationLimitation": "Không hỗ trợ quay lại trang trước với API hiện tại"
+    },
+    "confirmUpdateRole": {
+      "title": "Cập nhật vai trò người dùng",
+      "message": "Bạn có chắc chắn muốn thay đổi vai trò của {{email}} thành {{role}}?"
+    },
+    "confirmToggleStatus": {
+      "title": "Thay đổi trạng thái người dùng",
+      "messageEnable": "Bạn có chắc chắn muốn kích hoạt {{email}}?",
+      "messageDisable": "Bạn có chắc chắn muốn vô hiệu hóa {{email}}?"
     }
   }
 }

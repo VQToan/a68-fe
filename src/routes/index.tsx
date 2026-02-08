@@ -15,6 +15,7 @@ import ModuleBot from "../pages/ModuleBot";
 import Backtest from "../pages/Backtest";
 import BotTemplate from "../pages/BotTemplate";
 import TradingTemplate from "../pages/TradingTemplate";
+import UserManagement from "../pages/UserManagement";
 import Trading from "../pages/Trading";
 import TradingAccount from "../pages/TradingAccount";
 import TradingAccountDetail from "../pages/TradingAccount/TradingAccountDetail";
@@ -128,6 +129,10 @@ export const routes: RouteObject[] = [
           {
             path: "trading-template",
             element: <TradingTemplate />,
+          },
+          {
+            path: "user-management",
+            element: <UserManagement />,
           },
         ],
       },

@@ -123,3 +123,11 @@ export {
 
 // Backtest Result Queries (re-export for convenience)
 export { useBacktestResult } from "./useBacktestResultQueries";
+
+// User Management Queries & Mutations
+export {
+  useUsersQuery,
+  useUserDetailQuery,
+  useUpdateUserRoleMutation,
+  useUpdateUserStatusMutation,
+} from "./useUserQueries";

@@ -19,7 +19,8 @@
     "tradingTemplate": "Trading Template",
     "backtest": "Backtest",
     "trading": "Crypto Trading",
-    "tradingAccounts": "Trading Accounts"
+    "tradingAccounts": "Trading Accounts",
+    "userManagement": "User Management"
   },
   "navbar": {
     "toggleNavigation": "Open main navigation",
@@ -1245,6 +1246,84 @@
     "notifications": {
       "updateSuccess": "Template updated successfully",
       "updateFailed": "Failed to update template"
+    }
+  },
+  "userManagement": {
+    "pageTitle": "User Management",
+    "searchPlaceholder": "Search users...",
+    "filters": {
+      "searchAttribute": "Search by",
+      "role": "Role",
+      "clearFilters": "Clear filters"
+    },
+    "searchAttributes": {
+      "email": "Email",
+      "given_name": "First name",
+      "family_name": "Last name"
+    },
+    "roles": {
+      "all": "All roles",
+      "user": "User",
+      "admin": "Admin",
+      "super_admin": "Super Admin"
+    },
+    "list": {
+      "empty": "No users found",
+      "headers": {
+        "email": "Email",
+        "username": "Username",
+        "fullName": "Full name",
+        "role": "Role",
+        "subscription": "Subscription",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "tooltips": {
+        "view": "View details"
+      },
+      "active": "Active",
+      "inactive": "Inactive",
+      "noSubscription": "No subscription",
+      "expiresOn": "Expires",
+      "nextPage": "Next page"
+    },
+    "detail": {
+      "title": "User Details",
+      "notFound": "User not found",
+      "sections": {
+        "basic": "Basic Information",
+        "roleStatus": "Role & Status",
+        "subscription": "Subscription Information"
+      },
+      "fields": {
+        "sub": "User ID",
+        "email": "Email",
+        "username": "Username",
+        "fullName": "Full name",
+        "givenName": "First name",
+        "familyName": "Last name",
+        "role": "Role",
+        "isActive": "Active status",
+        "currentPackage": "Current package",
+        "subscriptionEndDate": "Subscription end date"
+      },
+      "onlySuperAdmin": "Only super admins can change roles"
+    },
+    "notifications": {
+      "roleUpdateSuccess": "User role updated successfully",
+      "roleUpdateFailed": "Failed to update user role",
+      "statusUpdateSuccess": "User status updated successfully",
+      "statusUpdateFailed": "Failed to update user status",
+      "paginationLimitation": "Previous page not supported with current API"
+    },
+    "confirmUpdateRole": {
+      "title": "Update User Role",
+      "message": "Are you sure you want to change {{email}}'s role to {{role}}?"
+    },
+    "confirmToggleStatus": {
+      "title": "Toggle User Status",
+      "messageEnable": "Are you sure you want to activate {{email}}?",
+      "messageDisable": "Are you sure you want to deactivate {{email}}?"
     }
   }
 }

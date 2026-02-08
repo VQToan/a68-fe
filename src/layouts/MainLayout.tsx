@@ -35,6 +35,7 @@ import BarChartIcon from "@mui/icons-material/BarChart"; // Import icon for Back
 import DescriptionIcon from "@mui/icons-material/Description"; // Import icon for Bot Template
 import ViewModuleIcon from "@mui/icons-material/ViewModule"; // Import icon for Trading Template
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance"; // Import icon for Trading Account
+import PeopleIcon from "@mui/icons-material/People"; // Import icon for User Management
 import { useAuth } from "@hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import theme from "../theme";
@@ -564,6 +565,48 @@ const MainLayout = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary={t("navigation.tradingTemplate")}
+                    sx={{ opacity: open ? 1 : 0 }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            )}
+
+            {/* Admin only: User Management */}
+            {isAdmin && (
+              <ListItem disablePadding sx={{ display: "block" }}>
+                <ListItemButton
+                  sx={{
+                    height: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
+                    "&:hover": {
+                      backgroundColor: "rgba(255,255,255,0.1)",
+                    },
+                  }}
+                  onClick={() => handleNavigation("/user-management")}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                      display: "flex",
+                      alignItems: "center",
+                      width: 24,
+                      height: 24,
+                    }}
+                  >
+                    <PeopleIcon
+                      sx={{
+                        fontSize: 24,
+                        width: 24,
+                        height: 24,
+                        transition: "none",
+                      }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t("navigation.userManagement")}
                     sx={{ opacity: open ? 1 : 0 }}
                   />
                 </ListItemButton>
