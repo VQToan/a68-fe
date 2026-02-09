@@ -62,21 +62,21 @@ const SubscriptionPackageManager: React.FC<SubscriptionPackageManagerProps> = ({
     }
   }, [showPackageChange]);
 
+  // Set default dates when showing package change
   useEffect(() => {
-    if (!selectedPackage) {
-      return;
+    if (showPackageChange && !startDate) {
+      const today = new Date();
+      setStartDate(today.toISOString().split("T")[0]);
+
+      const endDateCalc = new Date(today);
+      if (billingCycle === "monthly") {
+        endDateCalc.setMonth(endDateCalc.getMonth() + 1);
+      } else {
+        endDateCalc.setFullYear(endDateCalc.getFullYear() + 1);
+      }
+      setEndDate(endDateCalc.toISOString().split("T")[0]);
     }
-    // if monthly, set end date to 1 month after start date
-    setStartDate(new Date().toISOString().split("T")[0]);
-    // if yearly, set end date to 1 year after start date
-    const endDateCalc = new Date(startDate);
-    if (billingCycle === "monthly") {
-      endDateCalc.setMonth(endDateCalc.getMonth() + 1);
-    } else {
-      endDateCalc.setFullYear(endDateCalc.getFullYear() + 1);
-    }
-    setEndDate(endDateCalc.toISOString().split("T")[0]);
-  }, [selectedPackage]);
+  }, [billingCycle, startDate, selectedPackage]);
 
   const handlePackageSelect = useCallback((pkg: SubscriptionPackage) => {
     setSelectedPackage(pkg);
