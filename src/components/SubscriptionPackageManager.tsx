@@ -64,8 +64,8 @@ const SubscriptionPackageManager: React.FC<SubscriptionPackageManagerProps> = ({
 
   // Set default dates when showing package change
   useEffect(() => {
-    if (showPackageChange && !startDate) {
-      const today = new Date();
+    if (showPackageChange && selectedPackage) {
+      const today = startDate ? new Date(startDate) : new Date();
       setStartDate(today.toISOString().split("T")[0]);
 
       const endDateCalc = new Date(today);
