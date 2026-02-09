@@ -1320,7 +1320,7 @@
       "packageFeatures": "Tính năng",
       "packagePrice": "Giá",
       "onlySuperAdmin": "Chỉ quản trị viên cấp cao mới có thể thay đổi vai trò",
-      "onlySuperAdminPackage": "Chỉ quản trị viên cấp cao mới có thể thay đổi gói đăng ký",
+      "onlyAdminPackage": "Chỉ quản trị viên mới có thể thay đổi gói đăng ký",
       "noPackagesAvailable": "Không có gói nào"
     },
     "notifications": {

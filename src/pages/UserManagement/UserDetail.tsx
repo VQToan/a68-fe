@@ -47,6 +47,7 @@ const UserDetail: React.FC<UserDetailProps> = ({ userSub, open, onClose }) => {
   const [confirmStatusChange, setConfirmStatusChange] = useState(false);
 
   const isSuperAdmin = cognitoUser?.role === "super_admin";
+  const isAdmin = cognitoUser?.role === "admin" || isSuperAdmin;
 
   useEffect(() => {
     if (user) {
@@ -323,7 +324,7 @@ const UserDetail: React.FC<UserDetailProps> = ({ userSub, open, onClose }) => {
             <SubscriptionPackageManager
               userSub={user.sub}
               userEmail={user.email || ""}
-              isSuperAdmin={isSuperAdmin}
+              canManageSubscription={isAdmin}
             />
           </Box>
         </Box>

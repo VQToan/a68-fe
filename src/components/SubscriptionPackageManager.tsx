@@ -27,13 +27,13 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 interface SubscriptionPackageManagerProps {
   userSub: string | null;
   userEmail: string;
-  isSuperAdmin: boolean;
+  canManageSubscription: boolean;
 }
 
 const SubscriptionPackageManager: React.FC<SubscriptionPackageManagerProps> = ({
   userSub,
   userEmail,
-  isSuperAdmin,
+  canManageSubscription,
 }) => {
   const { t } = useTranslation();
   const { showNotification } = useNotification();
@@ -146,7 +146,7 @@ const SubscriptionPackageManager: React.FC<SubscriptionPackageManagerProps> = ({
     t,
   ]);
 
-  if (!isSuperAdmin) {
+  if (!canManageSubscription) {
     return (
       <Typography
         variant="caption"
@@ -154,8 +154,8 @@ const SubscriptionPackageManager: React.FC<SubscriptionPackageManagerProps> = ({
         sx={{ mt: 2, display: "block" }}
       >
         {t(
-          "userManagement.detail.onlySuperAdminPackage",
-          "Only super admins can change subscription packages",
+          "userManagement.detail.onlyAdminPackage",
+          "Only admins can change subscription packages",
         )}
       </Typography>
     );

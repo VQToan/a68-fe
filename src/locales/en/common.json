@@ -1321,7 +1321,7 @@
       "packageFeatures": "Features",
       "packagePrice": "Price",
       "onlySuperAdmin": "Only super admins can change roles",
-      "onlySuperAdminPackage": "Only super admins can change subscription packages",
+      "onlyAdminPackage": "Only admins can change subscription packages",
       "noPackagesAvailable": "No packages available"
     },
     "notifications": {
