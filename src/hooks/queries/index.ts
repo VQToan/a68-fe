@@ -119,6 +119,7 @@ export {
   useToggleTemplateActiveMutation,
   useDeleteTemplateMutation,
   useUpdateTradingTemplateMutation,
+  useRerunBacktestMutation,
 } from "./useTradingTemplateQueries";
 
 // Backtest Result Queries (re-export for convenience)

@@ -67,3 +67,16 @@ export const updateTradingTemplate = async (
 export const deleteTradingTemplate = async (id: string): Promise<void> => {
   await apiClient.delete(`${API_BASE_PATH}/${id}`);
 };
+
+// Rerun backtest for a specific period (Admin only)
+export const rerunBacktest = async (
+  id: string,
+  period: "7d" | "30d" | "90d",
+): Promise<TradingTemplate> => {
+  const response = await apiClient.post(
+    `${API_BASE_PATH}/${id}/rerun-backtest`,
+    null,
+    { params: { period } },
+  );
+  return response.data;
+};

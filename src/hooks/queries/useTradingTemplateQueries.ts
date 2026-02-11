@@ -133,3 +133,31 @@ export const useUpdateTradingTemplateMutation = () => {
     },
   });
 };
+
+/**
+ * Hook to rerun backtest for a specific period
+ */
+export const useRerunBacktestMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      period,
+    }: {
+      id: string;
+      period: "7d" | "30d" | "90d";
+    }) => tradingTemplateService.rerunBacktest(id, period),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.tradingTemplates.detail(id),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.tradingTemplates.list(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.tradingTemplates.allList(),
+      });
+    },
+  });
+};

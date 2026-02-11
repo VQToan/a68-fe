@@ -21,12 +21,14 @@ import {
   Save as SaveIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
+  Replay as ReplayIcon,
 } from "@mui/icons-material";
 import { formatDate } from "@/utils/common";
 import { useTranslation } from "react-i18next";
 import {
   useUpdateTradingTemplateMutation,
   useTradingTemplateByIdQuery,
+  useRerunBacktestMutation,
 } from "@/hooks/queries";
 import type { RiskLevel, TradingStyle } from "@/types/tradingTemplate.type";
 import { useNotification } from "@/context/NotificationContext";
@@ -46,6 +48,7 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
   const { t } = useTranslation();
   const { showNotification } = useNotification();
   const updateMutation = useUpdateTradingTemplateMutation();
+  const rerunBacktestMutation = useRerunBacktestMutation();
 
   const { data: template, isLoading } = useTradingTemplateByIdQuery(
     templateId || undefined,
@@ -129,6 +132,32 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
         t(
           "tradingTemplate.notifications.updateFailed",
           "Failed to update template",
+        ),
+        "error",
+      );
+      console.error(error);
+    }
+  };
+
+  const handleRerunBacktest = async (period: "7d" | "30d" | "90d") => {
+    if (!template) return;
+    try {
+      await rerunBacktestMutation.mutateAsync({
+        id: template._id,
+        period,
+      });
+      showNotification(
+        t(
+          "tradingTemplate.notifications.rerunBacktestSuccess",
+          `Backtest rerun started for ${period}`,
+        ),
+        "success",
+      );
+    } catch (error) {
+      showNotification(
+        t(
+          "tradingTemplate.notifications.rerunBacktestFailed",
+          "Failed to rerun backtest",
         ),
         "error",
       );
@@ -316,6 +345,50 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
               </Box>
             </Grid>
           </Grid>
+
+          <Divider sx={{ my: 3 }} />
+
+          <Typography variant="h6" gutterBottom>
+            {t("tradingTemplate.detail.backtest", "Backtest")}
+          </Typography>
+
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              {t(
+                "tradingTemplate.detail.rerunBacktestDescription",
+                "Rerun backtest for specific periods to update metrics",
+              )}
+            </Typography>
+            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+              <Button
+                variant="outlined"
+                startIcon={<ReplayIcon />}
+                onClick={() => handleRerunBacktest("7d")}
+                disabled={rerunBacktestMutation.isPending}
+                size="small"
+              >
+                {t("tradingTemplate.detail.rerun7d", "Rerun 7 Days")}
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<ReplayIcon />}
+                onClick={() => handleRerunBacktest("30d")}
+                disabled={rerunBacktestMutation.isPending}
+                size="small"
+              >
+                {t("tradingTemplate.detail.rerun30d", "Rerun 30 Days")}
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<ReplayIcon />}
+                onClick={() => handleRerunBacktest("90d")}
+                disabled={rerunBacktestMutation.isPending}
+                size="small"
+              >
+                {t("tradingTemplate.detail.rerun90d", "Rerun 90 Days")}
+              </Button>
+            </Box>
+          </Box>
 
           <Divider sx={{ my: 3 }} />
 
