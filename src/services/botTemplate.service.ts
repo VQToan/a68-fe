@@ -20,7 +20,7 @@ export const getBotTemplates = async (
     if (limit !== undefined) params.limit = limit;
     if (is_active !== undefined) params.is_active = is_active;
 
-    const response = await api.get("/api/v1/bot-templates/", { params });
+    const response = await api.get("/api/v1/bot-templates", { params });
     return response.data;
   } catch (error) {
     console.error("Error fetching bot templates:", error);
@@ -55,7 +55,7 @@ export const createBotTemplate = async (
   templateData: BotTemplateCreate
 ): Promise<BotTemplate> => {
   try {
-    const response = await api.post("/api/v1/bot-templates/", templateData);
+    const response = await api.post("/api/v1/bot-templates", templateData);
     return response.data;
   } catch (error) {
     console.error("Error creating bot template:", error);
