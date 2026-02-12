@@ -78,6 +78,7 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
     is_active: false,
     risk_level: "" as RiskLevel | "",
     trading_style: "" as TradingStyle | "",
+    min_funds: 100,
   });
 
   const [parametersExpanded, setParametersExpanded] = useState(false);
@@ -96,6 +97,7 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
         is_active: template.is_active,
         risk_level: (template as any).risk_level || "",
         trading_style: (template as any).trading_style || "",
+        min_funds: template.min_funds ?? 100,
       });
     }
   }, [template]);
@@ -138,6 +140,10 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
 
       if (formData.trading_style) {
         updateData.trading_style = formData.trading_style;
+      }
+
+      if (formData.min_funds !== undefined) {
+        updateData.min_funds = formData.min_funds;
       }
 
       await updateMutation.mutateAsync({
@@ -360,6 +366,29 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
                   </MenuItem>
                 </Select>
               </FormControl>
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Typography variant="subtitle2" color="text.secondary">
+                {t("tradingTemplate.fields.minFunds", "Minimum Funds")}
+              </Typography>
+              <TextField
+                fullWidth
+                name="min_funds"
+                type="number"
+                value={formData.min_funds}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  setFormData((prev) => ({
+                    ...prev,
+                    min_funds: isNaN(value) ? 0 : value,
+                  }));
+                }}
+                variant="outlined"
+                size="small"
+                sx={{ mt: 1 }}
+                inputProps={{ min: 0, step: 1 }}
+              />
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>

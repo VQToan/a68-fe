@@ -17,6 +17,7 @@ export interface TradingTemplateUpdate {
   is_active?: boolean;
   risk_level?: RiskLevel;
   trading_style?: TradingStyle;
+  min_funds?: number;
 }
 
 export interface BotModuleInfo {
@@ -47,6 +48,7 @@ export interface TradingTemplate {
   aggregated_metrics?: any;
   bot_modules?: BotModules | null;
   parameters?: Record<string, any>;
+  min_funds?: number;
 }
 
 export interface TradingTemplateListItem {
