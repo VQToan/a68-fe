@@ -47,7 +47,7 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
   open,
   onClose,
 }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { showNotification } = useNotification();
   const updateMutation = useUpdateTradingTemplateMutation();
   const rerunBacktestMutation = useRerunBacktestMutation();

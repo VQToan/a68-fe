@@ -31,7 +31,7 @@ const ReleaseTemplateDialog: React.FC<ReleaseTemplateDialogProps> = ({
   const { control, handleSubmit, reset } = useForm<ReleaseTemplateInput>({
     defaultValues: {
       name: "",
-      description: "",
+      description: {},
       icon: "",
     },
   });
