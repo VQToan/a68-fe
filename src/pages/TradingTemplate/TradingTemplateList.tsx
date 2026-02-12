@@ -36,7 +36,26 @@ const TradingTemplateList: React.FC<TradingTemplateListProps> = ({
   onToggleActive,
   onView,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  // Helper to get description in current language or fallback
+  const getDescription = (description?: Record<string, string>): string => {
+    if (!description || typeof description !== "object") return "-";
+
+    // Try current language
+    const currentLang = i18n.language;
+    if (description[currentLang]) return description[currentLang];
+
+    // Try English as fallback
+    if (description.en) return description.en;
+
+    // Try Vietnamese as second fallback
+    if (description.vi) return description.vi;
+
+    // Return first available description
+    const firstDesc = Object.values(description).find((desc) => desc);
+    return firstDesc || "-";
+  };
 
   if (isLoading) {
     return <TableSkeleton columns={5} rows={5} hasActions />;
@@ -98,7 +117,7 @@ const TradingTemplateList: React.FC<TradingTemplateListProps> = ({
                   {template.name}
                 </TableCell>
                 <TableCell>
-                  <Tooltip title={template.description || ""} arrow>
+                  <Tooltip title={getDescription(template.description)} arrow>
                     <Typography
                       variant="body2"
                       sx={{
@@ -108,7 +127,7 @@ const TradingTemplateList: React.FC<TradingTemplateListProps> = ({
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {template.description || "-"}
+                      {getDescription(template.description)}
                     </Typography>
                   </Tooltip>
                 </TableCell>

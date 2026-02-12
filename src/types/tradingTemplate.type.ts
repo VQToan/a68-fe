@@ -1,6 +1,6 @@
 export interface ReleaseTemplateInput {
   name?: string;
-  description?: string;
+  description?: Record<string, string>;
   icon?: string;
 }
 
@@ -13,7 +13,7 @@ export type TradingStyle = "scalping" | "day_trade" | "swing";
 
 export interface TradingTemplateUpdate {
   name?: string;
-  description?: string;
+  description?: Record<string, string>;
   is_active?: boolean;
   risk_level?: RiskLevel;
   trading_style?: TradingStyle;
@@ -38,7 +38,7 @@ export interface BotModules {
 export interface TradingTemplate {
   _id: string;
   name: string;
-  description?: string;
+  description?: Record<string, string>;
   icon?: string;
   is_future: boolean;
   is_active: boolean;
@@ -52,7 +52,7 @@ export interface TradingTemplate {
 export interface TradingTemplateListItem {
   _id: string;
   name: string;
-  description?: string;
+  description?: Record<string, string>;
   icon?: string;
   is_future: boolean;
   is_active: boolean;

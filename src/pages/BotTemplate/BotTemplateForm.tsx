@@ -11,6 +11,8 @@ import {
   CircularProgress,
   FormControlLabel,
   Switch,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useModulesQuery } from "@hooks/queries";
@@ -49,6 +51,20 @@ const moduleLabelKeyMap: Record<ModuleType, string> = {
   [ModuleType.STOP_LOSS]: "botTemplate.form.fields.stopLoss",
 };
 
+// Supported languages
+const SUPPORTED_LANGUAGES = [
+  { code: "en", label: "English" },
+  { code: "vi", label: "Tiếng Việt" },
+  { code: "zh", label: "中文" },
+  { code: "hi", label: "हिन्दी" },
+  { code: "ru", label: "Русский" },
+  { code: "ar", label: "العربية" },
+  { code: "ms", label: "Bahasa Melayu" },
+  { code: "id", label: "Bahasa Indonesia" },
+  { code: "th", label: "ไทย" },
+  { code: "ko", label: "한국어" },
+];
+
 const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
   initialData,
   onSubmit,
@@ -58,6 +74,9 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
   // Use TanStack Query for modules
   const { data: modules = [], isLoading: isLoadingModules } = useModulesQuery();
   const { t } = useTranslation();
+
+  // Language tab state
+  const [activeLanguageTab, setActiveLanguageTab] = useState(0);
 
   // Group modules by type
   const [moduleOptions, setModuleOptions] = useState<
@@ -71,6 +90,17 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
     [ModuleType.STOP_LOSS]: [],
   });
 
+  // Initialize description object for all languages
+  const initializeDescriptions = (
+    existingDesc?: Record<string, string>,
+  ): Record<string, string> => {
+    const descriptions: Record<string, string> = {};
+    SUPPORTED_LANGUAGES.forEach((lang) => {
+      descriptions[lang.code] = existingDesc?.[lang.code] || "";
+    });
+    return descriptions;
+  };
+
   const {
     control,
     handleSubmit,
@@ -80,7 +110,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
   } = useForm({
     defaultValues: {
       name: initialData?.name || "",
-      description: initialData?.description || "",
+      description: initializeDescriptions(initialData?.description),
       entry_module: initialData?.entry_module || "",
       exit_module: initialData?.exit_module || "",
       dca_cutloss_module: initialData?.dca_cutloss_module || "",
@@ -134,7 +164,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
     if (initialData) {
       reset({
         name: initialData.name || "",
-        description: initialData.description || "",
+        description: initializeDescriptions(initialData.description),
         entry_module: initialData.entry_module || "",
         exit_module: initialData.exit_module || "",
         dca_cutloss_module: initialData.dca_cutloss_module || "",
@@ -153,7 +183,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
     if (initialData && initialData.is_future !== isFutureValue) {
       reset({
         name: initialData.name || "",
-        description: initialData.description || "",
+        description: initializeDescriptions(initialData.description),
         entry_module: "",
         exit_module: "",
         dca_cutloss_module: "",
@@ -172,7 +202,7 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
       // Since all fields are now required, we don't need to clean empty values
       onSubmit(data);
     },
-    [onSubmit]
+    [onSubmit],
   );
 
   return (
@@ -234,26 +264,48 @@ const BotTemplateForm: React.FC<BotTemplateFormProps> = ({
           </Grid>
 
           <Grid size={{ xs: 12 }}>
-            <Controller
-              name="description"
-              control={control}
-              rules={{
-                required: t("botTemplate.form.validation.descriptionRequired"),
-              }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label={t("botTemplate.form.fields.description")}
-                  placeholder={t("botTemplate.form.placeholders.description")}
-                  fullWidth
-                  multiline
-                  rows={3}
-                  error={!!errors.description}
-                  helperText={errors.description?.message}
-                  disabled={isSubmitting}
-                />
-              )}
-            />
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              {t("botTemplate.form.fields.description")}
+            </Typography>
+            <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
+              <Tabs
+                value={activeLanguageTab}
+                onChange={(_, newValue) => setActiveLanguageTab(newValue)}
+                variant="scrollable"
+                scrollButtons="auto"
+              >
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <Tab key={lang.code} label={lang.label} />
+                ))}
+              </Tabs>
+            </Box>
+            {SUPPORTED_LANGUAGES.map((lang, index) => (
+              <Box
+                key={lang.code}
+                role="tabpanel"
+                hidden={activeLanguageTab !== index}
+                sx={{ display: activeLanguageTab === index ? "block" : "none" }}
+              >
+                {activeLanguageTab === index && (
+                  <Controller
+                    name={`description.${lang.code}` as any}
+                    control={control}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        placeholder={t(
+                          "botTemplate.form.placeholders.description",
+                        )}
+                        fullWidth
+                        multiline
+                        rows={3}
+                        disabled={isSubmitting}
+                      />
+                    )}
+                  />
+                )}
+              </Box>
+            ))}
           </Grid>
 
           <Grid size={{ xs: 12, lg: 6 }}>

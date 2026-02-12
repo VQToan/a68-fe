@@ -2,7 +2,7 @@
 export interface BotTemplate {
   _id: string;
   name: string;
-  description: string;
+  description?: Record<string, string>; // Multi-language description
   entry_module: string;
   exit_module: string;
   dca_cutloss_module: string;
@@ -19,7 +19,7 @@ export interface BotTemplate {
 // Interface for creating a new bot template
 export interface BotTemplateCreate {
   name: string;
-  description: string;
+  description?: Record<string, string>; // Multi-language description
   entry_module: string;
   exit_module: string;
   dca_cutloss_module: string;
@@ -33,7 +33,7 @@ export interface BotTemplateCreate {
 // Interface for updating a bot template
 export interface BotTemplateUpdate {
   name?: string;
-  description?: string;
+  description?: Record<string, string>; // Multi-language description
   entry_module: string;
   exit_module: string;
   dca_cutloss_module: string;

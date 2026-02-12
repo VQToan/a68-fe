@@ -16,6 +16,8 @@ import {
   FormControl,
   InputLabel,
   Collapse,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import {
   Save as SaveIcon,
@@ -45,20 +47,34 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
   open,
   onClose,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { showNotification } = useNotification();
   const updateMutation = useUpdateTradingTemplateMutation();
   const rerunBacktestMutation = useRerunBacktestMutation();
+
+  // Supported languages
+  const SUPPORTED_LANGUAGES = [
+    { code: "en", label: "English" },
+    { code: "vi", label: "Tiếng Việt" },
+    { code: "zh", label: "中文" },
+    { code: "hi", label: "हिन्दी" },
+    { code: "ru", label: "Русский" },
+    { code: "ar", label: "العربية" },
+    { code: "ms", label: "Bahasa Melayu" },
+    { code: "id", label: "Bahasa Indonesia" },
+    { code: "th", label: "ไทย" },
+    { code: "ko", label: "한국어" },
+  ];
+
+  const [activeLanguageTab, setActiveLanguageTab] = useState(0);
 
   const { data: template, isLoading } = useTradingTemplateByIdQuery(
     templateId || undefined,
   );
 
-  console.log("TradingTemplate Detail Data:", template);
-
   const [formData, setFormData] = useState({
     name: "",
-    description: "",
+    description: {} as Record<string, string>,
     is_active: false,
     risk_level: "" as RiskLevel | "",
     trading_style: "" as TradingStyle | "",
@@ -68,9 +84,15 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
 
   useEffect(() => {
     if (template) {
+      // Initialize description object for all languages
+      const descriptions: Record<string, string> = {};
+      SUPPORTED_LANGUAGES.forEach((lang) => {
+        descriptions[lang.code] = template.description?.[lang.code] || "";
+      });
+
       setFormData({
         name: template.name,
-        description: template.description || "",
+        description: descriptions,
         is_active: template.is_active,
         risk_level: (template as any).risk_level || "",
         trading_style: (template as any).trading_style || "",
@@ -237,20 +259,56 @@ const TradingTemplateDetail: React.FC<TradingTemplateDetailProps> = ({
             </Grid>
 
             <Grid size={{ xs: 12 }}>
-              <Typography variant="subtitle2" color="text.secondary">
+              <Typography
+                variant="subtitle2"
+                color="text.secondary"
+                sx={{ mb: 1 }}
+              >
                 {t("tradingTemplate.detail.description", "Description")}
               </Typography>
-              <TextField
-                fullWidth
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                multiline
-                rows={4}
-                variant="outlined"
-                size="small"
-                sx={{ mt: 1 }}
-              />
+              <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
+                <Tabs
+                  value={activeLanguageTab}
+                  onChange={(_, newValue) => setActiveLanguageTab(newValue)}
+                  variant="scrollable"
+                  scrollButtons="auto"
+                >
+                  {SUPPORTED_LANGUAGES.map((lang) => (
+                    <Tab key={lang.code} label={lang.label} />
+                  ))}
+                </Tabs>
+              </Box>
+              {SUPPORTED_LANGUAGES.map((lang, index) => (
+                <Box
+                  key={lang.code}
+                  role="tabpanel"
+                  hidden={activeLanguageTab !== index}
+                  sx={{
+                    display: activeLanguageTab === index ? "block" : "none",
+                  }}
+                >
+                  {activeLanguageTab === index && (
+                    <TextField
+                      fullWidth
+                      name={`description_${lang.code}`}
+                      value={formData.description[lang.code] || ""}
+                      onChange={(e) => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          description: {
+                            ...prev.description,
+                            [lang.code]: e.target.value,
+                          },
+                        }));
+                      }}
+                      multiline
+                      rows={4}
+                      variant="outlined"
+                      size="small"
+                    />
+                  )}
+                </Box>
+              ))}
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>

@@ -32,7 +32,7 @@ const BotTemplateDetail: React.FC<BotTemplateDetailProps> = ({
       const module = modules.find((m) => m._id === moduleId);
       return module ? module.name : t("botTemplate.detail.moduleMissing");
     },
-    [modules, t]
+    [modules, t],
   );
 
   if (isLoading) {
@@ -89,9 +89,37 @@ const BotTemplateDetail: React.FC<BotTemplateDetailProps> = ({
           <Typography variant="subtitle1" fontWeight="bold">
             {t("botTemplate.detail.description")}:
           </Typography>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            {template.description}
-          </Typography>
+          {template.description && typeof template.description === "object" ? (
+            <Box sx={{ mt: 1 }}>
+              {Object.entries(template.description).map(
+                ([lang, desc]) =>
+                  desc && (
+                    <Box key={lang} sx={{ mb: 1.5 }}>
+                      <Chip
+                        label={lang.toUpperCase()}
+                        size="small"
+                        variant="outlined"
+                        sx={{ mr: 1 }}
+                      />
+                      <Typography
+                        variant="body2"
+                        component="span"
+                        sx={{ color: "text.secondary" }}
+                      >
+                        {desc}
+                      </Typography>
+                    </Box>
+                  ),
+              )}
+            </Box>
+          ) : (
+            <Typography variant="body1" sx={{ mt: 1, color: "text.secondary" }}>
+              {t(
+                "botTemplate.detail.noDescription",
+                "No description available",
+              )}
+            </Typography>
+          )}
         </Grid>
         <Grid size={{ xs: 12 }}>
           <Divider sx={{ my: 2 }} />
