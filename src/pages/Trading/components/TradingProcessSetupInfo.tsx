@@ -27,6 +27,7 @@ interface TradingProcessSetupInfoProps {
     MIN_ROI?: number;
     R2R?: string;
     MA_PERIOD?: string;
+    AVG_PRICE_PERIOD?: number;
     RSI_ENTRY_LONG?: number;
     RSI_EXIT_LONG?: number;
     RSI_ENTRY_SHORT?: number;
@@ -151,6 +152,9 @@ const TradingProcessSetupInfo = ({
           <Box sx={{ ml: 2, mb: 3 }}>
             <Typography variant="body1" sx={{ mb: 1 }}>
               <strong>{t("trading.form.fields.maPeriod")}:</strong> {formatValue(setupData?.MA_PERIOD)}
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 1 }}>
+              <strong>{t("trading.form.fields.avgPricePeriod")}:</strong> {formatValue(setupData?.AVG_PRICE_PERIOD)}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
               <strong>{t("trading.form.fields.rsiEntryLong")}:</strong> {formatValue(setupData?.RSI_ENTRY_LONG)}

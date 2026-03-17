@@ -65,6 +65,7 @@ const defaultBotParams: Partial<BacktestParameter> = {
   MIN_ROI: 8.0,
   R2R: "1:2", // Default Risk to Reward ratio
   MA_PERIOD: "8:20",
+  AVG_PRICE_PERIOD: 14,
   DCA_GRID: 0.008,
   GRID_MULTIPLIER: 1.1,
   DCA_MULTIPLIER: 1.1,
@@ -788,6 +789,16 @@ const BacktestForm = ({
                       fullWidth
                       placeholder={t("backtest.form.placeholders.maPeriod")}
                       helperText={t("backtest.form.helper.maPeriod")}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <ParameterTextField
+                      paramName="AVG_PRICE_PERIOD"
+                      label={t("backtest.form.fields.avgPricePeriod")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                      inputProps={{ step: "1", min: "1" }}
                     />
                   </Grid>
 
