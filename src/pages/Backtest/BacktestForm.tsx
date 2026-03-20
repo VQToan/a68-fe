@@ -66,6 +66,7 @@ const defaultBotParams: Partial<BacktestParameter> = {
   R2R: "1:2", // Default Risk to Reward ratio
   MA_PERIOD: "8:20",
   AVG_PRICE_PERIOD: 14,
+  VOLUME_SPIKE: 2,
   DCA_GRID: 0.008,
   GRID_MULTIPLIER: 1.1,
   DCA_MULTIPLIER: 1.1,
@@ -799,6 +800,16 @@ const BacktestForm = ({
                       fullWidth
                       parseValue={toNumber}
                       inputProps={{ step: "1", min: "1" }}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <ParameterTextField
+                      paramName="VOLUME_SPIKE"
+                      label={t("backtest.form.fields.volumeSpike")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                      inputProps={{ step: "0.1", min: "0" }}
                     />
                   </Grid>
 

@@ -28,6 +28,7 @@ interface TradingProcessSetupInfoProps {
     R2R?: string;
     MA_PERIOD?: string;
     AVG_PRICE_PERIOD?: number;
+    VOLUME_SPIKE?: number;
     RSI_ENTRY_LONG?: number;
     RSI_EXIT_LONG?: number;
     RSI_ENTRY_SHORT?: number;
@@ -155,6 +156,9 @@ const TradingProcessSetupInfo = ({
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
               <strong>{t("trading.form.fields.avgPricePeriod")}:</strong> {formatValue(setupData?.AVG_PRICE_PERIOD)}
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 1 }}>
+              <strong>{t("trading.form.fields.volumeSpike")}:</strong> {formatValue(setupData?.VOLUME_SPIKE)}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
               <strong>{t("trading.form.fields.rsiEntryLong")}:</strong> {formatValue(setupData?.RSI_ENTRY_LONG)}

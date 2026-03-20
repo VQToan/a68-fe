@@ -28,6 +28,7 @@ export interface BacktestParameter {
   R2R: string; // Risk to Reward ratio, default "1:2"
   MA_PERIOD: string;
   AVG_PRICE_PERIOD: number;
+  VOLUME_SPIKE: number;
   DCA_GRID: number;
   GRID_MULTIPLIER: number;
   DCA_MULTIPLIER: number;
