@@ -926,6 +926,8 @@
         "apiKeyCurrent": "API Key hiện tại",
         "secretKey": "Secret Key",
         "secretKeyNew": "Secret Key mới (để trống nếu không đổi)",
+        "password": "Mật khẩu/Passphrase",
+        "passwordNew": "Passphrase mới (để trống nếu không đổi)",
         "chatIds": "Telegram Chat IDs",
         "addChatId": "Thêm Chat ID"
       },
@@ -940,7 +942,8 @@
         "accountNameRequired": "Tên tài khoản là bắt buộc",
         "exchangeRequired": "Sàn giao dịch là bắt buộc",
         "apiKeyRequired": "API Key là bắt buộc",
-        "secretKeyRequired": "Secret Key là bắt buộc"
+        "secretKeyRequired": "Secret Key là bắt buộc",
+        "passwordRequired": "Mật khẩu/Passphrase là bắt buộc đối với sàn này"
       },
       "helper": {
         "keepCurrentApiKey": "Để trống nếu không muốn thay đổi API Key",

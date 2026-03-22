@@ -926,6 +926,8 @@
         "apiKeyCurrent": "Current API key",
         "secretKey": "Secret key",
         "secretKeyNew": "New secret key (leave blank to keep current)",
+        "password": "Password/Passphrase",
+        "passwordNew": "New password (leave blank to keep current)",
         "chatIds": "Telegram chat IDs",
         "addChatId": "Add chat ID"
       },
@@ -940,7 +942,8 @@
         "accountNameRequired": "Account name is required",
         "exchangeRequired": "Exchange is required",
         "apiKeyRequired": "API key is required",
-        "secretKeyRequired": "Secret key is required"
+        "secretKeyRequired": "Secret key is required",
+        "passwordRequired": "Password/Passphrase is required for this exchange"
       },
       "helper": {
         "keepCurrentApiKey": "Leave blank to keep the current API key",

@@ -19,7 +19,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
-import type { TradingProcess, TradingStatusType } from "@/types/trading.types";
+import type { TradingProcess, TradingStatusType, TradingExchangeType } from "@/types/trading.types";
 import { areEqual } from "@/utils/common";
 import StickyTable from "@components/StickyTable";
 import { useTranslation } from "react-i18next";
@@ -72,6 +72,48 @@ const getStatusColor = (
       return "default";
   }
 };
+
+const getExchangeColor = (
+  exchange: TradingExchangeType | undefined
+):
+  | "default"
+  | "primary"
+  | "secondary"
+  | "error"
+  | "info"
+  | "success"
+  | "warning" => {
+  if (!exchange) return "default";
+  switch (exchange.toLowerCase()) {
+    case "binance":
+      return "warning";
+    case "bybit":
+      return "info";
+    case "okx":
+      return "secondary";
+    case "bitget":
+      return "primary";
+    default:
+      return "default";
+  }
+};
+
+const getExchangeLabel = (exchange: TradingExchangeType | undefined): string => {
+  if (!exchange) return "";
+  switch (exchange.toLowerCase()) {
+    case "binance":
+      return "Binance";
+    case "bybit":
+      return "Bybit";
+    case "okx":
+      return "OKX";
+    case "bitget":
+      return "Bitget";
+    default:
+      return exchange.toUpperCase();
+  }
+};
+
 
 const TradingList = ({
   processes,
@@ -142,6 +184,7 @@ const TradingList = ({
               <TableCell>{t("trading.list.headers.status")}</TableCell>
               <TableCell>{t("trading.list.headers.daysRunning")}</TableCell>
               <TableCell>{t("trading.list.headers.account")}</TableCell>
+              <TableCell>{t("tradingAccount.list.headers.exchange")}</TableCell>
               <TableCell>{t("trading.list.headers.isFuture")}</TableCell>
               <TableCell sx={{ display: { xs: "none", lg: "table-cell" } }}>
                 {t("trading.list.headers.template")}
@@ -206,6 +249,17 @@ const TradingList = ({
                   <Typography variant="body2">
                     {process.trading_account_name || t("common.notAvailable")}
                   </Typography>
+                </TableCell>
+                <TableCell>
+                  {process.exchange ? (
+                    <Chip
+                      label={getExchangeLabel(process.exchange)}
+                      color={getExchangeColor(process.exchange)}
+                      size="small"
+                    />
+                  ) : (
+                    <Typography variant="body2">-</Typography>
+                  )}
                 </TableCell>
                 <TableCell>
                   <Chip

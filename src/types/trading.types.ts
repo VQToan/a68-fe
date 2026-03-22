@@ -210,6 +210,7 @@ export interface TradingAccountCreate {
   account_name: string;
   api_key: string;
   secret_key: string;
+  password?: string;
   chat_ids?: string[];
 }
 
@@ -217,6 +218,7 @@ export interface TradingAccountUpdate {
   account_name?: string;
   api_key?: string;
   secret_key?: string;
+  password?: string;
   chat_ids?: string[];
 }
 
@@ -236,6 +238,7 @@ export interface TradingProcess {
   stopped_at: string | null;
   trading_account_name?: string;
   bot_template_name?: string;
+  exchange?: TradingExchangeType;
 }
 
 // Trading Details API types

@@ -41,6 +41,47 @@ import type { TradingPerformanceResponse } from "@/types/trading.types";
 import * as tradingProcessService from "@services/tradingProcess.service";
 import { useTranslation } from "react-i18next";
 
+const getExchangeColor = (
+  exchange: string | undefined
+):
+  | "default"
+  | "primary"
+  | "secondary"
+  | "error"
+  | "info"
+  | "success"
+  | "warning" => {
+  if (!exchange) return "default";
+  switch (exchange.toLowerCase()) {
+    case "binance":
+      return "warning";
+    case "bybit":
+      return "info";
+    case "okx":
+      return "secondary";
+    case "bitget":
+      return "primary";
+    default:
+      return "default";
+  }
+};
+
+const getExchangeLabel = (exchange: string | undefined): string => {
+  if (!exchange) return "";
+  switch (exchange.toLowerCase()) {
+    case "binance":
+      return "Binance";
+    case "bybit":
+      return "Bybit";
+    case "okx":
+      return "OKX";
+    case "bitget":
+      return "Bitget";
+    default:
+      return exchange.toUpperCase();
+  }
+};
+
 const TradingProcessDetail = () => {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
@@ -399,10 +440,21 @@ const TradingProcessDetail = () => {
                 <Typography
                   variant="body2"
                   color="textSecondary"
-                  sx={{ mt: 1 }}
+                  sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}
                 >
                   {currentProcess.name} •{" "}
                   {currentProcess.bot_template_name || t("common.notAvailable")}
+                  {currentProcess.exchange && (
+                    <>
+                      {" "}•{" "}
+                      <Chip
+                        label={getExchangeLabel(currentProcess.exchange)}
+                        color={getExchangeColor(currentProcess.exchange)}
+                        size="small"
+                        sx={{ height: 20, fontSize: '0.75rem' }}
+                      />
+                    </>
+                  )}
                 </Typography>
                 <Typography
                   variant="body2"

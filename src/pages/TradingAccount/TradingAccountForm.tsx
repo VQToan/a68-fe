@@ -58,6 +58,7 @@ const TradingAccountForm = ({
     exchange: (initialData?.exchange || "") as TradingExchangeType,
     api_key: "",
     secret_key: "",
+    password: "",
     chat_ids: initialData?.chat_ids || [],
   });
 
@@ -72,6 +73,7 @@ const TradingAccountForm = ({
         exchange: (initialData.exchange || "") as TradingExchangeType,
         api_key: "", // Don't prefill API key for security
         secret_key: "", // Don't prefill secret key for security
+        password: "", // Don't prefill password
         chat_ids: initialData.chat_ids || [],
       });
     }
@@ -98,6 +100,14 @@ const TradingAccountForm = ({
     if (!isEditMode || formData.secret_key) {
       if (!formData.secret_key.trim()) {
         newErrors.secret_key = t("tradingAccount.form.validation.secretKeyRequired");
+      }
+    }
+
+    if (formData.exchange === 'okx' || formData.exchange === 'bitget') {
+      if (!isEditMode || formData.password) {
+        if (!formData.password?.trim()) {
+          newErrors.password = t("tradingAccount.form.validation.passwordRequired");
+        }
       }
     }
 
@@ -130,6 +140,9 @@ const TradingAccountForm = ({
       if (formData.secret_key) {
         updateData.secret_key = formData.secret_key;
       }
+      if (formData.password && (formData.exchange === 'okx' || formData.exchange === 'bitget')) {
+        updateData.password = formData.password;
+      }
 
       onSubmit(updateData);
     } else {
@@ -138,6 +151,7 @@ const TradingAccountForm = ({
         exchange: formData.exchange,
         api_key: formData.api_key,
         secret_key: formData.secret_key,
+        password: (formData.exchange === 'okx' || formData.exchange === 'bitget') ? formData.password : undefined,
         chat_ids: formData.chat_ids,
       } as TradingAccountCreate);
     }
@@ -290,6 +304,23 @@ const TradingAccountForm = ({
             required={!isEditMode}
           />
         </Grid>
+
+        {(formData.exchange === 'okx' || formData.exchange === 'bitget') && (
+          <Grid size={{ xs: 12 }}>
+            <TextField
+              fullWidth
+              label={isEditMode ? t("tradingAccount.form.fields.passwordNew") : t("tradingAccount.form.fields.password")}
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              error={!!errors.password}
+              helperText={errors.password || (isEditMode ? t("tradingAccount.form.helper.keepEmptyIfUnchanged") : "")}
+              disabled={isReadOnly}
+              required={!isEditMode}
+            />
+          </Grid>
+        )}
 
         <Grid size={{ xs: 12 }}>
           <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>
