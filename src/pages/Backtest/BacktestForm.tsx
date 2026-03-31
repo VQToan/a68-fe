@@ -57,6 +57,7 @@ const defaultBotParams: Partial<BacktestParameter> = {
   INTERVAL_2: "5m",
   TRADE_MODE: 0, // both
   ENTRY_PERCENTAGE: 1.0,
+  SAFE_ENTRY_MULTIPLIER: 1.0,
   LEVERAGE: 10,
   MIN_MARGIN: 0.0,
   FUNDS: 1000.0,
@@ -538,6 +539,16 @@ const BacktestForm = ({
                           ),
                         },
                       }}
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <ParameterTextField
+                      paramName="SAFE_ENTRY_MULTIPLIER"
+                      label={t("backtest.form.fields.safeEntryMultiplier")}
+                      type="number"
+                      fullWidth
+                      parseValue={toNumber}
+                      inputProps={{ step: "0.01", min: "0" }}
                     />
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>

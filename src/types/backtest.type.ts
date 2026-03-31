@@ -21,6 +21,7 @@ export interface BacktestParameter {
   LEVERAGE: number;
   FUNDS: number;
   ENTRY_PERCENTAGE: number;
+  SAFE_ENTRY_MULTIPLIER: number;
   MAX_MARGIN_PERCENTAGE: number;
   MIN_MARGIN: number;
   MAX_LOSS: number;

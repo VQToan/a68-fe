@@ -20,6 +20,7 @@ interface TradingProcessSetupInfoProps {
     INTERVAL_2?: string;
     TRADE_MODE?: number;
     ENTRY_PERCENTAGE?: number;
+    SAFE_ENTRY_MULTIPLIER?: number;
     TRAILING_PERCENTAGE?: number;
     CALLBACK_PERCENTAGE?: number;
     LEVERAGE?: number;
@@ -109,6 +110,9 @@ const TradingProcessSetupInfo = ({
           <Box sx={{ ml: 2, mb: 3 }}>
             <Typography variant="body1" sx={{ mb: 1 }}>
               <strong>{t("trading.form.fields.entryPercentage")}:</strong> {formatValue(setupData?.ENTRY_PERCENTAGE, '%')}
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 1 }}>
+              <strong>{t("trading.form.fields.safeEntryMultiplier")}:</strong> {formatValue(setupData?.SAFE_ENTRY_MULTIPLIER)}
             </Typography>
             <Typography variant="body1" sx={{ mb: 1 }}>
               <strong>{t("trading.form.fields.trailingPercentage")}:</strong> {formatValue(setupData?.TRAILING_PERCENTAGE, '%')}
