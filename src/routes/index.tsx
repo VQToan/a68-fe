@@ -10,6 +10,7 @@ import Register from "../pages/Register";
 import VerifyEmail from "../pages/VerifyEmail";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
+import ChangePassword from "../pages/ChangePassword";
 import Dashboard from "../pages/Dashboard";
 import ModuleBot from "../pages/ModuleBot";
 import Backtest from "../pages/Backtest";
@@ -58,6 +59,10 @@ export const routes: RouteObject[] = [
   {
     path: "/reset-password",
     element: <ResetPassword />,
+  },
+  {
+    path: "/change-password",
+    element: <ChangePassword />,
   },
   // Main routes with MainLayout
   {

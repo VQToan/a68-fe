@@ -34,6 +34,7 @@ const Login = () => {
     isLoading,
     requiresVerification,
     pendingUsername,
+    authStep,
     clearError,
   } = useAuth();
 
@@ -64,6 +65,15 @@ const Login = () => {
     }
   }, [requiresVerification, pendingUsername, navigate]);
 
+  useEffect(() => {
+    if (
+      authStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED" &&
+      pendingUsername
+    ) {
+      navigate("/change-password", { state: { email: pendingUsername } });
+    }
+  }, [authStep, pendingUsername, navigate]);
+
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
@@ -81,10 +91,15 @@ const Login = () => {
           // Check if login requires verification
           const payload = result.payload as {
             requiresVerification?: boolean;
+            requiresNewPassword?: boolean;
             email?: string;
           };
           if (payload?.requiresVerification) {
             navigate("/verify-email", { state: { email: formData.email } });
+            return;
+          }
+          if (payload?.requiresNewPassword) {
+            navigate("/change-password", { state: { email: formData.email } });
             return;
           }
 

@@ -8,6 +8,7 @@ import {
   resendVerificationCode,
   forgotPassword,
   confirmPasswordReset,
+  confirmNewPassword,
   checkAuthSession,
   clearError,
 } from "@features/auth/authSlice";
@@ -17,6 +18,7 @@ import type {
   RegisterCredentials,
   ConfirmSignUpCredentials,
   ResetPasswordCredentials,
+  ConfirmNewPasswordCredentials,
 } from "../types/auth.types";
 
 export const useAuth = () => {
@@ -73,6 +75,13 @@ export const useAuth = () => {
   const handleConfirmPasswordReset = useCallback(
     (credentials: ResetPasswordCredentials) => {
       return dispatch(confirmPasswordReset(credentials));
+    },
+    [dispatch]
+  );
+
+  const handleConfirmNewPassword = useCallback(
+    (credentials: ConfirmNewPasswordCredentials) => {
+      return dispatch(confirmNewPassword(credentials));
     },
     [dispatch]
   );
@@ -163,6 +172,7 @@ export const useAuth = () => {
     logout: handleLogout,
     forgotPassword: handleForgotPassword,
     confirmPasswordReset: handleConfirmPasswordReset,
+    confirmNewPassword: handleConfirmNewPassword,
     clearError: handleClearError,
   };
 };

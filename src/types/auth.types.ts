@@ -80,3 +80,7 @@ export interface ResetPasswordCredentials {
   code: string;
   newPassword: string;
 }
+
+export interface ConfirmNewPasswordCredentials {
+  newPassword: string;
+}

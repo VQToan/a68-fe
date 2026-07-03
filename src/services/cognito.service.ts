@@ -3,6 +3,7 @@ import {
   signIn as amplifySignIn,
   signOut as amplifySignOut,
   confirmSignUp as amplifyConfirmSignUp,
+  confirmSignIn as amplifyConfirmSignIn,
   resendSignUpCode as amplifyResendSignUpCode,
   resetPassword as amplifyResetPassword,
   confirmResetPassword as amplifyConfirmResetPassword,
@@ -31,6 +32,10 @@ export interface CognitoConfirmSignUpInput {
 export interface CognitoResetPasswordInput {
   email: string;
   code: string;
+  newPassword: string;
+}
+
+export interface CognitoConfirmNewPasswordInput {
   newPassword: string;
 }
 
@@ -126,6 +131,20 @@ export const signIn = async (
   const result = await amplifySignIn({
     username: email,
     password,
+  });
+
+  return {
+    isSignedIn: result.isSignedIn,
+    nextStep: result.nextStep.signInStep as AuthNextStep,
+  };
+};
+
+// Complete NEW_PASSWORD_REQUIRED challenge after first sign in.
+export const confirmNewPassword = async (
+  input: CognitoConfirmNewPasswordInput
+): Promise<SignInResult> => {
+  const result = await amplifyConfirmSignIn({
+    challengeResponse: input.newPassword,
   });
 
   return {
@@ -255,6 +274,7 @@ const cognitoService = {
   confirmSignUp,
   resendSignUpCode,
   signIn,
+  confirmNewPassword,
   signOut,
   forgotPassword,
   confirmResetPassword,

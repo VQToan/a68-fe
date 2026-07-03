@@ -6,6 +6,7 @@ import type {
   RegisterCredentials,
   ConfirmSignUpCredentials,
   ResetPasswordCredentials,
+  ConfirmNewPasswordCredentials,
 } from "../../types/auth.types";
 import cognitoService from "@services/cognito.service";
 
@@ -105,6 +106,13 @@ export const login = createAsyncThunk(
             nextStep: result.nextStep,
           };
         }
+        if (result.nextStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED") {
+          return {
+            email: credentials.email,
+            requiresNewPassword: true,
+            nextStep: result.nextStep,
+          };
+        }
         return rejectWithValue("Sign in incomplete: " + result.nextStep);
       }
 
@@ -141,6 +149,36 @@ export const login = createAsyncThunk(
       }
 
       return rejectWithValue(err.message || "Login failed");
+    }
+  }
+);
+
+// Complete Cognito NEW_PASSWORD_REQUIRED challenge
+export const confirmNewPassword = createAsyncThunk(
+  "auth/confirmNewPassword",
+  async (credentials: ConfirmNewPasswordCredentials, { rejectWithValue }) => {
+    try {
+      const result = await cognitoService.confirmNewPassword(credentials);
+
+      if (!result.isSignedIn) {
+        return rejectWithValue("Sign in incomplete: " + result.nextStep);
+      }
+
+      const tokens = await cognitoService.getAuthTokens();
+      const cognitoUser = await cognitoService.getCurrentUser();
+
+      return {
+        accessToken: tokens?.accessToken || null,
+        idToken: tokens?.idToken || null,
+        expiresAt: tokens?.expiresAt || null,
+        cognitoUser,
+      };
+    } catch (error: unknown) {
+      const err = error as Error & { name?: string; message?: string };
+      if (err.name === "InvalidPasswordException") {
+        return rejectWithValue("Password does not meet policy requirements");
+      }
+      return rejectWithValue(err.message || "Failed to set new password");
     }
   }
 );
@@ -347,6 +385,13 @@ const authSlice = createSlice({
           state.pendingUsername = action.payload.email || null;
           state.authStep = "CONFIRM_SIGN_UP";
           state.isLoggedIn = false;
+        } else if (
+          "requiresNewPassword" in action.payload &&
+          action.payload.requiresNewPassword
+        ) {
+          state.pendingUsername = action.payload.email || null;
+          state.authStep = "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED";
+          state.isLoggedIn = false;
         } else if ("accessToken" in action.payload) {
           state.isLoggedIn = true;
           state.accessToken = action.payload.accessToken ?? null;
@@ -359,6 +404,26 @@ const authSlice = createSlice({
         }
       })
       .addCase(login.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+
+      // Confirm new password challenge cases
+      .addCase(confirmNewPassword.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(confirmNewPassword.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isLoggedIn = true;
+        state.accessToken = action.payload.accessToken;
+        state.idToken = action.payload.idToken;
+        state.accessTokenExpiresAt = action.payload.expiresAt;
+        state.cognitoUser = action.payload.cognitoUser;
+        state.pendingUsername = null;
+        state.authStep = "DONE";
+      })
+      .addCase(confirmNewPassword.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       })
